@@ -1,0 +1,9 @@
+/*@import url('https://rsms.me/inter/inter.css');*/
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+body {
+  font-size: 16px;
+}
+
