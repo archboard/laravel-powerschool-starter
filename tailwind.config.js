@@ -2,6 +2,7 @@ const colors = require('tailwindcss/colors')
 const defaultTheme = require('tailwindcss/defaultTheme')
 
 module.exports = {
+  mode: 'jit',
   purge: [
     'resources/js/**/*.vue',
     'resources/views/**/*.blade.php',
@@ -19,7 +20,7 @@ module.exports = {
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
-      primary: colors.cyan,
+      primary: {}, // hard code from the actual color set you want
       black: colors.black,
       white: colors.white,
       gray: colors.trueGray,
