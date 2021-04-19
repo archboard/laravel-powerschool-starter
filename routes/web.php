@@ -44,7 +44,7 @@ Route::middleware('tenant')->group(function () {
         Route::get('/csrf-token', \App\Http\Controllers\RefreshCsrfTokenController::class)
             ->name('csrf-token');
 
-        Route::get('/home', function () {
+        Route::get('/', function () {
             return inertia('Index');
         });
 
