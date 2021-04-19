@@ -15,7 +15,7 @@ const host = process.env.APP_URL
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
+mix.dump().js('resources/js/app.js', 'public/js')
   .vue({ version: 3 })
   .disableSuccessNotifications()
   .version()
@@ -31,8 +31,8 @@ mix.js('resources/js/app.js', 'public/js')
   .options({
     hmrOptions: {
       host: host,
-      port: '8080'
+      port: '8080',
+      https: true,
     },
-    https: true,
     autoprefixer: { remove: false }
   })
