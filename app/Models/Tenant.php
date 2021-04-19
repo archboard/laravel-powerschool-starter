@@ -26,7 +26,7 @@ class Tenant extends TenantBase
     {
         static::created(function (Tenant $tenant) {
             // Seed the roles and abilities for this tenant scope
-            BouncerFacade::scope()->to($tenant->id);
+            // BouncerFacade::scope()->to($tenant->id);
             BouncerFacade::allow(User::DISTRICT_ADMIN)->everything();
 
             // Additional seeding as the project needs
