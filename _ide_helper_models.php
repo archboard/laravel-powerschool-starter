@@ -46,10 +46,10 @@ namespace App\Models{
  * @property int $id
  * @property int $tenant_id
  * @property int $sis_id
- * @property int $school_number
+ * @property int|null $school_number
  * @property string $name
- * @property int $high_grade
- * @property int $low_grade
+ * @property int|null $high_grade
+ * @property int|null $low_grade
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Course[] $courses
@@ -202,18 +202,19 @@ namespace App\Models{
  * @mixin IdeHelperUser
  * @property int $id
  * @property int $tenant_id
+ * @property int|null $sis_id
  * @property string|null $first_name
  * @property string|null $last_name
  * @property string $email
  * @property string|null $password
  * @property int|null $school_id
+ * @property string|null $timezone
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $timezone
- * @property int|null $sis_id
  * @property-read \Illuminate\Database\Eloquent\Collection|\Silber\Bouncer\Database\Ability[] $abilities
  * @property-read int|null $abilities_count
+ * @property-read array $school_permissions
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Silber\Bouncer\Database\Role[] $roles
