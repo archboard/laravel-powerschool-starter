@@ -1,18 +1,20 @@
 import axios from 'axios'
 import get from 'lodash/get'
 import store from '@/stores/notifications'
+import flashesNotifications from '@/plugins/flashesNotifications'
+import { Inertia } from '@inertiajs/inertia'
 
 const flashMessage = response => {
   const flash = get(response, 'data.props.flash')
+  const level = get(response, 'data.level')
+  const message = get(response, 'data.message')
 
-  if (flash) {
-    Object.keys(flash).forEach(level => {
-      const text = flash[level]
+  flashesNotifications(flash)
 
-      if (text) {
-        console.log(`${level}: ${flash[level]}`)
-        store.addNotification({ level, text }, 4000)
-      }
+  if (level && message) {
+    store.addNotification({
+      level,
+      text: message,
     })
   }
 }
@@ -37,6 +39,11 @@ axios.interceptors.response.use(response => {
       level: 'error',
       text: get(err, 'response.data.message', err.message),
     })
+  }
+
+  if (status === 401) {
+    Inertia.get('/login')
+    return
   }
 
   return Promise.reject(err)

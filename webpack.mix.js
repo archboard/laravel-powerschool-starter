@@ -15,7 +15,7 @@ const host = process.env.APP_URL
  |
  */
 
-mix.dump().js('resources/js/app.js', 'public/js')
+mix.js('resources/js/app.js', 'public/js')
   .vue({ version: 3 })
   .disableSuccessNotifications()
   .version()

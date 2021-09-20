@@ -1,28 +1,30 @@
 import { createApp, h } from 'vue'
-import { App } from '@inertiajs/inertia-vue3'
+import { createInertiaApp } from '@inertiajs/inertia-vue3'
 import plugins from '@/plugins'
 import components from '@/components'
+import get from 'lodash/get'
+import flashesNotifications from '@/plugins/flashesNotifications'
 import './bootstrap'
 
-const el = document.getElementById('app')
-const initialPage = JSON.parse(el.dataset.page)
-el.removeAttribute('data-page')
+createInertiaApp({
+  title: title => title ? `${title} | ${process.env.APP_NAME}` : process.env.APP_NAME,
+  resolve: name => import(`./pages/${name}`),
+  setup({ el, App, props, plugin }) {
+    const app = createApp({ render: () => h(App, props) })
+      .use(plugin)
 
-// Create the application instance
-const app = createApp({
-  render: () => h(App, {
-    initialPage,
-    resolveComponent: name => import(`./pages/${name}`).then(module => module.default),
-  })
+    // Register all the plugins
+    plugins.forEach(app.use)
+
+    // Register global components
+    Object.keys(components).forEach(componentName => {
+      app.component(componentName, components[componentName])
+    })
+
+    // Mount the app
+    app.mount(el)
+
+    el.removeAttribute('data-page')
+    flashesNotifications(get(props, 'initialPage.props.flash'))
+  },
 })
-
-// Register all the plugins
-plugins.forEach(app.use)
-
-// Register global components
-Object.keys(components).forEach(componentName => {
-  app.component(componentName, components[componentName])
-})
-
-// Mount the app
-app.mount(el)
