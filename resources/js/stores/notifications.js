@@ -7,7 +7,6 @@ export default {
     timeouts: {}
   }),
 
-
   addNotification (notification, delay = 4000) {
     const id = `id_${nanoid()}`
 
