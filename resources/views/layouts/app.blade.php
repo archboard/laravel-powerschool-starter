@@ -23,8 +23,7 @@
       window.changeTheme(localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches))
     </script>
 
-    <link href="{{ mix('/css/app.css') }}" rel="stylesheet" />
-    <script src="{{ mix('/js/app.js') }}" defer></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
   </head>
   <body class="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900">
     @inertia
