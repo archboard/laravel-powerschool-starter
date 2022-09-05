@@ -1,3 +1,3 @@
 <template>
-  <span class="text-red-500 ml-0.5">*</span>
+  <span class="text-red-600">*</span>
 </template>

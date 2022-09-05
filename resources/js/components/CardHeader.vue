@@ -1,5 +1,5 @@
 <template>
-  <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+  <h3 class="font-bold pt-1.5 text-3xl">
     <slot />
   </h3>
 </template>

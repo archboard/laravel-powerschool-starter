@@ -1,4 +1,4 @@
-import store from '@/stores/notifications'
+import store from '@/stores/notifications.js'
 
 export default {
   install (app, config = { delay: 4000 }) {

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import get from 'lodash/get'
+import get from 'just-safe-get'
 import store from '@/stores/notifications'
 import flashesNotifications from '@/plugins/flashesNotifications'
 import { Inertia } from '@inertiajs/inertia'

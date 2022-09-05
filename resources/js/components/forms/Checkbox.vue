@@ -3,13 +3,17 @@
     type="checkbox"
     :value="value"
     v-model="proxyChecked"
-   class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+    @change="$emit('change', proxyChecked)"
+   class="cursor-pointer text-brand-blue focus:ring-brand-blue border-gray-300 rounded"
   >
 </template>
 
 <script>
 export default {
-  emits: ['update:checked'],
+  emits: [
+    'update:checked',
+    'change'
+  ],
 
   props: {
     checked: {

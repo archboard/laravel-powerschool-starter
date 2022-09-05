@@ -4,8 +4,11 @@ import vue from '@vitejs/plugin-vue'
 const path = require('path')
 
 export default ({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), 'APP_')
-  const domain = (new URL(env.APP_URL)).hostname
+  process.env = {
+    ...process.env,
+    ...loadEnv(mode, process.cwd(), 'APP_'),
+  }
+  const domain = (new URL(process.env.APP_URL)).hostname
 
   return defineConfig({
     resolve: {
@@ -31,8 +34,8 @@ export default ({ mode }) => {
     ],
     server: {
       https: {
-        key: env.APP_SSL_KEY,
-        cert: env.APP_SSL_CERT,
+        key: process.env.APP_SSL_KEY,
+        cert: process.env.APP_SSL_CERT,
       },
       domain,
       hmr: {

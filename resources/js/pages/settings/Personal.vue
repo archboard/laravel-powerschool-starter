@@ -35,13 +35,13 @@
 <script>
 import { defineComponent, ref, inject } from 'vue'
 import { useForm } from '@inertiajs/inertia-vue3'
-import Authenticated from '../../layouts/Authenticated'
-import pick from 'lodash/pick'
-import Fieldset from '../../components/forms/Fieldset'
-import InputWrap from '../../components/forms/InputWrap'
-import Label from '../../components/forms/Label'
-import Input from '../../components/forms/Input'
-import Button from '../../components/Button'
+import Authenticated from '@/layouts/Authenticated.vue'
+import pick from 'just-pick'
+import Fieldset from '@/components/forms/Fieldset.vue'
+import InputWrap from '@/components/forms/InputWrap.vue'
+import Label from '@/components/forms/Label'
+import Input from '@/components/forms/Input'
+import Button from '@/components/Button'
 
 export default defineComponent({
   components: {

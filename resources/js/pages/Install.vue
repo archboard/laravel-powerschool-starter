@@ -8,45 +8,41 @@
           </CardHeader>
         </CardPadding>
         <CardPadding>
-          <form @submit.prevent="form.post($route('install'))">
-            <Fieldset>
-              <InputWrap :error="form.errors.license">
-                <Label for="license">{{ __('Product License') }}</Label>
-                <Input v-model="form.license" type="text" id="license" required />
-              </InputWrap>
-              <InputWrap :error="form.errors.name">
-                <Label for="name">{{ __('District Name') }}</Label>
-                <Input v-model="form.name" type="text" id="name" required />
-              </InputWrap>
-              <InputWrap :error="form.errors.domain">
-                <Label for="domain">{{ __('Domain') }}</Label>
-                <Input v-model="form.domain" type="text" id="domain" required />
-              </InputWrap>
-              <InputWrap :error="form.errors.ps_url">
-                <Label for="ps_url">{{ __('PowerSchool URL') }}</Label>
-                <Input v-model="form.ps_url" type="url" id="ps_url" required />
-              </InputWrap>
-              <InputWrap :error="form.errors.ps_client_id">
-                <Label for="ps_client_id">{{ __('PowerSchool Client ID') }}</Label>
-                <Input v-model="form.ps_client_id" type="text" id="ps_client_id" required />
-              </InputWrap>
-              <InputWrap :error="form.errors.ps_secret">
-                <Label for="ps_secret">{{ __('PowerSchool Client Secret') }}</Label>
-                <Input v-model="form.ps_secret" type="text" id="ps_secret" required />
-              </InputWrap>
-              <InputWrap :error="form.errors.email">
-                <Label for="email">{{ __('PowerSchool Admin Email') }}</Label>
-                <Input v-model="form.email" type="email" id="email" required />
-                <div class="pl-1 pt-1">
-                  <HelpText>{{ __('This must match the email address of your user account in PowerSchool. This is so your account can manage the district.') }}</HelpText>
-                </div>
-              </InputWrap>
-            </Fieldset>
+          <form @submit.prevent="form.post('/install')">
+            <AppFieldset>
+              <FormField v-model="form.license" :error="form.errors.license" required>
+                {{ __('Product License') }}
+              </FormField>
+              <FormField v-model="form.name" :error="form.errors.name" required>
+                {{ __('District Name') }}
+              </FormField>
+              <FormField v-model="form.domain" :error="form.errors.domain" required>
+                {{ __('Domain') }}
+              </FormField>
+              <FormField v-model="form.ps_url" :error="form.errors.ps_url" required>
+                {{ __('PowerSchool URL') }}
+              </FormField>
+              <FormField v-model="form.ps_client_id" :error="form.errors.ps_client_id" required>
+                {{ __('PowerSchool Client ID') }}
+              </FormField>
+              <FormField v-model="form.ps_secret" :error="form.errors.ps_secret" required>
+                {{ __('PowerSchool Client Secret') }}
+              </FormField>
+              <FormField
+                v-model="form.email"
+                :error="form.errors.email"
+                type="email"
+                :help="__('This must match the email address of your user account in PowerSchool. This is so your account can manage the district.')"
+                required
+              >
+                {{ __('PowerSchool Admin Email') }}
+              </FormField>
+            </AppFieldset>
 
             <div class="mt-6">
-              <Button type="submit" :loading="form.processing" :is-block="true">
+              <AppButton type="submit" :loading="form.processing" :is-block="true">
                 {{ __('Install') }}
-              </Button>
+              </AppButton>
             </div>
           </form>
         </CardPadding>
@@ -58,24 +54,18 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import { useForm } from '@inertiajs/inertia-vue3'
-import CardWrapper from '../components/CardWrapper'
-import CardPadding from '../components/CardPadding'
-import CardHeader from '../components/CardHeader'
-import Fieldset from '../components/forms/Fieldset'
-import Button from '../components/Button'
-import Label from '../components/forms/Label'
-import Input from '../components/forms/Input'
-import HelpText from '../components/HelpText'
-import InputWrap from '../components/forms/InputWrap'
+import CardWrapper from '@/components/CardWrapper.vue'
+import CardPadding from '@/components/CardPadding.vue'
+import CardHeader from '@/components/CardHeader.vue'
+import AppFieldset from '@/components/forms/AppFieldset.vue'
+import AppButton from '@/components/AppButton.vue'
+import FormField from '@/components/forms/FormField.vue'
 
 export default defineComponent({
   components: {
-    InputWrap,
-    HelpText,
-    Input,
-    Label,
-    Button,
-    Fieldset,
+    FormField,
+    AppButton,
+    AppFieldset,
     CardHeader,
     CardPadding,
     CardWrapper

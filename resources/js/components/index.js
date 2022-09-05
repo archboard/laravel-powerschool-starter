@@ -1,17 +1,26 @@
-import Input from '@/components/forms/Input'
-import Button from '@/components/Button'
-import Table from '@/components/tables/Table'
-import Thead from '@/components/tables/Thead'
-import Tbody from '@/components/tables/Tbody'
-import Th from '@/components/tables/Th'
-import Td from '@/components/tables/Td'
+// This file has global components that are registered in app.js
+import AppButton from './AppButton.vue'
+import AppLabel from './forms/AppLabel.vue'
+import AppInput from './forms/AppInput.vue'
+import AppTextarea from './forms/AppTextarea.vue'
+import AppSelect from './forms/AppSelect.vue'
+import AppCheckbox from './forms/AppCheckbox.vue'
+import CardWrapper from './CardWrapper.vue'
+import CardPadding from './CardPadding.vue'
+import CardHeader from './CardHeader.vue'
+import FormField from './forms/FormField.vue'
+import { Link } from '@inertiajs/inertia-vue3'
 
 export default {
-  'app-input': Input,
-  'app-button': Button,
-  'app-table': Table,
-  'app-thead': Thead,
-  'app-tbody': Tbody,
-  'app-th': Th,
-  'app-td': Td,
+  FormField,
+  AppButton,
+  AppLabel,
+  AppInput,
+  AppTextarea,
+  AppSelect,
+  AppCheckbox,
+  CardWrapper,
+  CardPadding,
+  CardHeader,
+  'InertiaLink': Link,
 }

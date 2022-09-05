@@ -1,5 +1,5 @@
 <template>
-  <span class="ml-2 text-gray-600 dark:text-gray-300">
+  <span class="text-black cursor-pointer text-sm">
     <slot />
   </span>
 </template>
