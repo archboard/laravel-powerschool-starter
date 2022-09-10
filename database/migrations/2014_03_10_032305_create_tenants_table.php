@@ -16,7 +16,7 @@ class CreateTenantsTable extends Migration
             $table->dateTime('subscription_started_at')->nullable();
             $table->dateTime('subscription_expires_at')->nullable();
             $table->string('license');
-            $table->string('sis_provider')->default(\App\Enums\Sis::PS);
+            $table->string('sis_provider')->default(\App\Enums\Sis::PS->value);
             $table->timestamps();
         });
     }
