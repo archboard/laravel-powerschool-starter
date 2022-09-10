@@ -8,6 +8,7 @@ use App\Models\Student;
 use App\Models\Tenant;
 use App\Models\User;
 use GrantHolle\PowerSchool\Api\RequestBuilder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -20,9 +21,9 @@ class PowerSchoolProvider implements SisProvider
     {
         $this->tenant = $tenant;
         $this->builder = new RequestBuilder(
-            $tenant->ps_url,
-            $tenant->ps_client_id,
-            $tenant->ps_secret
+            Arr::get($tenant->sis_config, 'url'),
+            Arr::get($tenant->sis_config, 'client_id'),
+            Arr::get($tenant->sis_config, 'client_secret')
         );
     }
 
