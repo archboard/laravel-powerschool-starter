@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Sis;
 use App\SisProviders\SisProvider;
 use GrantHolle\Http\Resources\Traits\HasResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +20,8 @@ class Tenant extends TenantBase
 
     protected $guarded = [];
     protected $casts = [
+        'sis_provider' => Sis::class,
+        'sis_config' => 'json',
         'allow_password_auth' => 'boolean',
     ];
 
@@ -55,7 +58,8 @@ class Tenant extends TenantBase
 
     public function sisProvider(): SisProvider
     {
-        return new $this->sis_provider($this);
+        return new $this->sis_provider
+            ?->getProvider($this);
     }
 
     public function getSchoolFromSisId($sisId): School
