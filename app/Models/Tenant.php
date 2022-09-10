@@ -36,6 +36,11 @@ class Tenant extends TenantBase
         });
     }
 
+    public function domains(): HasMany
+    {
+        return $this->hasMany(Domain::class);
+    }
+
     public function schools(): HasMany
     {
         return $this->hasMany(School::class);
