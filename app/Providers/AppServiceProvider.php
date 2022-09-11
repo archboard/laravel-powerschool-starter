@@ -35,12 +35,7 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(TelescopeServiceProvider::class);
         }
 
-        $currentTenant = function (): Tenant {
-            /** @var Tenant $current */
-            $current = Tenant::current();
-
-            return $current ?? new Tenant();
-        };
+        $currentTenant = fn (): Tenant => Tenant::current() ?? new Tenant();
 
         $currentSchool = function (): School {
             /** @var User $user */
