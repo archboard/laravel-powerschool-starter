@@ -61,10 +61,9 @@ class Tenant extends TenantBase
         return $this->hasMany(Section::class);
     }
 
-    public function sisProvider(): SisProvider
+    public function getSisProvider(): SisProvider
     {
-        return new $this->sis_provider
-            ?->getProvider($this);
+        return $this->sis_provider?->getProvider($this);
     }
 
     public function getSchoolFromSisId($sisId): School
@@ -74,7 +73,9 @@ class Tenant extends TenantBase
         }
 
         /** @var School $school */
-        $school = $this->schools()->where('sis_id', $sisId)->firstOrFail();
+        $school = $this->schools()
+            ->where('sis_id', $sisId)
+            ->firstOrFail();
         return $school;
     }
 
@@ -82,9 +83,7 @@ class Tenant extends TenantBase
     {
         return [
             'name' => $this->name,
-            'ps_url' => $this->ps_url,
-            'ps_client_id' => $this->ps_client_id,
-            'ps_secret' => $this->ps_secret,
+            //
             'allow_password_auth' => $this->allow_password_auth,
         ];
     }

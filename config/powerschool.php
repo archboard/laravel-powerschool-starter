@@ -26,4 +26,6 @@ return [
     'client_id' => env('POWERSCHOOL_CLIENT_ID'),
 
     'client_secret' => env('POWERSCHOOL_CLIENT_SECRET'),
+
+    'debug_with_ray' => env('POWERSCHOOL_DEBUG', false),
 ];
