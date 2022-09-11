@@ -18,6 +18,7 @@
     "guzzlehttp/guzzle": "^7.0.1",
     "inertiajs/inertia-laravel": "^0.6.0",
     "jamesmills/laravel-timezone": "^1.11",
+    "laravel/fortify": "^1.13",
     "laravel/framework": "^9.0",
     "laravel/tinker": "^2.5",
     "silber/bouncer": "1.0",

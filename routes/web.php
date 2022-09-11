@@ -38,17 +38,9 @@ Route::middleware('tenant')->group(function () {
             Route::get('/oidc', [\App\Http\Controllers\Auth\PowerSchoolOidcLoginController::class, 'login']);
         });
 
-    // Normal auth
-    Route::middleware('allows_pw_auth')->group(function () {
-        require __DIR__.'/auth.php';
-    });
-
     Route::middleware('auth')->group(function () {
         Route::get('/ping', \App\Http\Controllers\CheckAuthStatusController::class)
             ->name('auth.status');
-
-        Route::get('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])
-            ->name('logout');
 
         Route::get('/csrf-token', \App\Http\Controllers\RefreshCsrfTokenController::class)
             ->name('csrf-token');
