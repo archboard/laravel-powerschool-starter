@@ -1,11 +1,16 @@
 import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/inertia-vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
+import { InertiaProgress } from '@inertiajs/progress'
 import * as plugins from '@/plugins'
 import components from '@/components'
 import get from 'just-safe-get'
 import flashesNotifications from '@/plugins/flashesNotifications.js'
 import './bootstrap'
+
+InertiaProgress.init({
+  color: '#d946ef',
+})
 
 createInertiaApp({
   title: title => title ? `${title} | ${process.env.APP_NAME}` : process.env.APP_NAME,
