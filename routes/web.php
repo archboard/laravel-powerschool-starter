@@ -28,9 +28,15 @@ Route::middleware('self_hosted')->group(function () {
 
 Route::middleware('tenant')->group(function () {
     // PowerSchool auth
-    Route::get('/auth/powerschool/openid', [\App\Http\Controllers\Auth\PowerSchoolOpenIdLoginController::class, 'authenticate']);
-    Route::get('/auth/powerschool/openid/verify', [\App\Http\Controllers\Auth\PowerSchoolOpenIdLoginController::class, 'login'])
-        ->name('openid.verify');
+    Route::middleware(['sis_configured'])
+        ->prefix('/auth/powerschool')
+        ->group(function () {
+            Route::get('/openid', [\App\Http\Controllers\Auth\PowerSchoolOpenIdLoginController::class, 'authenticate']);
+            Route::get('/openid/verify', [\App\Http\Controllers\Auth\PowerSchoolOpenIdLoginController::class, 'login'])
+                ->name('openid.verify');
+            Route::get('/oidc/authenticate', [\App\Http\Controllers\Auth\PowerSchoolOidcLoginController::class, 'authenticate']);
+            Route::get('/oidc', [\App\Http\Controllers\Auth\PowerSchoolOidcLoginController::class, 'login']);
+        });
 
     // Normal auth
     Route::middleware('allows_pw_auth')->group(function () {

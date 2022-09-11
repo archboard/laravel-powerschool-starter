@@ -13,6 +13,11 @@ class PowerSchoolOpenIdLoginController extends Controller
 {
     use AuthenticatesUsingPowerSchoolWithOpenId;
 
+    protected function getRedirectToRoute(string $userType): string
+    {
+        return '/';
+    }
+
     /**
      * The user has been authenticated.
      *
