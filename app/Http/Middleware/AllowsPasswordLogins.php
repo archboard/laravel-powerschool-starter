@@ -17,7 +17,7 @@ class AllowsPasswordLogins
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Tenant::current()->allows_pw_auth) {
+        if (Tenant::current()->allow_password_auth) {
             return $next($request);
         }
 
