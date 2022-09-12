@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Sis;
 use App\SisProviders\SisProvider;
 use GrantHolle\Http\Resources\Traits\HasResource;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Silber\Bouncer\BouncerFacade;
@@ -34,6 +35,11 @@ class Tenant extends TenantBase
 
             // Additional seeding as the project needs
         });
+    }
+
+    public function domain(): Attribute
+    {
+        return Attribute::get(fn () => request()->host());
     }
 
     public function domains(): HasMany
