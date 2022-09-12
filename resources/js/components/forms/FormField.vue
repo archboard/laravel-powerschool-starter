@@ -42,6 +42,9 @@ import FieldError from './FieldError.vue'
 import Req from './Req.vue'
 import HelpText from '@/components/forms/HelpText.vue'
 import AppDatepicker from '@/components/forms/AppDatepicker.vue'
+import AppLabel from '@/components/forms/AppLabel.vue'
+import AppInput from '@/components/forms/AppInput.vue'
+import AppSelect from '@/components/forms/AppSelect.vue'
 
 export default defineComponent({
   mixins: [ModelValue],
@@ -51,6 +54,9 @@ export default defineComponent({
     Req,
     FieldError,
     ExclamationCircleIcon,
+    AppLabel,
+    AppInput,
+    AppSelect,
   },
 
   props: {

@@ -1,29 +1,28 @@
 <template>
   <Layout>
     <form @submit.prevent="submit">
-      <Fieldset>
-        <InputWrap :error="form.errors.email">
-          <Label for="email" class="text-base">{{ __('Email') }}</Label>
-          <Input id="email" type="email" class="text-lg" v-model="form.email" required autofocus autocomplete="username" />
-        </InputWrap>
+      <AppFieldset>
+        <FormField type="email" :error="form.errors.email">
+          {{ __('Email') }}
+        </FormField>
 
-        <InputWrap>
-          <Label for="password" class="text-base">{{ __('Password') }}</Label>
-          <Input id="password" type="password" class="text-lg" v-model="form.password" required autocomplete="current-password" />
-        </InputWrap>
+        <FormField type="password" :error="form.errors.password">
+          {{ __('Password') }}
+        </FormField>
 
-        <InputWrap>
-          <label class="flex items-center">
-            <Checkbox name="remember" v-model:checked="form.remember" />
-            <CheckboxText>{{ __('Remember me') }}</CheckboxText>
-          </label>
-        </InputWrap>
-      </Fieldset>
+        <FormField>
+          <template #component>
+            <AppCheckbox v-model="form.remember">
+              {{ __('Remember me') }}
+            </AppCheckbox>
+          </template>
+        </FormField>
+      </AppFieldset>
 
       <div class="my-4">
-        <Button :loading="form.processing" :is-block="true" size="lg">
+        <AppButton :loading="form.processing" size="lg">
           {{ __('Log in') }}
-        </Button>
+        </AppButton>
       </div>
 
       <p>
@@ -35,58 +34,28 @@
   </Layout>
 </template>
 
-<script>
-import Layout from '@/layouts/Guest'
-import Fieldset from '@/components/forms/Fieldset'
-import InputWrap from '@/components/forms/InputWrap'
-import Label from '@/components/forms/Label'
-import Input from '@/components/forms/Input'
-import Checkbox from '@/components/forms/Checkbox'
-import Button from '@/components/Button'
-import ValidationErrors from '@/components/ValidationErrors'
-import Alert from '../../components/Alert'
-import CheckboxText from '../../components/forms/CheckboxText'
+<script setup>
+import Layout from '@/layouts/Guest.vue'
+import { useForm } from '@inertiajs/inertia-vue3'
+import AppFieldset from '@/components/forms/AppFieldset.vue'
+import FormField from '@/components/forms/FormField.vue'
+import AppCheckbox from '@/components/forms/AppCheckbox.vue'
+import AppButton from '@/components/AppButton.vue'
 
-export default {
-  components: {
-    CheckboxText,
-    Alert,
-    Layout,
-    ValidationErrors,
-    Button,
-    Checkbox,
-    Input,
-    Label,
-    InputWrap,
-    Fieldset,
-  },
-
-  props: {
-    canResetPassword: Boolean,
-    status: String
-  },
-
-  data() {
-    return {
-      form: this.$inertia.form({
-        email: '',
-        password: '',
-        remember: false
-      })
+const props = defineProps({
+  canResetPassword: Boolean,
+  status: String
+})
+const form = useForm({
+  email: '',
+  password: '',
+  remember: false
+})
+const submit = () => {
+  form.post('/login', {
+    onError: () => {
+      form.reset('password')
     }
-  },
-
-  methods: {
-    submit() {
-      this.form
-        .transform(data => ({
-          ...data,
-          remember: this.form.remember ? 'on' : ''
-        }))
-        .post(this.$route('login'), {
-          onFinish: () => this.form.reset('password'),
-        })
-    }
-  }
+  })
 }
 </script>
