@@ -4,7 +4,7 @@
       <div class="flex items-start">
         <div class="flex-shrink-0">
           <!-- Notification icon -->
-          <svg class="h-6 w-6" :class="color" v-html="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"></svg>
+          <component :is="icon" class="h-6 w-6" :class="color"></component>
         </div>
         <div class="ml-3 w-0 flex-1 pt-0.5">
           <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -29,6 +29,7 @@
 <script>
 import { defineComponent } from 'vue'
 import store from '@/stores/notifications'
+import { CheckCircleIcon, InformationCircleIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline/index.js'
 
 export default defineComponent({
   props: {
@@ -52,10 +53,10 @@ export default defineComponent({
       neutral: 'Hey!',
     }
     const icons = {
-      success: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`,
-      error: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`,
-      warning: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`,
-      neutral: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>`
+      success: CheckCircleIcon,
+      error: ExclamationCircleIcon,
+      warning: ExclamationCircleIcon,
+      neutral: InformationCircleIcon,
     }
 
     return {

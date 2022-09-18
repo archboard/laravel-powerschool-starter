@@ -3,55 +3,55 @@
     <h1 class="font-bold text-2xl leading-5 mb-8">Laravel Inertia Starter</h1>
     <p class="text-lg mb-4">A Laravel starter with Inertia and some components to get you started.</p>
 
-    <inertia-link :href="$route('settings.personal')">Settings</inertia-link>
+    <AppLink href="/settings">Settings</AppLink>
 
     <h2 class="text-xl font-bold mb-2">Notifications</h2>
     <div class="space-y-2">
       <div>
-        <app-button @click="notify('This is a success!', 'success')" color="green">Success</app-button>
+        <AppButton @click="notify('This is a success!', 'success')" color="green">Success</AppButton>
       </div>
       <div>
-        <app-button @click.prevent="notify('This is an error!', 'error')" color="red">Error</app-button>
+        <AppButton @click.prevent="notify('This is an error!', 'error')" color="red">Error</AppButton>
       </div>
       <div>
-        <app-button @click.prevent="notify('This is a warning!', 'warning')" color="yellow">Warning</app-button>
+        <AppButton @click.prevent="notify('This is a warning!', 'warning')" color="yellow">Warning</AppButton>
       </div>
       <div>
-        <app-button @click.prevent="notify('This is neutral!')" color="neutral">Neutral</app-button>
+        <AppButton @click.prevent="notify('This is neutral!')" color="neutral">Neutral</AppButton>
       </div>
     </div>
 
     <h2 class="text-xl font-bold mb-2 mt-10">Alerts</h2>
 
     <div class="space-y-4">
-      <Alert>My neutral alert.</Alert>
-      <Alert level="success">My success alert.</Alert>
-      <Alert level="warning">My warning alert.</Alert>
-      <Alert level="error">My error alert.</Alert>
+      <SimpleAlert>My neutral alert.</SimpleAlert>
+      <SimpleAlert level="success">My success alert.</SimpleAlert>
+      <SimpleAlert level="warning">My warning alert.</SimpleAlert>
+      <SimpleAlert level="error">My error alert.</SimpleAlert>
     </div>
 
     <h2 class="text-xl font-bold mb-2 mt-10">Modal</h2>
 
     <div class="space-y-2">
       <div>
-        <app-button @click.prevent="showModal = true">Launch Modal</app-button>
+        <AppButton @click.prevent="showModal = true">Launch Modal</AppButton>
       </div>
       <div>
-        <confirm-button @confirm="confirmed" color="red">
+        <ConfirmButton @confirm="confirmed" color="red">
           Delete?
 
           <template v-slot:actionText>
             I'm not scared
           </template>
-        </confirm-button>
+        </ConfirmButton>
       </div>
       <div>
-        <app-button @click.prevent="showDoubleModal = true" color="white">Modal + Confirm Modal</app-button>
+        <AppButton @click.prevent="showDoubleModal = true" color="white">Modal + Confirm Modal</AppButton>
       </div>
     </div>
 
 
-    <modal
+    <Modal
       v-if="showModal"
       @close="showModal = false"
       @action="modalAction"
@@ -63,7 +63,7 @@
       <p class="text-sm text-gray-500">
         This is some default text in the modal, but you could put anything in here like forms or something else.
       </p>
-    </modal>
+    </Modal>
 
     <modal
       v-if="showDoubleModal"
@@ -79,12 +79,9 @@
       </p>
 
       <template v-slot:actions>
-        <confirm-button @confirm="nestedConfirm" type="button" class="sm:ml-1">
-          Launch Confirm Modal
-        </confirm-button>
-        <app-button @click.prevent="() => $refs.doubleModal.close()" type="button" color="white">
+        <AppButton @click.prevent="() => $refs.doubleModal.close()" type="button" color="white">
           Cancel
-        </app-button>
+        </AppButton>
       </template>
     </modal>
 
@@ -94,17 +91,21 @@
 
 <script>
 import { defineComponent } from 'vue'
-import Notifications from '@/components/Notifications'
-import Alert from '@/components/Alert'
-import Modal from '@/components/Modal'
-import ConfirmButton from '@/components/ConfirmButton'
-import authCheck from '../mixins/AuthCheck'
+import Notifications from '@/components/Notifications.vue'
+import authCheck from '@/mixins/AuthCheck'
+import AppButton from '@/components/AppButton.vue'
+import Modal from '@/components/modals/Modal.vue'
+import AppLink from '@/components/AppLink.vue'
+import SimpleAlert from '@/components/alerts/SimpleAlert.vue'
+import ConfirmButton from '@/components/ConfirmButton.vue'
 
 export default defineComponent({
   components: {
     ConfirmButton,
+    SimpleAlert,
+    AppLink,
     Modal,
-    Alert,
+    AppButton,
     Notifications,
   },
 

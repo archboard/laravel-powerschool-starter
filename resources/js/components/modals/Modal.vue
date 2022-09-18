@@ -42,10 +42,11 @@ import ModalHeadline from '@/components/modals/ModalHeadline.vue'
 import ModalWrapper from '@/components/modals/ModalWrapper.vue'
 import DropIn from '@/components/transitions/DropIn.vue'
 import { useModal } from 'momentum-modal'
-import { trans } from 'laravel-vue-i18n'
+import AppButton from '@/components/AppButton.vue'
 
 export default defineComponent({
   components: {
+    AppButton,
     DropIn,
     ModalWrapper,
     ModalHeadline,

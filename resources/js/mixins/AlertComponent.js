@@ -1,8 +1,10 @@
+import { CheckCircleIcon, InformationCircleIcon, ExclamationCircleIcon } from '@heroicons/vue/24/solid/index.js'
+
 const icons = {
-  success: 'checkmark-circle',
-  neutral: 'information-circle',
-  warning: 'alert-circle',
-  error: 'alert-circle',
+  success: CheckCircleIcon,
+  neutral: InformationCircleIcon,
+  warning: ExclamationCircleIcon,
+  error: ExclamationCircleIcon,
 }
 
 export default {
