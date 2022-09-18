@@ -31,6 +31,9 @@ module.exports = {
           800: '#86198f',
           900: '#701a75',
         },
+        gray: {
+          ...colors.zinc,
+        }
       }
     },
   },

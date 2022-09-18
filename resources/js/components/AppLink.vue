@@ -21,7 +21,7 @@ export default defineComponent({
 
   setup (props) {
     const colorClasses = {
-      primary: 'text-brand-primary hover:underline',
+      primary: 'text-primary-500 dark:text-primary-300 hover:underline',
     }
 
     return {

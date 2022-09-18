@@ -1,5 +1,5 @@
 <template>
-  <span class="text-black cursor-pointer text-sm">
+  <span class="cursor-pointer text-sm">
     <slot />
   </span>
 </template>
