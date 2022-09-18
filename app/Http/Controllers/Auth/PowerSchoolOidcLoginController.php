@@ -33,7 +33,8 @@ class PowerSchoolOidcLoginController extends Controller
         return '/';
     }
 
-    protected function authenticated(Request $request, Authenticatable $user, Collection $data): mixed
+    protected function authenticated(Request $request, Authenticatable $user, Collection $data)
     {
+        ray($user, $data);
     }
 }
