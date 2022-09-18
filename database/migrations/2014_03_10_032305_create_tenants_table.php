@@ -13,6 +13,7 @@ class CreateTenantsTable extends Migration
             $table->string('name');
             $table->json('sis_config')->nullable();
             $table->boolean('allow_password_auth')->default(false);
+            $table->boolean('allow_oidc_login')->default(false);
             $table->dateTime('subscription_started_at')->nullable();
             $table->dateTime('subscription_expires_at')->nullable();
             $table->string('license');
