@@ -18,6 +18,8 @@ class TenantResource extends JsonResource
             'domain' => $this->domain,
             'license' => $this->license,
             'subscription_started_at' => $this->subscription_started_at,
+            'allow_oidc_login' => $this->allow_oidc_login,
+            'allow_password_auth' => $this->allow_password_auth,
         ];
     }
 }
