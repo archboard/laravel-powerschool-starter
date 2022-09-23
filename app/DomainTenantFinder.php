@@ -15,10 +15,11 @@ class DomainTenantFinder extends TenantFinder
     /** @noinspection PhpIncompatibleReturnTypeInspection */
     public function findForRequest(Request $request): ?Tenant
     {
+        $host = $request->getHost();
+
         return $this->getTenantModel()::query()
-            ->whereHas('domains', function (Builder $builder) use ($request) {
-                $builder->where('hostname', $request->getHost());
-            })
+            ->where('domain', $host)
+            ->orWhere('custom_domain', $host)
             ->first();
     }
 }

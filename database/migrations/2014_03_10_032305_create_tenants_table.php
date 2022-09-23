@@ -12,6 +12,8 @@ class CreateTenantsTable extends Migration
             $table->id();
             $table->string('name');
             $table->json('sis_config')->nullable();
+            $table->string('domain')->nullable();
+            $table->string('custom_domain')->nullable();
             $table->boolean('allow_password_auth')->default(false);
             $table->boolean('allow_oidc_login')->default(false);
             $table->dateTime('subscription_started_at')->nullable();
