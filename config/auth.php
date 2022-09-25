@@ -46,6 +46,12 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
+        'machine' => [
+            'driver' => 'token',
+            'provider' => 'machine',
+            'hash' => true,
+        ],
     ],
 
     /*
@@ -71,10 +77,10 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+         'machine' => [
+             'driver' => 'database',
+             'table' => 'machine_api_tokens',
+         ],
     ],
 
     /*
