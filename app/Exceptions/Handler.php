@@ -45,7 +45,8 @@ class Handler extends ExceptionHandler
 
         if (
             !app()->environment('local') &&
-            in_array($response->status(), [500, 503, 404, 403])
+            in_array($response->status(), [500, 503, 404, 403]) &&
+            (!$request->wantsJson() || $request->inertia())
         ) {
             $title = __('Error');
 

@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\AllowsPasswordLogins;
+use App\Http\Middleware\Cloud;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\Installed;
 use App\Http\Middleware\SelfHosted;
@@ -78,6 +79,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'self_hosted' => SelfHosted::class,
+        'cloud' => Cloud::class,
         'allows_pw_auth' => AllowsPasswordLogins::class,
         'sis_configured' => SisConfigured::class,
         'uninstalled' => Uninstalled::class,
