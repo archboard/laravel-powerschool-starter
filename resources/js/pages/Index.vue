@@ -45,9 +45,6 @@
           </template>
         </ConfirmButton>
       </div>
-      <div>
-        <AppButton @click.prevent="showDoubleModal = true" color="white">Modal + Confirm Modal</AppButton>
-      </div>
     </div>
 
 
@@ -65,27 +62,7 @@
       </p>
     </Modal>
 
-    <modal
-      v-if="showDoubleModal"
-      @close="showDoubleModal = false"
-      @action="modalAction"
-      :auto-close="false"
-      size="sm"
-      action-text="Got it!"
-      ref="doubleModal"
-    >
-      <p class="text-sm text-gray-500">
-        This modal launches a confirmation modal.
-      </p>
-
-      <template v-slot:actions>
-        <AppButton @click.prevent="() => $refs.doubleModal.close()" type="button" color="white">
-          Cancel
-        </AppButton>
-      </template>
-    </modal>
-
-    <notifications />
+    <Notifications />
   </div>
 </template>
 

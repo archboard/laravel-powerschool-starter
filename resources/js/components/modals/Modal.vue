@@ -35,105 +35,83 @@
   </ModalWrapper>
 </template>
 
-<script>
-import { ref, computed, defineComponent, nextTick, onMounted, onUnmounted } from 'vue'
+<script setup>
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 import ModalHeadline from '@/components/modals/ModalHeadline.vue'
 import ModalWrapper from '@/components/modals/ModalWrapper.vue'
 import DropIn from '@/components/transitions/DropIn.vue'
 import { useModal } from 'momentum-modal'
+import { trans } from 'laravel-vue-i18n'
 import AppButton from '@/components/AppButton.vue'
 
-export default defineComponent({
-  components: {
-    AppButton,
-    DropIn,
-    ModalWrapper,
-    ModalHeadline,
+const props = defineProps({
+  headline: String,
+  actionText: String,
+  actionLoading: {
+    type: Boolean,
+    default: false
   },
-  emits: ['close', 'action'],
-
-  props: {
-    headline: String,
-    actionText: String,
-    actionLoading: {
-      type: Boolean,
-      default: false
-    },
-    actionColor: {
-      type: String,
-      default: 'primary',
-    },
-    autoClose: {
-      type: Boolean,
-      default: () => false
-    },
-    size: {
-      type: String,
-      default: 'lg'
-    }
+  actionColor: {
+    type: String,
+    default: 'primary',
   },
-
-  setup (props, { emit }) {
-    const { show, close, redirect } = useModal()
-    const modal = ref()
-    const performAction = () => {
-      emit('action', close)
-
-      if (this.autoClose) {
-        close()
-      }
-    }
-    const listener = (e) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation()
-        close()
-      }
-    }
-    const computedActionText = computed(() => {
-      return props.actionText || trans('Save')
-    })
-    const modalSize = computed(() => {
-      const modalSizes = {
-        xs: 'sm:max-w-xs',
-        sm: 'sm:max-w-sm',
-        md: 'sm:max-w-md',
-        lg: 'sm:max-w-lg',
-        xl: 'sm:max-w-xl',
-        '2xl': 'sm:max-w-2xl',
-        '3xl': 'sm:max-w-3xl',
-        '4xl': 'sm:max-w-4xl',
-      }
-
-      return modalSizes[props.size]
-    })
-    const localActionText = computed(() => {
-      return props.actionText || 'Confirm'
-    })
-
-    onMounted(() => {
-      show.value = true
-      document.removeEventListener('keydown', listener)
-
-      nextTick(() => {
-        disableBodyScroll(modal.value)
-      })
-    })
-
-    onUnmounted(() => {
-      clearAllBodyScrollLocks()
-      document.addEventListener('keydown', listener)
-    })
-
-    return {
-      show,
-      close,
-      performAction,
-      computedActionText,
-      modalSize,
-      modal,
-      localActionText,
-    }
+  autoClose: {
+    type: Boolean,
+    default: () => false
   },
+  size: {
+    type: String,
+    default: 'lg'
+  }
 })
+const emit = defineEmits(['close', 'action'])
+const { show, close } = useModal()
+const modal = ref()
+const performAction = () => {
+  emit('action', close)
+
+  if (props.autoClose) {
+    close()
+  }
+}
+const listener = (e) => {
+  if (e.key === 'Escape') {
+    e.stopPropagation()
+    close()
+  }
+}
+const computedActionText = computed(() => {
+  return props.actionText || trans('Save')
+})
+const modalSize = computed(() => {
+  const modalSizes = {
+    xs: 'sm:max-w-xs',
+    sm: 'sm:max-w-sm',
+    md: 'sm:max-w-md',
+    lg: 'sm:max-w-lg',
+    xl: 'sm:max-w-xl',
+    '2xl': 'sm:max-w-2xl',
+    '3xl': 'sm:max-w-3xl',
+    '4xl': 'sm:max-w-4xl',
+  }
+
+  return modalSizes[props.size]
+})
+
+onMounted(() => {
+  show.value = true
+  document.removeEventListener('keydown', listener)
+
+  nextTick(() => {
+    disableBodyScroll(modal.value)
+  })
+})
+
+onUnmounted(() => {
+  clearAllBodyScrollLocks()
+  document.addEventListener('keydown', listener)
+})
+
+defineExpose({ close })
 </script>
