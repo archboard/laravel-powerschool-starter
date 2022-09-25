@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-gray-50 dark:bg-gray-700 rounded-br-md rounded-bl-md"
+    class="bg-gray-50 dark:bg-gray-700 rounded-br-2xl rounded-bl-2xl"
     :class="{
       '-mx-4 -mb-5 mt-6 sm:-mx-6': negativeMargin
     }"
@@ -11,20 +11,12 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
-import CardPadding from './CardPadding'
-
-export default defineComponent({
-  components: {
-    CardPadding
-  },
-
-  props: {
-    negativeMargin: {
-      type: Boolean,
-      default: false
-    }
+<script setup>
+import CardPadding from '@/components/CardPadding.vue'
+const props = defineProps({
+  negativeMargin: {
+    type: Boolean,
+    default: false
   }
 })
 </script>

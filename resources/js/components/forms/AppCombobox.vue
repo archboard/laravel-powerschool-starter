@@ -14,7 +14,7 @@
       />
 
       <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
-        <SelectorIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+        <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
       </ComboboxButton>
     </div>
     <transition
@@ -83,7 +83,7 @@ import {
   ComboboxButton,
 } from '@headlessui/vue'
 import { useVModel } from '@vueuse/core'
-import { CheckIcon, SelectorIcon } from '@heroicons/vue/24/solid'
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/24/solid'
 import AppInput from '@/components/forms/AppInput.vue'
 
 const props = defineProps({

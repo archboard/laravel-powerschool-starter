@@ -7,7 +7,7 @@
     <div class="relative">
       <slot name="component" :has-error="!!error" :local-value="localValue" :id="id">
         <component
-          :is="component"
+          :is="components[component]"
           v-model="localValue"
           :has-error="!!error"
           :id="id"
@@ -33,11 +33,9 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
+<script setup>
 import { ExclamationCircleIcon } from '@heroicons/vue/24/solid'
 import { nanoid } from 'nanoid'
-import ModelValue from '@/mixins/ModelValue'
 import FieldError from './FieldError.vue'
 import Req from './Req.vue'
 import HelpText from '@/components/forms/HelpText.vue'
@@ -45,54 +43,50 @@ import AppDatepicker from '@/components/forms/AppDatepicker.vue'
 import AppLabel from '@/components/forms/AppLabel.vue'
 import AppInput from '@/components/forms/AppInput.vue'
 import AppSelect from '@/components/forms/AppSelect.vue'
+import { useVModel } from '@vueuse/core'
 
-export default defineComponent({
-  mixins: [ModelValue],
-  components: {
-    AppDatepicker,
-    HelpText,
-    Req,
-    FieldError,
-    ExclamationCircleIcon,
-    AppLabel,
-    AppInput,
-    AppSelect,
+const components = {
+  AppDatepicker,
+  AppInput,
+  AppSelect,
+}
+
+const props = defineProps({
+  modelValue: [Object, String, Boolean, Number],
+  component: {
+    type: String,
+    default: 'AppInput',
   },
-
-  props: {
-    component: {
-      type: String,
-      default: 'AppInput',
-    },
-    id: {
-      type: String,
-      default: () => nanoid(),
-    },
-    type: {
-      type: String,
-      default: 'text',
-    },
-    error: String,
-    placeholder: {
-      type: [String, Number],
-      default: '',
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
-    disabled: {
-      type: Boolean,
-      default: () => false,
-    },
-    help: {
-      type: String,
-      default: null,
-    },
-    options: {
-      type: Array,
-      default: () => [],
-    }
+  id: {
+    type: String,
+    default: () => nanoid(),
+  },
+  type: {
+    type: String,
+    default: 'text',
+  },
+  error: String,
+  placeholder: {
+    type: [String, Number],
+    default: '',
+  },
+  required: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
+    type: Boolean,
+    default: () => false,
+  },
+  help: {
+    type: String,
+    default: null,
+  },
+  options: {
+    type: Array,
+    default: () => [],
   }
 })
+const emit = defineEmits(['update:modelValue'])
+const localValue = useVModel(props, 'modelValue', emit)
 </script>

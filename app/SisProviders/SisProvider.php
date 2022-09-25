@@ -12,6 +12,8 @@ interface SisProvider
 {
     public function __construct(Tenant $tenant);
 
+    public function configured(): bool;
+
     public function getAllSchools(): Collection;
 
     public function syncSchools(): Collection;

@@ -20,11 +20,12 @@ if (app()->environment('local')) {
 /**
  * Self-hosted only routes
  */
-Route::middleware('self_hosted')->group(function () {
-    Route::get('/install', \App\Http\Controllers\ShowInstallationPageController::class);
-    Route::post('/install', \App\Http\Controllers\CreateTenantController::class)
-        ->name('install');
-});
+Route::middleware(['self_hosted', 'uninstalled'])
+    ->group(function () {
+        Route::get('/install', [\App\Http\Controllers\InstallationController::class, 'index']);
+        Route::post('/install', [\App\Http\Controllers\InstallationController::class, 'store'])
+            ->name('install');
+    });
 
 Route::middleware('tenant')->group(function () {
     // PowerSchool auth

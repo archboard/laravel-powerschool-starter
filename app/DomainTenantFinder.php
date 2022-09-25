@@ -17,9 +17,6 @@ class DomainTenantFinder extends TenantFinder
     {
         $host = $request->getHost();
 
-        return $this->getTenantModel()::query()
-            ->where('domain', $host)
-            ->orWhere('custom_domain', $host)
-            ->first();
+        return $this->getTenantModel()::fromRequest($request);
     }
 }

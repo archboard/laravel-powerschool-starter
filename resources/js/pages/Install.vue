@@ -1,58 +1,33 @@
 <template>
   <div class="textured-bg min-h-screen flex justify-center items-center p-4">
     <div class="max-w-md mx-auto w-full">
-      <CardWrapper>
-        <CardPadding>
-          <CardHeader>
-            {{ __('Installation') }}
-          </CardHeader>
-        </CardPadding>
-        <CardPadding>
-          <form @submit.prevent="form.post('/install')">
-            <AppFieldset>
-              <FormField v-model="form.license" :error="form.errors.license" required>
-                {{ __('Product License') }}
-              </FormField>
-              <FormField v-model="form.name" :error="form.errors.name" required>
-                {{ __('District Name') }}
-              </FormField>
-              <FormField v-model="form.domain" :error="form.errors.domain" required>
-                {{ __('Domain') }}
-              </FormField>
-              <FormField v-model="form.ps_url" :error="form.errors.ps_url" required>
-                {{ __('PowerSchool URL') }}
-              </FormField>
-              <FormField v-model="form.ps_client_id" :error="form.errors.ps_client_id" required>
-                {{ __('PowerSchool Client ID') }}
-              </FormField>
-              <FormField v-model="form.ps_secret" :error="form.errors.ps_secret" required>
-                {{ __('PowerSchool Client Secret') }}
-              </FormField>
-              <FormField
-                v-model="form.email"
-                :error="form.errors.email"
-                type="email"
-                :help="__('This must match the email address of your user account in PowerSchool. This is so your account can manage the district.')"
-                required
-              >
-                {{ __('PowerSchool Admin Email') }}
-              </FormField>
-            </AppFieldset>
-
-            <div class="mt-6">
-              <AppButton type="submit" :loading="form.processing" :is-block="true">
-                {{ __('Install') }}
-              </AppButton>
-            </div>
-          </form>
-        </CardPadding>
-      </CardWrapper>
+      <form @submit.prevent="form.post('/install')">
+        <CardWrapper>
+          <CardPadding>
+            <CardHeader>
+              {{ __('Installation') }}
+            </CardHeader>
+          </CardPadding>
+          <CardPadding>
+            <DynamicFormFields
+              v-model="form"
+              :errors="form.errors"
+              :fields="fields"
+            />
+          </CardPadding>
+          <CardAction>
+            <AppButton type="submit" :loading="form.processing" full>
+              {{ __('Install') }}
+            </AppButton>
+          </CardAction>
+        </CardWrapper>
+      </form>
     </div>
   </div>
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import { useForm } from '@inertiajs/inertia-vue3'
 import CardWrapper from '@/components/CardWrapper.vue'
 import CardPadding from '@/components/CardPadding.vue'
@@ -60,9 +35,14 @@ import CardHeader from '@/components/CardHeader.vue'
 import AppFieldset from '@/components/forms/AppFieldset.vue'
 import AppButton from '@/components/AppButton.vue'
 import FormField from '@/components/forms/FormField.vue'
+import CardAction from '@/components/CardAction.vue'
+import DynamicFormFields from '@/components/forms/fields/DynamicFormFields.vue'
+import clone from 'just-clone'
 
 export default defineComponent({
   components: {
+    DynamicFormFields,
+    CardAction,
     FormField,
     AppButton,
     AppFieldset,
@@ -72,20 +52,15 @@ export default defineComponent({
   },
 
   props: {
-    tenant: Object,
+    form: Object,
     email: String,
-    flash: Object,
+    fields: Array,
   },
 
-  setup ({ tenant, email }) {
+  setup (props) {
     const form = useForm({
-      license: tenant.license || '',
-      name: tenant.name || '',
-      domain: tenant.domain || '',
-      ps_url: tenant.ps_url || '',
-      ps_client_id: tenant.ps_client_id || '',
-      ps_secret: tenant.ps_secret || '',
-      email,
+      ...clone(props.form),
+      email: props.email,
     })
 
     return {

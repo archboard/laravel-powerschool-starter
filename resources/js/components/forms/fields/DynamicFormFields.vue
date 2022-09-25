@@ -1,20 +1,19 @@
 <template>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
     <FadeInGroup>
-      <template v-for="field in fields" :key="field.attribute">
+      <template v-for="field in fields" :key="field.key">
         <div
-          v-if="!simplified || (simplified && !field.hide_for_simple)"
           :class="{
             'md:col-span-2': !field.half,
           }"
         >
           <component
             :is="FormFields[field.component]"
-            v-model="localForm[field.attribute]"
-            :error="errors[errorPrefix + field.attribute]"
+            v-model="localForm[field.key]"
+            :error="errors[errorPrefix + field.key]"
             :options="field.options"
             :label="field.label"
-            :required="field.rules.includes('required')"
+            :required="field.required"
             :disabled="field.disabled"
             :help="field.help"
           />
@@ -46,10 +45,8 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  simplified: {
-    type: Boolean,
-  }
 })
 const emit = defineEmits(['update:modelValue'])
 const localForm = useVModel(props, 'modelValue', emit)
+// const localForm = computed({})
 </script>

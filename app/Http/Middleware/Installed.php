@@ -17,7 +17,7 @@ class Installed
      */
     public function handle(Request $request, Closure $next)
     {
-        if (config('app.cloud') || Tenant::exists()) {
+        if (config('app.cloud') || Tenant::current()?->installed()) {
             return $next($request);
         }
 

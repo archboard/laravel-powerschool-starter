@@ -15,17 +15,17 @@ use Illuminate\Support\Facades\DB;
 
 class PowerSchoolProvider implements SisProvider
 {
-    protected Tenant $tenant;
     protected RequestBuilder $builder;
 
-    public function __construct(Tenant $tenant)
+    public function __construct(protected Tenant $tenant)
     {
-        $this->tenant = $tenant;
-        $this->builder = new RequestBuilder(
-            Arr::get($tenant->sis_config, 'url'),
-            Arr::get($tenant->sis_config, 'client_id'),
-            Arr::get($tenant->sis_config, 'client_secret')
-        );
+        if (Arr::has($this->tenant->sis_config, ['url', 'client_id', 'client_secret'])) {
+            $this->builder = new RequestBuilder(
+                Arr::get($tenant->sis_config, 'url'),
+                Arr::get($tenant->sis_config, 'client_id'),
+                Arr::get($tenant->sis_config, 'client_secret')
+            );
+        }
     }
 
     public function getAllSchools(): Collection
@@ -456,5 +456,12 @@ class PowerSchoolProvider implements SisProvider
     public function syncTeacher($sisId): User
     {
         throw new \Exception('Not implement.');
+    }
+
+    public function configured(): bool
+    {
+        return Arr::get($this->tenant->sis_config, 'url') &&
+            Arr::get($this->tenant->sis_config, 'client_id') &&
+            Arr::get($this->tenant->sis_config, 'client_secret');
     }
 }

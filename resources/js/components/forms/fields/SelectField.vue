@@ -1,11 +1,12 @@
 <template>
   <FormField
     v-model="localValue"
-    :type="type"
     :error="error"
     :help="helpText"
     :required="required"
     :disabled="disabled"
+    component="AppSelect"
+    :options="options"
   >
     {{ label }}
   </FormField>
@@ -18,7 +19,6 @@ import { useVModel } from '@vueuse/core'
 
 const props = defineProps({
   ...fieldProps,
-  modelValue: String,
 })
 const emit = defineEmits([
   ...fieldEmits,

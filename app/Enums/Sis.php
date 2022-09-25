@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use App\Fields\FormField;
+use App\Fields\FormFieldCollection;
 use App\Models\Tenant;
 use App\SisProviders\PowerSchoolProvider;
 use App\SisProviders\SisProvider;
@@ -50,36 +52,21 @@ enum Sis: string
         };
     }
 
-    public function getConfigFields(): array
+    public function getConfigFields(): FormFieldCollection
     {
-        return match($this) {
+        $fields = match($this) {
             self::PS => [
-                'url' => [
-                    'key' => 'url',
-                    'label' => __('PowerSchool URL'),
-                    'component' => 'AppInput',
-                    'type' => 'url',
-                    'required' => true,
-                    'rules' => ['required', 'url'],
-                ],
-                'client_id' => [
-                    'key' => 'client_id',
-                    'label' => __('PowerSchool Client ID'),
-                    'component' => 'AppInput',
-                    'type' => 'text',
-                    'required' => true,
-                    'rules' => ['required', 'uuid'],
-                ],
-                'client_secret' => [
-                    'key' => 'client_secret',
-                    'label' => __('PowerSchool Client Secret'),
-                    'component' => 'AppInput',
-                    'type' => 'text',
-                    'required' => true,
-                    'rules' => ['required', 'uuid'],
-                ],
+                'url' => FormField::make(__('PowerSchool URL'))
+                    ->type('url')
+                    ->rules(['required', 'url']),
+                'client_id' => FormField::make(__('PowerSchool Client ID'))
+                    ->rules(['required', 'uuid']),
+                'client_secret' => FormField::make(__('PowerSchool Client Secret'))
+                    ->rules(['required', 'uuid']),
             ],
             self::CLASS_LINK => throw new \Exception('To be implemented'),
         };
+
+        return FormFieldCollection::make(Arr::prependKeysWith($fields, 'sis_config.'));
     }
 }

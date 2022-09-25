@@ -15,18 +15,13 @@ class SyncSchools implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Tenant
-     */
-    public $tenant;
-
-    /**
      * Create a new job instance.
      *
      * @param Tenant $tenant
      */
-    public function __construct(Tenant $tenant)
+    public function __construct(protected Tenant $tenant)
     {
-        $this->tenant = $tenant;
+        //
     }
 
     /**
@@ -36,6 +31,6 @@ class SyncSchools implements ShouldQueue
      */
     public function handle()
     {
-        $this->tenant->sisProvider()->syncSchools();
+        $this->tenant->getSisProvider()->syncSchools();
     }
 }

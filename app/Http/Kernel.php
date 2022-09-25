@@ -7,6 +7,7 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\Installed;
 use App\Http\Middleware\SelfHosted;
 use App\Http\Middleware\SisConfigured;
+use App\Http\Middleware\Uninstalled;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -79,5 +80,6 @@ class Kernel extends HttpKernel
         'self_hosted' => SelfHosted::class,
         'allows_pw_auth' => AllowsPasswordLogins::class,
         'sis_configured' => SisConfigured::class,
+        'uninstalled' => Uninstalled::class,
     ];
 }

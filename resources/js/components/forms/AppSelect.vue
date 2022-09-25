@@ -15,30 +15,28 @@
   </select>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
-import ModelValue from '@/mixins/ModelValue'
+<script setup>
+import { useVModel } from '@vueuse/core'
 
-export default defineComponent({
-  mixins: [ModelValue],
-  props: {
-    hasError: {
-      type: Boolean,
-      default: false,
-    },
-    options: {
-      type: Array,
-      default: () => ([]),
-    },
-    nullOption: {
-      type: String,
-      default: 'Select an option',
-    },
-    hideNull: {
-      type: Boolean,
-      default: () => false,
-    }
+const props = defineProps({
+  modelValue: [Object, String, Number, Boolean],
+  hasError: {
+    type: Boolean,
+    default: false,
   },
-  emits: ['change'],
+  options: {
+    type: Array,
+    default: () => ([]),
+  },
+  nullOption: {
+    type: String,
+    default: 'Select an option',
+  },
+  hideNull: {
+    type: Boolean,
+    default: () => false,
+  }
 })
+const emit = defineEmits(['update:modelValue', 'change'])
+const localValue = useVModel(props, 'modelValue', emit)
 </script>
