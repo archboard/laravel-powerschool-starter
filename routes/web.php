@@ -39,6 +39,13 @@ Route::middleware('tenant')->group(function () {
             Route::get('/oidc', [\App\Http\Controllers\Auth\PowerSchoolOidcLoginController::class, 'login']);
         });
 
+    Route::prefix('/auth/classlink')
+        ->group(function () {
+            Route::get('/oauth', [\App\Http\Controllers\ClassLinkOAuthController::class, 'authenticate'])
+                ->name('classlink.authenticate');
+            Route::get('/redirect', [\App\Http\Controllers\ClassLinkOAuthController::class, 'login']);
+        });
+
     Route::middleware('auth')->group(function () {
         Route::get('/ping', \App\Http\Controllers\CheckAuthStatusController::class)
             ->name('auth.status');
