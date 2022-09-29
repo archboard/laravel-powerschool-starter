@@ -2,7 +2,8 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "expose": "expose share http://s.laravel-powerschool-saas-starter.test --domain=expose.archboard.dev --server=us-2 --subdomain=classlink"
   },
   "devDependencies": {
     "@headlessui/vue": "^1.4.1",
