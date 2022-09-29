@@ -13,14 +13,20 @@
       </BorderSeparator>
     </div>
 
-    <form @submit.prevent="submit">
+    <form v-if="tenant.allow_password_auth" @submit.prevent="submit">
       <AppFieldset>
-        <FormField type="email" :error="form.errors.email">
+        <FormField :error="form.errors.email">
           {{ __('Email') }}
+          <template #component="{ hasError }">
+            <AppInput v-model="form.email" class="text-lg" type="email" :has-error="hasError" />
+          </template>
         </FormField>
 
-        <FormField type="password" :error="form.errors.password">
+        <FormField :error="form.errors.password">
           {{ __('Password') }}
+          <template #component="{ hasError }">
+            <AppInput v-model="form.password" class="text-lg" type="password" :has-error="hasError" />
+          </template>
         </FormField>
 
         <FormField>
@@ -31,7 +37,7 @@
           </template>
         </FormField>
 
-        <AppButton :loading="form.processing" size="lg">
+        <AppButton :loading="form.processing" size="lg" full>
           {{ __('Log in') }}
         </AppButton>
 
@@ -42,6 +48,10 @@
         </p>
       </AppFieldset>
     </form>
+
+    <p v-if="!tenant.allow_password_auth && !tenant.allow_oidc_login">
+      No authentication methods are available.
+    </p>
   </Layout>
 </template>
 
@@ -54,6 +64,7 @@ import AppCheckbox from '@/components/forms/AppCheckbox.vue'
 import AppButton from '@/components/AppButton.vue'
 import BorderSeparator from '@/components/BorderSeparator.vue'
 import AppLink from '@/components/AppLink.vue'
+import AppInput from '@/components/forms/AppInput.vue'
 
 const props = defineProps({
   status: String,
