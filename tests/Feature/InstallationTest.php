@@ -79,7 +79,8 @@ class InstallationTest extends TestCase
 
     public function test_can_view_installation_page_when_not_installed_and_authenticated()
     {
-        $this->logIn()
+        $this->asSelfHosted()
+            ->logIn()
             ->removeSisConfig()
             ->get('/')
             ->assertRedirect('/install');
@@ -88,6 +89,7 @@ class InstallationTest extends TestCase
     public function test_installation_page_unauthenticated()
     {
         $this->removeSisConfig()
+            ->asSelfHosted()
             ->get('/install')
             ->assertViewHas('title')
             ->assertOk()
@@ -103,6 +105,7 @@ class InstallationTest extends TestCase
     public function test_installation_page_authenticated()
     {
         $this->removeSisConfig()
+            ->asSelfHosted()
             ->logIn()
             ->tapUser(function (User $user) {
                 $user->allow()->everything();
@@ -129,6 +132,7 @@ class InstallationTest extends TestCase
         $data = $this->getPowerSchoolInstallationRequest();
 
         $this->fakeLicenseValidation()
+            ->asSelfHosted()
             ->post('/install', $data)
             ->assertSessionHas('success')
             ->assertRedirect(route('settings.tenant'));
@@ -148,6 +152,7 @@ class InstallationTest extends TestCase
         $data = $this->getPowerSchoolInstallationRequest();
 
         $this->fakeLicenseValidation()
+            ->asSelfHosted()
             ->removeSisConfig()
             ->post('/install', $data)
             ->assertSessionHas('success')
