@@ -1,3 +1,5 @@
 import { InertiaProgress } from '@inertiajs/progress'
 
-InertiaProgress.init()
+InertiaProgress.init({
+  color: '#d946ef',
+})
