@@ -1,69 +1,71 @@
 <template>
-  <div class="max-w-xl mx-auto px-4 pt-16 pb-12 min-h-screen text-gray-800 dark:text-gray-100">
-    <h1 class="font-bold text-2xl leading-5 mb-8">Laravel Inertia Starter</h1>
-    <p class="text-lg mb-4">A Laravel starter with Inertia and some components to get you started.</p>
+  <Authenticated>
+    <div>
+      <h1 class="font-bold text-2xl leading-5 mb-8">Laravel Inertia Starter</h1>
+      <p class="text-lg mb-4">A Laravel starter with Inertia and some components to get you started.</p>
 
-    <AppLink href="/settings">Settings</AppLink>
+      <AppLink href="/settings">Settings</AppLink>
 
-    <h2 class="text-xl font-bold mb-2">Notifications</h2>
-    <div class="space-y-2">
-      <div>
-        <AppButton @click="notify('This is a success!', 'success')" color="green">Success</AppButton>
+      <h2 class="text-xl font-bold mb-2">Notifications</h2>
+      <div class="space-y-2">
+        <div>
+          <AppButton @click="notify('This is a success!', 'success')" color="green">Success</AppButton>
+        </div>
+        <div>
+          <AppButton @click.prevent="notify('This is an error!', 'error')" color="red">Error</AppButton>
+        </div>
+        <div>
+          <AppButton @click.prevent="notify('This is a warning!', 'warning')" color="yellow">Warning</AppButton>
+        </div>
+        <div>
+          <AppButton @click.prevent="notify('This is neutral!')" color="neutral">Neutral</AppButton>
+        </div>
       </div>
-      <div>
-        <AppButton @click.prevent="notify('This is an error!', 'error')" color="red">Error</AppButton>
+
+      <h2 class="text-xl font-bold mb-2 mt-10">Alerts</h2>
+
+      <div class="space-y-4">
+        <SimpleAlert>My neutral alert.</SimpleAlert>
+        <SimpleAlert level="success">My success alert.</SimpleAlert>
+        <SimpleAlert level="warning">My warning alert.</SimpleAlert>
+        <SimpleAlert level="error">My error alert.</SimpleAlert>
       </div>
-      <div>
-        <AppButton @click.prevent="notify('This is a warning!', 'warning')" color="yellow">Warning</AppButton>
+
+      <h2 class="text-xl font-bold mb-2 mt-10">Modal</h2>
+
+      <div class="space-y-2">
+        <div>
+          <AppButton @click.prevent="showModal = true">Launch Modal</AppButton>
+        </div>
+        <div>
+          <ConfirmButton @confirm="confirmed" color="red">
+            Delete?
+
+            <template v-slot:actionText>
+              I'm not scared
+            </template>
+          </ConfirmButton>
+        </div>
       </div>
-      <div>
-        <AppButton @click.prevent="notify('This is neutral!')" color="neutral">Neutral</AppButton>
-      </div>
+
+
+      <Modal
+        v-if="showModal"
+        @close="showModal = false"
+        @action="modalAction"
+        :auto-close="false"
+        size="sm"
+        action-text="Got it!"
+        headline="Optional Headline"
+      >
+        <p class="text-sm text-gray-500">
+          This is some default text in the modal, but you could put anything in here like forms or something else.
+        </p>
+      </Modal>
+
+      <Notifications />
     </div>
-
-    <h2 class="text-xl font-bold mb-2 mt-10">Alerts</h2>
-
-    <div class="space-y-4">
-      <SimpleAlert>My neutral alert.</SimpleAlert>
-      <SimpleAlert level="success">My success alert.</SimpleAlert>
-      <SimpleAlert level="warning">My warning alert.</SimpleAlert>
-      <SimpleAlert level="error">My error alert.</SimpleAlert>
-    </div>
-
-    <h2 class="text-xl font-bold mb-2 mt-10">Modal</h2>
-
-    <div class="space-y-2">
-      <div>
-        <AppButton @click.prevent="showModal = true">Launch Modal</AppButton>
-      </div>
-      <div>
-        <ConfirmButton @confirm="confirmed" color="red">
-          Delete?
-
-          <template v-slot:actionText>
-            I'm not scared
-          </template>
-        </ConfirmButton>
-      </div>
-    </div>
-
-
-    <Modal
-      v-if="showModal"
-      @close="showModal = false"
-      @action="modalAction"
-      :auto-close="false"
-      size="sm"
-      action-text="Got it!"
-      headline="Optional Headline"
-    >
-      <p class="text-sm text-gray-500">
-        This is some default text in the modal, but you could put anything in here like forms or something else.
-      </p>
-    </Modal>
-
-    <Notifications />
-  </div>
+  </Authenticated>
 </template>
 
 <script>
@@ -75,9 +77,11 @@ import Modal from '@/components/modals/Modal.vue'
 import AppLink from '@/components/AppLink.vue'
 import SimpleAlert from '@/components/alerts/SimpleAlert.vue'
 import ConfirmButton from '@/components/ConfirmButton.vue'
+import Authenticated from '@/layouts/Authenticated.vue'
 
 export default defineComponent({
   components: {
+    Authenticated,
     ConfirmButton,
     SimpleAlert,
     AppLink,

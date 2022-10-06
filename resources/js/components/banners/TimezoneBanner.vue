@@ -8,7 +8,7 @@
               <ClockIcon class="h-6 w-6 text-white" aria-hidden="true" />
             </span>
             <p class="ml-3 font-medium text-white truncate">
-              <span class="md:hidden">{{ __("You're in a different timezone.") }}</span>
+              <span class="md:hidden">{{ __("Are you in a different timezone?") }}</span>
               <span class="hidden md:inline">{{ __("It looks like you're in a different timezone.") }}</span>
             </p>
           </div>
@@ -20,7 +20,7 @@
           <div class="order-2 flex-shrink-0 sm:order-3 sm:ml-3">
             <button @click.prevent="show = false" type="button" class="-mr-1 flex p-2 rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
               <span class="sr-only">Dismiss</span>
-              <XIcon class="h-6 w-6 text-white" aria-hidden="true" />
+              <XMarkIcon class="h-6 w-6 text-white" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -30,13 +30,13 @@
 </template>
 
 <script>
-import { ClockIcon, XIcon } from '@heroicons/vue/24/outline'
+import { ClockIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { ref } from 'vue'
 
 export default {
   components: {
     ClockIcon,
-    XIcon,
+    XMarkIcon,
   },
   emits: ['launch'],
 

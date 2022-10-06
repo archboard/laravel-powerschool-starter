@@ -29,7 +29,7 @@ export default () => {
       const { data } = await $http.get('/timezones')
       return data
     } catch (e) {
-      return {}
+      return []
     }
   }
   const getDate = (date, offset = false) => (date ? dayjs(date) : dayjs()).tz(timezone.value, offset)

@@ -7,8 +7,8 @@ export default () => {
 
   onMounted(() => {
     document.title = title.value
-      ? `${title.value} | LifePlus HRIS`
-      : 'LifePlus HRIS'
+      ? `${title.value} | App Name`
+      : 'App Name'
   })
 
   return title

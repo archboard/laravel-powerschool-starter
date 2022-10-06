@@ -1,51 +1,36 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-4">
     <CardWrapper>
       <CardPadding>
-        <div class="md:grid md:grid-cols-3 md:gap-6">
-          <div class="md:col-span-1">
+        <div class="lg:grid lg:grid-cols-3 lg:gap-6">
+          <div class="lg:col-span-1">
             <slot name="headline" />
           </div>
-          <div class="mt-5 md:mt-0 md:col-span-2">
+          <div class="mt-5 lg:mt-0 lg:col-span-2">
             <div class="grid grid-cols-6 gap-6">
               <slot />
             </div>
           </div>
         </div>
       </CardPadding>
+      <CardAction :loading="loading" />
     </CardWrapper>
-    <FormActions v-if="!hideActions">
-      <slot name="actions">
-        <AppButton component="Link" :href="cancel" color="white">
-          {{ __('Cancel') }}
-        </AppButton>
-        <AppButton type="submit" :loading="loading">
-          {{ __('Save') }}
-        </AppButton>
-      </slot>
-    </FormActions>
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
+<script setup>
 import CardWrapper from '@/components/CardWrapper.vue'
 import CardPadding from '@/components/CardPadding.vue'
 import FormActions from '@/components/forms/FormActions.vue'
+import AppButton from '@/components/AppButton.vue'
+import CardAction from '@/components/CardAction.vue'
 
-export default defineComponent({
-  components: {
-    FormActions,
-    CardPadding,
-    CardWrapper,
-  },
-  props: {
-    cancel: String,
-    loading: Boolean,
-    hideActions: {
-      type: Boolean,
-      default: () => false,
-    }
+const props = defineProps({
+  cancel: String,
+  loading: Boolean,
+  hideActions: {
+    type: Boolean,
+    default: () => false,
   }
 })
 </script>
