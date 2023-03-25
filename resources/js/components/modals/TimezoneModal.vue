@@ -29,7 +29,7 @@ import FormField from '@/components/forms/FormField.vue'
 import useDates from '@/composition/useDates.js'
 import AppCombobox from '@/components/forms/AppCombobox.vue'
 import { computed, ref } from 'vue'
-import { useForm } from '@inertiajs/inertia-vue3'
+import { useForm } from '@inertiajs/vue3'
 
 const props = defineProps({})
 const emit = defineEmits(['close'])

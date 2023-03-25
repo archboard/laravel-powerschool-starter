@@ -1,10 +1,8 @@
 import { computed } from 'vue'
-import { usePage } from '@inertiajs/inertia-vue3'
+import { usePage } from '@inertiajs/vue3'
 
 export default (prop) => {
-  const page = usePage()
-
   return computed(() => {
-    return page.props.value[prop]
+    return usePage().props[prop]
   })
 }

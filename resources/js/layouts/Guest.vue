@@ -27,10 +27,10 @@ import CardWrapper from '@/components/CardWrapper.vue'
 import CardPadding from '@/components/CardPadding.vue'
 import Alert from '@/components/alerts/SimpleAlert.vue'
 import Notifications from '@/components/Notifications.vue'
-import { usePage } from '@inertiajs/inertia-vue3'
+import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 
 const status = computed(() => {
-  return usePage().props.value.status
+  return usePage().props.status
 })
 </script>

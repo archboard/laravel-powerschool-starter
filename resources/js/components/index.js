@@ -9,7 +9,7 @@
 // import CardPadding from './CardPadding.vue'
 // import CardHeader from './CardHeader.vue'
 // import FormField from './forms/FormField.vue'
-import { Link } from '@inertiajs/inertia-vue3'
+import { Link } from '@inertiajs/vue3'
 
 export default {
   // FormField,

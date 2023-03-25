@@ -57,7 +57,7 @@
 
 <script setup>
 import Layout from '@/layouts/Guest.vue'
-import { useForm } from '@inertiajs/inertia-vue3'
+import { useForm } from '@inertiajs/vue3'
 import AppFieldset from '@/components/forms/AppFieldset.vue'
 import FormField from '@/components/forms/FormField.vue'
 import AppCheckbox from '@/components/forms/AppCheckbox.vue'

@@ -1,17 +1,20 @@
 import { createApp, h } from 'vue'
-import { createInertiaApp } from '@inertiajs/inertia-vue3'
+import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import * as plugins from '@/plugins'
 import components from '@/components'
 import get from 'just-safe-get'
 import flashesNotifications from '@/plugins/flashesNotifications.js'
-import './bootstrap'
+import { modal } from 'momentum-modal'
 
 createInertiaApp({
-  title: title => title ? `${title} | ${process.env.APP_NAME}` : process.env.APP_NAME,
+  title: title => title ? `${title} | ${import.meta.env.APP_NAME}` : import.meta.env.APP_NAME,
   resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob('./pages/**/*.vue')),
   setup({ el, App, props, plugin }) {
     const app = createApp({ render: () => h(App, props) })
+      .use(modal, {
+        resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob('./pages/**/*.vue')),
+      })
       .use(plugin)
 
     // Register all the plugins

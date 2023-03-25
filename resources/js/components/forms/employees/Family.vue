@@ -78,7 +78,7 @@ import AppLink from '@/components/AppLink.vue'
 import CreateFamilyModal from '@/components/modals/CreateFamilyModal.vue'
 import AddDependentModal from '@/components/modals/AddDependentModal.vue'
 import ConfirmationModal from '@/components/modals/ConfirmationModal.vue'
-import { Inertia } from '@inertiajs/inertia'
+import { router } from '@inertiajs/vue3'
 import UpdateFamilyModal from '@/components/modals/UpdateFamilyModal.vue'
 import Pill from '@/components/Pill.vue'
 
@@ -105,7 +105,7 @@ export default defineComponent({
   setup () {
     const state = ref()
     const removeMember = (close) => {
-      Inertia.delete(state.value, {
+      router.delete(state.value, {
         onSuccess: () => {
           if (typeof close === 'function') {
             close()

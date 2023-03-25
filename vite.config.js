@@ -22,6 +22,7 @@ export default ({ mode }) => {
           'resources/js/app.js',
         ],
         refresh: true,
+        valetTls: domain.split('.').slice(-2).join('.'),
       }),
       vue({
         template: {
@@ -32,15 +33,16 @@ export default ({ mode }) => {
         }
       })
     ],
-    server: {
-      https: {
-        key: process.env.APP_SSL_KEY,
-        cert: process.env.APP_SSL_CERT,
-      },
-      domain,
-      hmr: {
-        host: domain,
-      }
-    }
+    // If you need to add a non-Valet certificate:
+    // server: {
+    //   https: {
+    //     key: process.env.APP_SSL_KEY,
+    //     cert: process.env.APP_SSL_CERT,
+    //   },
+    //   domain,
+    //   hmr: {
+    //     host: domain,
+    //   }
+    // }
   })
 }

@@ -2,7 +2,7 @@ import axios from 'axios'
 import get from 'just-safe-get'
 import store from '@/stores/notifications'
 import flashesNotifications from '@/plugins/flashesNotifications'
-import { Inertia } from '@inertiajs/inertia'
+import { router } from '@inertiajs/vue3'
 
 const flashMessage = response => {
   const flash = get(response, 'data.props.flash')
@@ -42,7 +42,7 @@ axios.interceptors.response.use(response => {
   }
 
   if (status === 401) {
-    Inertia.get('/login')
+    router.get('/login')
     return
   }
 

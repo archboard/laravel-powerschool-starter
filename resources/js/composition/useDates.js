@@ -3,7 +3,7 @@ import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, inject } from 'vue'
-import { usePage } from '@inertiajs/inertia-vue3'
+import { usePage } from '@inertiajs/vue3'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -13,7 +13,7 @@ export default () => {
   const $http = inject('$http')
   const page = usePage()
   const timezone = computed(() =>
-    page.props.value.user?.timezone ||
+    page.props.user?.timezone ||
     'UTC'
   )
   const timeFormat = 'h:mma'

@@ -54,7 +54,7 @@
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { XIcon } from '@heroicons/vue/24/outline'
 import LifeplusHorizontal from './logos/lifeplus-horizontal.vue'
-import { usePage } from '@inertiajs/inertia-vue3'
+import { usePage } from '@inertiajs/vue3'
 
 const props = defineProps({
   sidebarOpen: {
@@ -64,5 +64,5 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 const page = usePage()
-const navigation = page.props.value.navigation
+const navigation = page.props.navigation
 </script>

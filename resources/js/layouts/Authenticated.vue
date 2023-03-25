@@ -139,6 +139,7 @@
   </div>
 
   <Notifications />
+  <Modal />
   <TimezoneModal
     v-if="showTzModal"
     @close="showTzModal = false"
@@ -158,7 +159,8 @@ import TimezoneModal from '@/components/modals/TimezoneModal.vue'
 import useDates from '@/composition/useDates.js'
 import TimezoneBanner from '@/components/banners/TimezoneBanner.vue'
 import usePageTitle from '@/composition/usePageTitle.js'
-import { usePage } from '@inertiajs/inertia-vue3'
+import { usePage } from '@inertiajs/vue3'
+import { Modal } from 'momentum-modal'
 
 const title = usePageTitle()
 const { props } = usePage()
