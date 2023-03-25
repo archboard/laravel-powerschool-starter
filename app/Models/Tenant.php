@@ -8,7 +8,6 @@ use App\Fields\FormField;
 use App\Fields\FormFieldCollection;
 use App\Rules\ValidLicense;
 use App\SisProviders\SisProvider;
-use GrantHolle\Http\Resources\Traits\HasResource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,7 +25,6 @@ use Spatie\Multitenancy\Models\Tenant as TenantBase;
 class Tenant extends TenantBase
 {
     use HasFactory;
-    use HasResource;
 
     protected $guarded = [];
     protected $casts = [

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\FlashesAndRedirects;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 
 class PersonalSettingsController extends Controller
 {
+    use FlashesAndRedirects;
+
     /**
      * Show the settings page
      *
@@ -17,7 +20,7 @@ class PersonalSettingsController extends Controller
      */
     public function index()
     {
-        $title = __('Personal Settings');
+        $title = __('Personal settings');
 
         return inertia('settings/Personal', [
             'title' => $title,
@@ -33,25 +36,14 @@ class PersonalSettingsController extends Controller
     public function update(Request $request)
     {
         $data = $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required|email',
-            'password' => 'nullable|string|confirmed|min:8',
+            'first_name' => ['required'],
+            'last_name' => ['required'],
+            'email' => ['required', 'email'],
         ]);
 
-        /** @var User $user */
-        $user = $request->user();
+        $request->user()
+            ->update($data);
 
-        $user->fill(Arr::except($data, 'password'));
-
-        if ($data['password']) {
-            $user->password = Hash::make($data['password']);
-        }
-
-        $user->save();
-
-        session()->flash('success', __('Settings updated successfully.'));
-
-        return back();
+        return $this->flashAndBack();
     }
 }
