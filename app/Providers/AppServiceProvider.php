@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
@@ -30,11 +31,6 @@ class AppServiceProvider extends ServiceProvider
     {
         JsonResource::withoutWrapping();
 
-        if ($this->app->environment('local')) {
-            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
-            $this->app->register(TelescopeServiceProvider::class);
-        }
-
         $currentTenant = fn (): Tenant => Tenant::current() ?? new Tenant();
 
         $currentSchool = function (): School {
@@ -55,5 +51,13 @@ class AppServiceProvider extends ServiceProvider
 
         Request::macro('tenant', $currentTenant);
         Request::macro('school', $currentSchool);
+
+        Relation::morphMap([
+            'user' => \App\Models\User::class,
+            'student' => \App\Models\Student::class,
+            'tenant' => \App\Models\Tenant::class,
+            'school' => \App\Models\School::class,
+            'section' => \App\Models\Section::class,
+        ]);
     }
 }
