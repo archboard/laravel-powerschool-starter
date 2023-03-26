@@ -1,7 +1,7 @@
 <template>
   <div class="textured-bg min-h-screen flex justify-center items-center p-4">
     <div class="max-w-md mx-auto w-full">
-      <form @submit.prevent="form.post('/install')">
+      <form @submit.prevent="inertiaForm.post('/install')">
         <CardWrapper>
           <CardPadding>
             <CardHeader>
@@ -10,13 +10,13 @@
           </CardPadding>
           <CardPadding>
             <DynamicFormFields
-              v-model="form"
-              :errors="form.errors"
+              v-model="inertiaForm"
+              :errors="inertiaForm.errors"
               :fields="fields"
             />
           </CardPadding>
           <CardAction>
-            <AppButton type="submit" :loading="form.processing" full>
+            <AppButton type="submit" :loading="inertiaForm.processing" full>
               {{ __('Install') }}
             </AppButton>
           </CardAction>
@@ -26,47 +26,25 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { defineComponent } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import CardWrapper from '@/components/CardWrapper.vue'
 import CardPadding from '@/components/CardPadding.vue'
 import CardHeader from '@/components/CardHeader.vue'
-import AppFieldset from '@/components/forms/AppFieldset.vue'
 import AppButton from '@/components/AppButton.vue'
-import FormField from '@/components/forms/FormField.vue'
 import CardAction from '@/components/CardAction.vue'
 import DynamicFormFields from '@/components/forms/fields/DynamicFormFields.vue'
 import clone from 'just-clone'
 
-export default defineComponent({
-  components: {
-    DynamicFormFields,
-    CardAction,
-    FormField,
-    AppButton,
-    AppFieldset,
-    CardHeader,
-    CardPadding,
-    CardWrapper
-  },
-
-  props: {
-    form: Object,
-    email: String,
-    fields: Array,
-  },
-
-  setup (props) {
-    const form = useForm({
-      ...clone(props.form),
-      email: props.email,
-    })
-
-    return {
-      form,
-    }
-  }
+const props = defineProps({
+  form: Object,
+  email: String,
+  fields: Array,
+})
+const inertiaForm = useForm({
+  ...clone(props.form),
+  email: props.email,
 })
 </script>
 
