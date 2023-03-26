@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Silber\Bouncer\BouncerFacade;
@@ -29,7 +30,8 @@ class Tenant extends TenantBase
     protected $guarded = [];
     protected $casts = [
         'sis_provider' => Sis::class,
-        'sis_config' => 'json',
+        'sis_config' => 'encrypted:collection',
+        'smtp_config' => 'encrypted:collection',
         'allow_password_auth' => 'boolean',
     ];
 
@@ -37,10 +39,12 @@ class Tenant extends TenantBase
     {
         static::created(function (Tenant $tenant) {
             // Seed the roles and abilities for this tenant scope
-            // BouncerFacade::scope()->to($tenant->id);
-            BouncerFacade::allow(Role::DISTRICT_ADMIN->value)->everything();
+             BouncerFacade::scope()->onceTo($tenant->id, function () {
+                BouncerFacade::allow(Role::DISTRICT_ADMIN->value)->everything();
 
-            // Additional seeding as the project needs
+                // Additional seeding as the project needs
+             });
+
         });
     }
 
@@ -56,7 +60,26 @@ class Tenant extends TenantBase
 
     public function sisConfig(): Attribute
     {
-        return Attribute::get(fn ($value) => $value ? $this->castAttribute('sis_config', $value) : []);
+        return Attribute::get(
+            fn ($value): Collection => $value ? $this->castAttribute('sis_config', $value) : collect()
+        );
+    }
+
+    public function smtpConfig(): Attribute
+    {
+        return Attribute::get(function ($value): Collection {
+            return $value
+                ? $this->castAttribute('smtp_config', $value)
+                : collect([
+                    'host' => null,
+                    'port' => null,
+                    'username' => null,
+                    'password' => null,
+                    'from_name' => null,
+                    'from_address' => null,
+                    'encryption' => null,
+                ]);
+        });
     }
 
     public function schools(): HasMany
@@ -79,7 +102,6 @@ class Tenant extends TenantBase
         return $this->hasMany(Section::class);
     }
 
-    /** @noinspection PhpIncompatibleReturnTypeInspection */
     public static function fromRequest(Request $request): ?Tenant
     {
         return static::getByHost($request->getHost());
@@ -90,7 +112,6 @@ class Tenant extends TenantBase
         return static::fromRequest($request) ?? new static;
     }
 
-    /** @noinspection PhpIncompatibleReturnTypeInspection */
     public static function getByHost(string $host): ?Tenant
     {
         return static::query()
@@ -176,8 +197,6 @@ class Tenant extends TenantBase
     public function getInstallationFields(): FormFieldCollection
     {
         return FormFieldCollection::make([
-                'license' => FormField::make(__('License'))
-                    ->rules(['required', 'uuid', new ValidLicense()]),
                 'name' => FormField::make(__('Tenant name'))
                     ->rules(['required', 'string', 'max:255']),
                 'domain' => FormField::make(__('Domain'))

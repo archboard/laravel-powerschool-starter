@@ -2,21 +2,21 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantModel;
-use Spatie\Multitenancy\Models\Tenant;
+use App\Models\Tenant;
 use Spatie\Multitenancy\TenantFinder\TenantFinder;
 
 class DomainTenantFinder extends TenantFinder
 {
     use UsesTenantModel;
 
-    /** @noinspection PhpIncompatibleReturnTypeInspection */
     public function findForRequest(Request $request): ?Tenant
     {
-        $host = $request->getHost();
+        $model = $this->getTenantModel();
 
-        return $this->getTenantModel()::fromRequest($request);
+        return config('app.cloud')
+            ? $model::fromRequest($request)
+            : $model::first();
     }
 }
