@@ -21,6 +21,7 @@
     "laravel/tinker": "^2.5",
     "silber/bouncer": "^1.0",
     "spatie/laravel-ignition": "^2.0",
+    "spatie/laravel-model-flags": "^1.2",
     "spatie/laravel-multitenancy": "^3.0"
   },
   "require-dev": {
