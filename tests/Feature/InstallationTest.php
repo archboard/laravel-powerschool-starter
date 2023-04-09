@@ -37,7 +37,6 @@ class InstallationTest extends TestCase
     protected function getPowerSchoolInstallationRequest(array $attributes = []): array
     {
         return [
-            'license' => $this->faker->uuid(),
             'name' => $this->faker->company(),
             'domain' => env('TESTING_APP_URL'),
             'email' => $this->faker->email(),

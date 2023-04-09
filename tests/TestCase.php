@@ -51,6 +51,7 @@ abstract class TestCase extends BaseTestCase
     public function asSelfHosted(): static
     {
         config()->set('app.cloud', false);
+        config()->set('app.self_hosted', true);
 
         return $this;
     }
