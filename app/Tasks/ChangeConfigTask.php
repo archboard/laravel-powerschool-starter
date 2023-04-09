@@ -20,7 +20,6 @@ class ChangeConfigTask implements SwitchTenantTask
         Config::set('app.url', "https://{$tenant->domain}");
         URL::forceRootUrl(config('app.url'));
 
-
         Inertia::share('tenant', fn () => new TenantResource($tenant));
     }
 

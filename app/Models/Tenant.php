@@ -6,7 +6,6 @@ use App\Enums\Role;
 use App\Enums\Sis;
 use App\Fields\FormField;
 use App\Fields\FormFieldCollection;
-use App\Rules\ValidLicense;
 use App\SisProviders\SisProvider;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -125,7 +124,6 @@ class Tenant extends TenantBase
 
     public function installed(): bool
     {
-        ray($this->getSisProvider());
         return $this->getSisProvider()?->configured() ?? false;
     }
 
@@ -221,7 +219,6 @@ class Tenant extends TenantBase
                     ]),
                 ...$this->sis_provider?->getConfigFields() ?? collect()
             ])
-            ->merge($this->sis_provider?->getConfigFields() ?? collect())
             ->map(fn (FormField $field, string $key) => $field
                 ->withValue($this->getInstallationFieldValue($key))
                 ->keyedBy($key)

@@ -862,16 +862,16 @@
         },
         {
             "name": "grantholle/laravel-timezone",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/grantholle/laravel-timezone.git",
-                "reference": "ca7fb261fe0276798f6ed084ec53a08c5d3c1919"
+                "reference": "08280249feee735463095765a4c46141c1633d73"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/grantholle/laravel-timezone/zipball/ca7fb261fe0276798f6ed084ec53a08c5d3c1919",
-                "reference": "ca7fb261fe0276798f6ed084ec53a08c5d3c1919",
+                "url": "https://api.github.com/repos/grantholle/laravel-timezone/zipball/08280249feee735463095765a4c46141c1633d73",
+                "reference": "08280249feee735463095765a4c46141c1633d73",
                 "shasum": ""
             },
             "require": {
@@ -934,9 +934,9 @@
             ],
             "support": {
                 "issues": "https://github.com/grantholle/laravel-timezone/issues",
-                "source": "https://github.com/grantholle/laravel-timezone/tree/1.1.1"
+                "source": "https://github.com/grantholle/laravel-timezone/tree/1.1.2"
             },
-            "time": "2023-04-04T21:58:48+00:00"
+            "time": "2023-04-09T03:26:04+00:00"
         },
         {
             "name": "grantholle/pear-cache-lite",

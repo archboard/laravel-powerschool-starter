@@ -29,7 +29,10 @@ class InstallationController extends Controller
     {
         $tenant = Tenant::fromRequestAndFallback($request);
 
-        $data = $request->validate($tenant->getInstallationFields()->toValidationRules());
+        $data = $request->validate(
+            $tenant->getInstallationFields()
+                ->toValidationRules()
+        );
 
         $tenant->fill(Arr::undot(Arr::except($data, 'email')))
             ->save();
@@ -46,6 +49,6 @@ class InstallationController extends Controller
 
         session()->flash('success', __('Installation complete. Sync has been started.'));
 
-        return to_route('settings.tenant');
+        return to_route('settings.tenant.edit');
     }
 }

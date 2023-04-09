@@ -18,7 +18,7 @@ class PersonalSettingsController extends Controller
      *
      * @return \Inertia\Response|\Inertia\ResponseFactory
      */
-    public function index()
+    public function edit()
     {
         $title = __('Personal settings');
 

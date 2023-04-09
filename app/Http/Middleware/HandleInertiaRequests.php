@@ -81,19 +81,19 @@ class HandleInertiaRequests extends Middleware
                 $nav = [
                     NavigationItem::make()
                         ->labeled(__('Personal settings'))
-                        ->to(route('settings.personal')),
+                        ->to(route('settings.personal.edit')),
                 ];
 
                 if ($user->can('edit school settings')) {
                     $nav[] = NavigationItem::make()
                         ->labeled(__('School settings'))
-                        ->to(route('settings.school'));
+                        ->to(route('settings.school.edit'));
                 }
 
                 if ($user->can('edit tenant settings')) {
                     $nav[] = NavigationItem::make()
                         ->labeled(__('Tenant settings'))
-                        ->to(route('settings.tenant'));
+                        ->to(route('settings.tenant.edit'));
                 }
 
                 $nav[] = NavigationItem::make()

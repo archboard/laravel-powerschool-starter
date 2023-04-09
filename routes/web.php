@@ -57,16 +57,21 @@ Route::middleware('tenant')->group(function () {
             return inertia('Index');
         });
 
-        Route::prefix('/settings')->group(function () {
-            Route::get('personal', [\App\Http\Controllers\Settings\PersonalSettingsController::class, 'index']);
-            Route::post('personal', [\App\Http\Controllers\Settings\PersonalSettingsController::class, 'update'])
-                ->name('settings.personal');
+        Route::prefix('/settings')
+            ->name('settings.')
+            ->group(function () {
+                Route::singleton('/personal', \App\Http\Controllers\Settings\PersonalSettingsController::class)
+                    ->only('edit', 'update');
 
-            Route::middleware('can:edit tenant settings')->group(function () {
-                Route::get('tenant', [\App\Http\Controllers\Settings\TenantSettingsController::class, 'index']);
-                Route::post('tenant', [\App\Http\Controllers\Settings\TenantSettingsController::class, 'update'])
-                    ->name('settings.tenant');
+                Route::middleware('can:edit tenant settings')->group(function () {
+                    Route::singleton('/tenant', \App\Http\Controllers\Settings\TenantSettingsController::class)
+                        ->only('edit', 'update');
+                });
+
+                Route::middleware('can:edit school settings')->group(function () {
+                    Route::singleton('/school', \App\Http\Controllers\Settings\SchoolSettingsController::class)
+                        ->only('edit', 'update');
+                });
             });
-        });
     });
 });

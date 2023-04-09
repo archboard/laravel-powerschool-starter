@@ -35,7 +35,7 @@ return [
     'switch_tenant_tasks' => [
         \Spatie\Multitenancy\Tasks\PrefixCacheTask::class,
         \App\Tasks\ChangeConfigTask::class,
-        // \App\Tasks\ScopeBouncer::class,
+        \App\Tasks\ScopeBouncer::class,
     ],
 
     /*

@@ -18,7 +18,8 @@ class CreateTenantsTable extends Migration
             $table->boolean('allow_oidc_login')->default(false);
             $table->dateTime('subscription_started_at')->nullable();
             $table->dateTime('subscription_expires_at')->nullable();
-            $table->string('license')->nullable();
+            $table->uuid('license')->nullable();
+            $table->string('timezone')->nullable();
             $table->string('sis_provider')->default(\App\Enums\Sis::PS->value);
             $table->text('smtp_config')->nullable();
             $table->timestamps();

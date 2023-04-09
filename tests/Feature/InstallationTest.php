@@ -134,12 +134,12 @@ class InstallationTest extends TestCase
             ->asSelfHosted()
             ->post('/install', $data)
             ->assertSessionHas('success')
-            ->assertRedirect(route('settings.tenant'));
+            ->assertRedirect(route('settings.tenant.edit'));
 
-        $this->assertDatabaseHas('tenants', Arr::only($data, ['license', 'name', 'domain']));
-        $tenant = Tenant::firstWhere('license', $data['license']);
+        $this->assertDatabaseHas('tenants', Arr::only($data, ['name', 'domain']));
+        $tenant = Tenant::firstWhere('domain', $data['domain']);
 
-        $this->assertEquals($tenant->sis_config, Arr::undot(Arr::only($data, ['sis_config.url', 'sis_config.client_secret', 'sis_config.client_id']))['sis_config']);
+        $this->assertEquals($tenant->sis_config->toArray(), Arr::undot(Arr::only($data, ['sis_config.url', 'sis_config.client_secret', 'sis_config.client_id']))['sis_config']);
 
         Queue::assertPushed(SyncSchools::class);
     }
@@ -155,12 +155,12 @@ class InstallationTest extends TestCase
             ->removeSisConfig()
             ->post('/install', $data)
             ->assertSessionHas('success')
-            ->assertRedirect(route('settings.tenant'));
+            ->assertRedirect(route('settings.tenant.edit'));
 
-        $this->assertDatabaseHas('tenants', Arr::only($data, ['license', 'name', 'domain']));
-        $tenant = Tenant::firstWhere('license', $data['license']);
+        $this->assertDatabaseHas('tenants', Arr::only($data, ['name', 'domain']));
+        $tenant = Tenant::firstWhere('domain', $data['domain']);
 
-        $this->assertEquals($tenant->sis_config, Arr::undot(Arr::only($data, ['sis_config.url', 'sis_config.client_secret', 'sis_config.client_id']))['sis_config']);
+        $this->assertEquals($tenant->sis_config->toArray(), Arr::undot(Arr::only($data, ['sis_config.url', 'sis_config.client_secret', 'sis_config.client_id']))['sis_config']);
 
         Queue::assertPushed(SyncSchools::class);
     }

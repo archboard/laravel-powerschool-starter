@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Enums\Sis;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class TenantSettingsController extends Controller
      *
      * @return \Inertia\Response|\Inertia\ResponseFactory
      */
-    public function index()
+    public function edit()
     {
         $title = __('Tenant Settings');
 
@@ -36,21 +37,22 @@ class TenantSettingsController extends Controller
 
         $data = $request->validate([
             'name' => ['required'],
-            'ps_url' => 'required|url',
-            'ps_client_id' => 'required|uuid',
-            'ps_secret' => 'required|uuid',
-            'allow_password_auth' => 'required|boolean',
+            'sis_provider' => ['required', Rule::enum(Sis::class)],
+            'allow_password_auth' => ['required', 'boolean'],
+            'allow_oidc_login' => ['required', 'boolean'],
             'smtp_config' => ['array'],
-            'smtp_config.host' => [Rule::requiredIf(!config('app.cloud'))],
-            'smtp_config.port' => [Rule::requiredIf(!config('app.cloud'))],
+            'smtp_config.host' => [Rule::requiredIf(config('app.self_hosted'))],
+            'smtp_config.port' => [Rule::requiredIf(config('app.self_hosted'))],
             'smtp_config.username' => ['nullable'],
             'smtp_config.password' => ['nullable'],
-            'smtp_config.from_name' => [Rule::requiredIf(!config('app.cloud'))],
-            'smtp_config.from_address' => [Rule::requiredIf(!config('app.cloud')), 'email'],
+            'smtp_config.from_name' => [Rule::requiredIf(config('app.self_hosted'))],
+            'smtp_config.from_address' => [Rule::requiredIf(config('app.self_hosted')), 'email'],
             'smtp_config.encryption' => ['nullable'],
+            ...$tenant->getInstallationFields()
+                ->toValidationRules(),
         ]);
 
-        Tenant::current()->update($data);
+        $tenant->update($data);
 
         session()->flash('success', __('Settings updated successfully.'));
 
