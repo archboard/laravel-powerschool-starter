@@ -29,10 +29,18 @@ abstract class TestCase extends BaseTestCase
         }
     }
 
+    public function seedUser(array $attributes = []): User
+    {
+        $tenant = $this->tenant ?? Tenant::factory()->create();
+        $mergedAttributes = array_merge(['tenant_id' => $tenant->id], $attributes);
+
+        return User::factory()->create($mergedAttributes);
+    }
+
     public function logIn(User $user = null, array $attributes = [], string $role = 'admin'): static
     {
         /** @var User $user */
-        $user = $user ?? User::factory()->create(array_merge(['tenant_id' => $this->tenant?->id], $attributes));
+        $user = $user ?? $this->seedUser($attributes);
 
         $user->assign($role);
         $this->be($user);

@@ -40,7 +40,6 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
-{
-    // ..
+function logIn(array $attributes = []) {
+    return test()->logIn(attributes: $attributes);
 }
