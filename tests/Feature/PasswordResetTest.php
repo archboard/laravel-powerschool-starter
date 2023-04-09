@@ -13,6 +13,14 @@ class PasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_tenants_without_passwords_can_reset()
+    {
+        $this->tenant->update(['allow_password_auth' => false]);
+
+        $this->get('/forgot-password')
+            ->assertNotFound();
+    }
+
     public function test_reset_password_link_screen_can_be_rendered()
     {
         $this->get('/forgot-password')
