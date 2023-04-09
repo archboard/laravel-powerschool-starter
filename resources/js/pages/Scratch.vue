@@ -19,23 +19,18 @@
         </MenuItem>
       </MenuItems>
     </Menu>
+
+    <div>
+      <AppDatepicker v-model="date" />
+      <pre>{{ date }}</pre>
+    </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import { defineComponent, ref } from 'vue'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
+import AppDatepicker from '@/components/forms/AppDatepicker.vue'
 
-export default defineComponent({
-  components: {
-    Menu,
-    MenuButton,
-    MenuItems,
-    MenuItem,
-  },
-
-  setup () {
-
-  }
-})
+const date = ref()
 </script>
