@@ -11,6 +11,24 @@ class MachineTokenTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected bool $cloud = true;
+
+    public function test_self_hosted_cant_generate_token()
+    {
+        $this->asSelfHosted();
+
+        $this->assertTrue(
+            DB::table('machine_api_tokens')->whereNotNull('api_token')->doesntExist()
+        );
+
+        $this->artisan('make:token')
+            ->assertOk();
+
+        $this->assertTrue(
+            DB::table('machine_api_tokens')->whereNotNull('api_token')->doesntExist()
+        );
+    }
+
     public function test_can_new_generate_token()
     {
         $this->assertTrue(

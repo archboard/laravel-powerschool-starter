@@ -11,6 +11,7 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
 
     protected bool $signIn = false;
+    protected bool $cloud = false;
     protected Tenant $tenant;
     protected User $user;
 
@@ -26,6 +27,12 @@ abstract class TestCase extends BaseTestCase
 
         if ($this->signIn) {
             $this->logIn();
+        }
+
+        if ($this->cloud) {
+            $this->asCloud();
+        } else {
+            $this->asSelfHosted();
         }
     }
 
@@ -52,6 +59,7 @@ abstract class TestCase extends BaseTestCase
     public function asCloud(): static
     {
         config()->set('app.cloud', true);
+        config()->set('app.self_hosted', false);
 
         return $this;
     }
