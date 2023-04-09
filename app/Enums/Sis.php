@@ -69,4 +69,11 @@ enum Sis: string
 
         return FormFieldCollection::make(Arr::prependKeysWith($fields, 'sis_config.'));
     }
+
+    public function getRules(): array
+    {
+        return $this->getConfigFields()
+            ->map(fn (FormField $field): array => $field->getRules())
+            ->toArray();
+    }
 }
