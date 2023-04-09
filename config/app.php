@@ -17,6 +17,8 @@ return [
 
     'cloud' => env('IS_CLOUD', false),
 
+    'self_hosted' => !env('IS_CLOUD', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
