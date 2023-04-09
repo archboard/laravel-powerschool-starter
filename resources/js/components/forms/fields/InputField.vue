@@ -1,7 +1,6 @@
 <template>
   <FormField
     v-model="localValue"
-    :type="type"
     :error="error"
     :help="helpText"
     :required="required"
@@ -18,7 +17,6 @@ import { useVModel } from '@vueuse/core'
 
 const props = defineProps({
   ...fieldProps,
-  modelValue: String,
 })
 const emit = defineEmits([
   ...fieldEmits,
