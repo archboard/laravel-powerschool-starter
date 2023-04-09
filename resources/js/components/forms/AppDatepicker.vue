@@ -2,6 +2,7 @@
   <DatePicker
     v-model="localValue"
     :popover="{ visibility: 'focus' }"
+    :is-dark="theme === 'dark'"
     v-bind="$attrs"
   >
     <template v-slot="{ inputValue, inputEvents }">
@@ -30,7 +31,9 @@ import AppInput from '@/components/forms/AppInput.vue'
 import { fieldProps, fieldEmits } from '@/composition/useFormField.js'
 import { useVModel } from '@vueuse/core'
 import { TrashIcon, CalendarIcon } from '@heroicons/vue/24/outline'
+import { useLocalStorage } from '@vueuse/core'
 
+const theme = useLocalStorage('theme', 'light')
 const props = defineProps({
   ...fieldProps,
 })
