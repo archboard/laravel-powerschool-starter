@@ -2,8 +2,7 @@ import { computed, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 
 export default () => {
-  const page = usePage()
-  const title = computed(() => page.props.title)
+  const title = computed(() => usePage().props.title)
 
   onMounted(() => {
     document.title = title.value
