@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Enums\Role;
+use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -25,6 +26,9 @@ abstract class TestCase extends BaseTestCase
         $this->tenant = Tenant::factory()->create(compact('domain'));
         $this->tenant->domain = $domain;
         $this->tenant->makeCurrent();
+        School::factory()
+            ->count(2)
+            ->create(['tenant_id' => $this->tenant->id]);
 
         if ($this->signIn) {
             $this->logIn();

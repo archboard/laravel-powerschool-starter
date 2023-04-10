@@ -39,6 +39,7 @@ Route::middleware('tenant')->group(function () {
             Route::get('/oidc', [\App\Http\Controllers\Auth\PowerSchoolOidcLoginController::class, 'login']);
         });
 
+    // TODO: ClassLink auth
     Route::prefix('/auth/classlink')
         ->group(function () {
             Route::get('/oauth', [\App\Http\Controllers\ClassLinkOAuthController::class, 'authenticate'])
@@ -55,7 +56,11 @@ Route::middleware('tenant')->group(function () {
 
         Route::get('/', function () {
             return inertia('Index');
-        });
+        })->name('home');
+
+        Route::get('/select-school', [\App\Http\Controllers\SchoolSelectionController::class, 'index'])
+            ->name('select-school');
+        Route::post('/select-school', [\App\Http\Controllers\SchoolSelectionController::class, 'update']);
 
         Route::prefix('/settings')
             ->name('settings.')
@@ -68,7 +73,7 @@ Route::middleware('tenant')->group(function () {
                         ->only('edit', 'update');
                 });
 
-                Route::middleware('can:edit school settings')->group(function () {
+                Route::middleware(['can:edit school settings', 'has_school'])->group(function () {
                     Route::singleton('/school', \App\Http\Controllers\Settings\SchoolSettingsController::class)
                         ->only('edit', 'update');
                 });

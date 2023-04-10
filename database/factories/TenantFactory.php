@@ -24,7 +24,7 @@ class TenantFactory extends Factory
             'allow_oidc_login' => true,
             'subscription_started_at' => now(),
             'license' => $this->faker->uuid(),
-            'sis_provider' => Sis::PS->value,
+            'sis_provider' => Sis::PS,
             'sis_config' => [
                 'url' => env('POWERSCHOOL_ADDRESS'),
                 'client_id' => env('POWERSCHOOL_CLIENT_ID'),

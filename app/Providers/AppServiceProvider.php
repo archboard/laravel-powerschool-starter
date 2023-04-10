@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\Sis;
 use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
@@ -31,7 +32,8 @@ class AppServiceProvider extends ServiceProvider
     {
         JsonResource::withoutWrapping();
 
-        $currentTenant = fn (): Tenant => Tenant::current() ?? new Tenant();
+        $currentTenant = fn (): Tenant =>
+            Tenant::current() ?? new Tenant();
 
         $currentSchool = function (): School {
             /** @var User $user */
@@ -44,10 +46,8 @@ class AppServiceProvider extends ServiceProvider
             return new School();
         };
 
-        if (!$this->app->runningInConsole()) {
-            $this->app->bind(Tenant::class, $currentTenant);
-            $this->app->bind(School::class, $currentSchool);
-        }
+        $this->app->bind(Tenant::class, $currentTenant);
+        $this->app->bind(School::class, $currentSchool);
 
         Request::macro('tenant', $currentTenant);
         Request::macro('school', $currentSchool);
