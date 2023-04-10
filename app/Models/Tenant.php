@@ -54,7 +54,11 @@ class Tenant extends TenantBase
 
     public function sisProvider(): Attribute
     {
-        return Attribute::get(fn ($value) => $value ? $this->castAttribute('sis_provider', $value) : Sis::PS);
+        return Attribute::get(
+            fn ($value) => is_string($value)
+                ? $this->castAttribute('sis_provider', $value)
+                : Sis::PS
+        );
     }
 
     public function sisConfig(): Attribute
