@@ -20,6 +20,7 @@ class UserResource extends JsonResource
             'last_name' => $this->last_name,
             'email' => $this->email,
             'timezone' => $this->timezone,
+            'school_id' => $this->school_id,
             'schools' => SchoolResource::collection($this->whenLoaded('schools')),
             'school' => new SchoolResource($this->whenLoaded('schoool')),
             'permissions' => $this->whenLoaded('school', function () {
