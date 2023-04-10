@@ -19,6 +19,7 @@
     "dotenv": "^8.2.0",
     "just-clone": "^6.1.1",
     "just-pick": "^4.1.1",
+    "just-reduce-object": "^2.3.0",
     "just-safe-get": "^4.1.1",
     "just-throttle": "^4.1.1",
     "laravel-vite-plugin": "^0.6.0",
