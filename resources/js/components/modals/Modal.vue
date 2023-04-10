@@ -41,7 +41,6 @@ import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 import ModalHeadline from '@/components/modals/ModalHeadline.vue'
 import ModalWrapper from '@/components/modals/ModalWrapper.vue'
 import DropIn from '@/components/transitions/DropIn.vue'
-import { useModal } from 'momentum-modal'
 import { trans } from 'laravel-vue-i18n'
 import AppButton from '@/components/AppButton.vue'
 
@@ -66,7 +65,11 @@ const props = defineProps({
   }
 })
 const emit = defineEmits(['close', 'action'])
-const { show, close } = useModal()
+const show = ref(false)
+const close = () => {
+  show.value = false
+  clearAllBodyScrollLocks()
+}
 const modal = ref()
 const performAction = () => {
   emit('action', close)
