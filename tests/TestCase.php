@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Enums\Role;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -44,12 +45,12 @@ abstract class TestCase extends BaseTestCase
         return User::factory()->create($mergedAttributes);
     }
 
-    public function logIn(User $user = null, array $attributes = [], string $role = 'admin'): static
+    public function logIn(User $user = null, array $attributes = [], Role $role = Role::DISTRICT_ADMIN): static
     {
         /** @var User $user */
         $user = $user ?? $this->seedUser($attributes);
 
-        $user->assign($role);
+        $user->assign($role->value);
         $this->be($user);
         $this->user = $user;
 
