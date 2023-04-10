@@ -2,13 +2,14 @@
 
 namespace App\Fields;
 
+use App\Enums\FieldType;
 use Illuminate\Support\Arr;
 
 class FormField
 {
     protected ?string $label = '';
     protected ?string $help = '';
-    protected string $component = 'InputField';
+    protected FieldType $component = FieldType::input;
     protected string $type = 'text';
     protected bool $required = false;
     protected array $rules = ['nullable'];
@@ -37,9 +38,11 @@ class FormField
         return $this;
     }
 
-    public function component(string $component): static
+    public function component(string|FieldType $component): static
     {
-        $this->component = $component;
+        $this->component = is_string($component)
+            ? FieldType::from($component)
+            : $component;
 
         return $this;
     }
@@ -105,28 +108,28 @@ class FormField
 
     public function datePicker(): static
     {
-        $this->component = 'DatePickerField';
+        $this->component = FieldType::date_picker;
 
         return $this;
     }
 
     public function checkbox(): static
     {
-        $this->component = 'CheckboxField';
+        $this->component = FieldType::checkbox;
 
         return $this;
     }
 
     public function combobox(array $options = []): static
     {
-        $this->component = 'ObjectComboboxField';
+        $this->component = FieldType::combobox;
 
         return $this->withOptions($options);
     }
 
     public function select(array $options = []): static
     {
-        $this->component = 'SelectField';
+        $this->component = FieldType::select;
 
         return $this->withOptions($options);
     }
@@ -145,7 +148,7 @@ class FormField
             'key' => $this->key,
             'label' => $this->label,
             'help' => $this->help,
-            'component' => $this->component,
+            'component' => $this->component->value,
             'type' => $this->type,
             'required' => empty($this->rules)
                 ? $this->required
