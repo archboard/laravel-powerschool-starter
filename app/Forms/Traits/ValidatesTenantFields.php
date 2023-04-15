@@ -45,6 +45,14 @@ trait ValidatesTenantFields
 
     public function smtpRules(): array
     {
-
+        return [
+            'host' => ['required'],
+            'port' => ['required'],
+            'username' => ['nullable'],
+            'password' => ['nullable'],
+            'from_name' => ['required'],
+            'from_address' => ['required', 'email'],
+            'encryption' => ['nullable', Rule::in(['tls', 'ssl'])],
+        ];
     }
 }
