@@ -19,8 +19,6 @@ class InstallationForm implements AppForm
     public function fields(): FormFieldCollection
     {
         return FormFieldCollection::make([
-                'license' => FormField::make(__('License'))
-                    ->rules($this->licenseRules()),
                 'name' => FormField::make(__('Tenant name'))
                     ->rules($this->nameRules()),
                 'domain' => FormField::make(__('Domain'))
@@ -35,7 +33,6 @@ class InstallationForm implements AppForm
                     ->rules($this->emailRules()),
                 ...$this->tenant->sis_provider?->getConfigFields() ?? collect()
             ])
-            ->merge($this->tenant->sis_provider?->getConfigFields() ?? collect())
             ->map(fn (FormField $field, string $key) => $field
                 ->withValue($this->tenant->getInstallationFieldValue($key))
                 ->keyedBy($key)
