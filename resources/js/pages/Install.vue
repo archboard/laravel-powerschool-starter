@@ -27,7 +27,6 @@
 </template>
 
 <script setup>
-import { defineComponent } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import CardWrapper from '@/components/CardWrapper.vue'
 import CardPadding from '@/components/CardPadding.vue'
