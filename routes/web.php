@@ -54,6 +54,12 @@ Route::middleware('tenant')->group(function () {
         Route::get('/csrf-token', \App\Http\Controllers\RefreshCsrfTokenController::class)
             ->name('csrf-token');
 
+        Route::get('/timezones',
+            fn () => timezones()
+                ->map(fn (string $label, string $value) => compact('label', 'value'))
+                ->values()
+        );
+
         Route::get('/', function () {
             return inertia('Index');
         })->name('home');
@@ -67,6 +73,9 @@ Route::middleware('tenant')->group(function () {
             ->group(function () {
                 Route::singleton('/personal', \App\Http\Controllers\Settings\PersonalSettingsController::class)
                     ->only('edit', 'update');
+
+                Route::put('/timezone', \App\Http\Controllers\UpdateTimezoneController::class)
+                    ->name('timezone.update');
 
                 Route::middleware('can:edit tenant settings')->group(function () {
                     Route::singleton('/tenant', \App\Http\Controllers\Settings\TenantSettingsController::class)

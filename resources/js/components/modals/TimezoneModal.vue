@@ -42,7 +42,7 @@ const form = useForm({
 const save = (close) => {
   form.timezone = selectedTimezone.value?.value
 
-  form.put('/timezone', {
+  form.put('/settings/timezone', {
     preserveScroll: true,
     onSuccess () {
       close()
