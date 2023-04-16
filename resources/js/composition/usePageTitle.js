@@ -6,8 +6,8 @@ export default () => {
 
   onMounted(() => {
     document.title = title.value
-      ? `${title.value} | ${import.meta.env.APP_NAME}`
-      : import.meta.env.APP_NAME
+      ? `${title.value} | ${import.meta.env.VITE_APP_NAME}`
+      : import.meta.env.VITE_APP_NAME
   })
 
   return title

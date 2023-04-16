@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('VITE_APP_NAME', 'Laravel'),
 
     'cloud' => env('IS_CLOUD', false),
 
