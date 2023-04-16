@@ -11,9 +11,8 @@ dayjs.extend(relativeTime)
 
 export default () => {
   const $http = inject('$http')
-  const page = usePage()
   const timezone = computed(() =>
-    page.props.user?.timezone ||
+    usePage().props.user?.timezone ||
     'UTC'
   )
   const timeFormat = 'h:mma'
