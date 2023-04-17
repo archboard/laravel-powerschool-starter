@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Enums\Sis;
+use App\Forms\SmtpForm;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
@@ -18,10 +19,12 @@ class TenantSettingsController extends Controller
     public function edit()
     {
         $title = __('Tenant Settings');
+        $smtpForm = new SmtpForm(Tenant::current());
 
         return inertia('settings/Tenant', [
             'title' => $title,
             'tenant' => Tenant::current()->toArray(),
+            'smtpForm' => $smtpForm->toInertia(),
         ])->withViewData(compact('title'));
     }
 

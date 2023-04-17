@@ -17,6 +17,7 @@
             :disabled="field.disabled"
             :help="field.help"
           />
+          {{ field.key }}
         </div>
       </template>
     </FadeInGroup>

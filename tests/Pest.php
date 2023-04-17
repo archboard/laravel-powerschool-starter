@@ -43,3 +43,7 @@ expect()->extend('toBeOne', function () {
 function logIn(array $attributes = []) {
     return test()->logIn(attributes: $attributes);
 }
+
+function fullPermissions() {
+    test()->fullPermission();
+}

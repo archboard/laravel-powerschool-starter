@@ -7,6 +7,7 @@ use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Silber\Bouncer\BouncerFacade;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -59,6 +60,11 @@ abstract class TestCase extends BaseTestCase
         $this->user = $user;
 
         return $this;
+    }
+
+    public function fullPermission(): void
+    {
+        BouncerFacade::allow($this->user)->everything();
     }
 
     public function asCloud(): static

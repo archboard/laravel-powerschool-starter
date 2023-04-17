@@ -80,6 +80,9 @@ Route::middleware('tenant')->group(function () {
                 Route::middleware('can:edit tenant settings')->group(function () {
                     Route::singleton('/tenant', \App\Http\Controllers\Settings\TenantSettingsController::class)
                         ->only('edit', 'update');
+
+                    Route::put('/tenant/smtp', \App\Http\Controllers\UpdateSmtpSettingsController::class)
+                        ->name('tenant.smtp');
                 });
 
                 Route::middleware(['can:edit school settings', 'has_school'])->group(function () {
