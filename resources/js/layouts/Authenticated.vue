@@ -135,15 +135,11 @@
       <Footer />
     </div>
 
-    <TimezoneBanner v-if="timezone !== guessedTimezone" @launch="showTzModal = true" />
+    <TimezoneBanner />
   </div>
 
   <Notifications />
   <Modal />
-  <TimezoneModal
-    v-if="showTzModal"
-    @close="showTzModal = false"
-  />
 </template>
 
 <script setup>
@@ -155,8 +151,6 @@ import Logo from '@/components/icons/Logo.vue'
 import { useLocalStorage } from '@vueuse/core'
 import Footer from '@/components/Footer.vue'
 import Notifications from '@/components/Notifications.vue'
-import TimezoneModal from '@/components/modals/TimezoneModal.vue'
-import useDates from '@/composition/useDates.js'
 import TimezoneBanner from '@/components/banners/TimezoneBanner.vue'
 import usePageTitle from '@/composition/usePageTitle.js'
 import { usePage } from '@inertiajs/vue3'
@@ -171,7 +165,4 @@ const toggleTheme = () => {
   theme.value = theme.value === 'dark' ? 'light' : 'dark'
   window.changeTheme(theme.value === 'dark')
 }
-const { timezone, dayjs } = useDates()
-const guessedTimezone = dayjs.tz.guess()
-const showTzModal = ref(false)
 </script>
