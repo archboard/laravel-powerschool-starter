@@ -8,6 +8,7 @@ use App\Models\Tenant;
 use App\SisProviders\PowerSchoolProvider;
 use App\SisProviders\SisProvider;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 enum Sis: string
 {
@@ -42,12 +43,12 @@ enum Sis: string
         };
     }
 
-    public function isConfigured(array $config): bool
+    public function isConfigured(Collection $config): bool
     {
         return match($this) {
-            self::PS => Arr::get($config, 'url') &&
-                Arr::get($config, 'client_id') &&
-                Arr::get($config, 'client_secret'),
+            self::PS => $config->get('url') &&
+                $config->get('client_id') &&
+                $config->get('client_secret'),
             self::CLASS_LINK => throw new \Exception('To be implemented'),
         };
     }
