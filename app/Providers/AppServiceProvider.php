@@ -6,9 +6,11 @@ use App\Enums\Sis;
 use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
+use GrantHolle\PowerSchool\Auth\UserFactory;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -59,5 +61,13 @@ class AppServiceProvider extends ServiceProvider
             'school' => \App\Models\School::class,
             'section' => \App\Models\Section::class,
         ]);
+
+        // Add the tenant_id to the identifying attributes when looking up a user
+        UserFactory::findUserUsing(function (Collection $data, string $model, array $attributes) {
+            return $model::firstOrNew([
+                ...$attributes,
+                'tenant_id' => Tenant::current()->id,
+            ]);
+        });
     }
 }
