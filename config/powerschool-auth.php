@@ -46,12 +46,15 @@ return [
         'model' => \App\Models\User::class,
         'attributes' => [
             'firstName' => 'first_name',
+            'given_name' => 'first_name',
             'lastName' => 'last_name',
+            'family_name' => 'last_name',
             'email' => 'email',
         ],
         'guard' => 'web',
         'identifying_attributes' => [
-            'email' => 'email',
+            'usersDCID' => 'sis_id',
+            'ps_dcid' => 'sis_id',
         ],
         'attribute_transformers' => [
             'email' => \GrantHolle\PowerSchool\Auth\Transformers\Lowercase::class,
