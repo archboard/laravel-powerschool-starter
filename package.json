@@ -9,7 +9,7 @@
     "@heroicons/vue": "^2.0.10",
     "@inertiajs/vue3": "^1.0.2",
     "@tailwindcss/forms": "^0.5.0",
-    "@vitejs/plugin-vue": "^3.0.3",
+    "@vitejs/plugin-vue": "^4.2.3",
     "@vueuse/core": "^9.2.0",
     "autoprefixer": "^10.2.5",
     "axios": "^1.3.4",
@@ -22,16 +22,16 @@
     "just-reduce-object": "^2.3.0",
     "just-safe-get": "^4.1.1",
     "just-throttle": "^4.1.1",
-    "laravel-vite-plugin": "^0.6.0",
+    "laravel-vite-plugin": "^0.7.8",
     "laravel-vue-i18n": "^2.2.2",
     "momentum-modal": "^0.2.1",
     "nanoid": "^3.1.22",
     "postcss": "^8.3.11",
     "postcss-import": "^14.1.0",
     "qs": "^6.10.1",
-    "tailwindcss": "^3.3.1",
+    "tailwindcss": "^3.3.2",
     "v-calendar": "^3.0.1",
-    "vite": "^3.0.9",
-    "vue": "^3.2.21"
+    "vite": "^4.3.9",
+    "vue": "^3.3.4"
   }
 }
