@@ -16,7 +16,7 @@ import { onMounted, ref } from 'vue'
 import { useVModel } from '@vueuse/core'
 
 const props = defineProps({
-  modelValue: String,
+  modelValue: [String, Number],
   type: {
     type: String,
     default: 'text',

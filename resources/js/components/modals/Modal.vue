@@ -11,7 +11,7 @@
           </button>
         </div>
         <div class="sm:flex sm:items-start px-4 pt-5 pb-4 sm:p-6">
-          <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+          <div class="mt-3 sm:mt-0 w-full">
             <ModalHeadline v-if="headline">
               {{ headline }}
             </ModalHeadline>

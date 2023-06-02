@@ -37,25 +37,41 @@ class SmtpForm extends BaseForm
 
         return FormFieldCollection::make([
                 'host' => FormField::make(__('Host'))
+                    ->span(3)
+                    ->placeholder('127.0.0.1')
+                    ->help(__('IP address or domain name of the SMTP server.'))
                     ->rules($rules['host']),
                 'port' => FormField::make(__('Port'))
                     ->component(FieldType::number)
+                    ->span(3)
+                    ->placeholder('587')
                     ->rules($rules['port']),
                 'username' => FormField::make(__('Username'))
+                    ->span(3)
                     ->rules($rules['username']),
                 'password' => FormField::make(__('Password'))
+                    ->span(3)
                     ->component(FieldType::password)
                     ->rules($rules['password']),
                 'from_name' => FormField::make(__('From name'))
+                    ->span(2)
+                    ->placeholder('App Name')
                     ->rules($rules['from_name']),
                 'from_address' => FormField::make(__('From address'))
+                    ->span(2)
                     ->component(FieldType::email)
                     ->rules($rules['from_address']),
                 'encryption' => FormField::make(__('Encryption'))
+                    ->span(2)
+                    ->component(FieldType::select)
+                    ->withOptions([
+                        'tls' => 'TLS',
+                        'ssl' => 'SSL',
+                    ])
                     ->rules($rules['encryption']),
             ])
             ->map(fn (FormField $field, string $key) => $field
-                ->withValue($this->tenant->getInstallationFieldValue($key))
+                ->withValue($this->tenant->getConfigFieldValue('smtp_config', $key))
                 ->keyedBy($key)
             );
     }

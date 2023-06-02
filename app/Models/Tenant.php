@@ -149,7 +149,7 @@ class Tenant extends TenantBase
         return $school;
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'name' => $this->name,
@@ -157,20 +157,20 @@ class Tenant extends TenantBase
         ];
     }
 
-    public function getSisConfigKey(?string $key, mixed $defaultValue = null): mixed
+    public function getConfigKey(string $configKey, ?string $key, mixed $defaultValue = null): mixed
     {
         return Arr::get(
-            $this->sis_config,
-            Str::replace('sis_config.', '', $key),
+            $this->$configKey,
+            Str::replace("{$configKey}.", '', $key),
             $defaultValue
         );
     }
 
-    public function setSisConfigKey(?string $key, mixed $value): static
+    public function setConfigKey(string $configKey, ?string $key, mixed $value): static
     {
-        $this->sis_config = [
-            ...$this->sis_config,
-            Str::replace('sis_config.', '', $key) => $value,
+        $this->$configKey = [
+            ...$this->$configKey,
+            Str::replace("{$configKey}.", '', $key) => $value,
         ];
 
         return $this;
@@ -178,22 +178,16 @@ class Tenant extends TenantBase
 
     public function getInstallationFieldValue(?string $key): mixed
     {
-        if (Str::startsWith($key, 'sis_config')) {
-            return $this->getSisConfigKey($key);
+        return $this->getConfigFieldValue('sis_config', $key);
+    }
+
+    public function getConfigFieldValue(string $configKey, ?string $key): mixed
+    {
+        if (Str::startsWith($key, $configKey)) {
+            return $this->getConfigKey($configKey, $key);
         }
 
         return $this->getAttribute($key);
-    }
-
-    public function setInstallationFieldValue(?string $key, mixed $value): static
-    {
-        if (Str::startsWith($key, 'sis_config')) {
-            return $this->setSisConfigKey($key, $value);
-        }
-
-        $this->setAttribute($key, $value);
-
-        return $this;
     }
 
     public function getInstallationFields(): FormFieldCollection

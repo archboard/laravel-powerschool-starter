@@ -6,6 +6,7 @@
     type="number"
     :required="required"
     :disabled="disabled"
+    :placeholder="placeholder"
   >
     {{ label }}
   </FormField>
@@ -18,6 +19,7 @@ import { useVModel } from '@vueuse/core'
 
 const props = defineProps({
   ...fieldProps,
+  modelValue: Number,
 })
 const emit = defineEmits([
   ...fieldEmits,

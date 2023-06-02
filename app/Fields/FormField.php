@@ -16,7 +16,9 @@ class FormField
     protected mixed $options = [];
     protected bool $disabled = false;
     protected ?string $key = null;
+    protected ?string $placeholder = null;
     protected mixed $value = null;
+    protected int $span = 6;
 
     public static function make(string $label = null): static
     {
@@ -50,6 +52,13 @@ class FormField
     public function type(string $type): static
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function placeholder(string $placeholder): static
+    {
+        $this->placeholder = $placeholder;
 
         return $this;
     }
@@ -106,6 +115,13 @@ class FormField
         return $this;
     }
 
+    public function span(int $span): static
+    {
+        $this->span = $span;
+
+        return $this;
+    }
+
     public function datePicker(): static
     {
         $this->component = FieldType::date_picker;
@@ -148,6 +164,8 @@ class FormField
             'key' => $this->key,
             'label' => $this->label,
             'help' => $this->help,
+            'span' => $this->span,
+            'placeholder' => $this->placeholder,
             'component' => $this->component->value,
             'type' => $this->type,
             'required' => empty($this->rules)

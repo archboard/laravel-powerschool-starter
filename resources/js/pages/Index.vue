@@ -58,7 +58,7 @@
         action-text="Got it!"
         headline="Optional Headline"
       >
-        <p class="text-sm text-gray-500">
+        <p>
           This is some default text in the modal, but you could put anything in here like forms or something else.
         </p>
       </Modal>

@@ -15,7 +15,6 @@
         <AppButton type="submit" :loading="inertiaForm.processing" />
       </CardAction>
     </CardWrapper>
-    <pre>{{ form }}</pre>
   </form>
 </template>
 

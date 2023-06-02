@@ -1,9 +1,10 @@
 export const fieldProps = {
-  modelValue: [Object, Boolean, String, Number],
+  modelValue: [Object, String, Number],
   label: String,
   type: String,
-  options: Array,
+  options: [Array, Object],
   error: String,
+  placeholder: String,
   disabled: Boolean,
   required: {
     type: Boolean,

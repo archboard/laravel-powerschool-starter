@@ -2,9 +2,9 @@
   <select
     v-model="localValue"
     @change="e => $emit('change', e)"
-    class="block w-full pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 rounded-md"
+    class="block w-full pl-3 pr-8 py-2 text-sm dark:bg-gray-900 focus:outline-none focus:ring-2 rounded-md"
     :class="{
-      'focus:ring-brand-blue focus:border-brand-blue border-gray-300': !hasError,
+      'focus:ring-primary-500 focus:border-primary-500 dark:focus:border-primary-500 border-gray-300 dark:border-gray-600': !hasError,
       'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500': hasError,
     }"
   >
@@ -25,7 +25,7 @@ const props = defineProps({
     default: false,
   },
   options: {
-    type: Array,
+    type: [Array, Object],
     default: () => ([]),
   },
   nullOption: {

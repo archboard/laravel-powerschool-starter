@@ -6,6 +6,7 @@
     type="email"
     :required="required"
     :disabled="disabled"
+    :placeholder="placeholder"
   >
     {{ label }}
   </FormField>
