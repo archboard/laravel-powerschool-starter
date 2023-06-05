@@ -19,12 +19,14 @@ class TenantSettingsController extends Controller
     public function edit()
     {
         $title = __('Tenant Settings');
-        $smtpForm = new SmtpForm(Tenant::current());
+        $smtpForm = config('app.self_hosted')
+            ? new SmtpForm(Tenant::current())
+            : null;
 
         return inertia('settings/Tenant', [
             'title' => $title,
             'tenant' => Tenant::current()->toArray(),
-            'smtpForm' => $smtpForm->toInertia(),
+            'smtpForm' => $smtpForm?->toInertia(),
         ])->withViewData(compact('title'));
     }
 
