@@ -1,5 +1,5 @@
 <template>
-  <form @submit="save">
+  <form @submit.prevent="save">
     <CardWrapper>
       <CardPadding v-if="form.title">
         <CardHeader>{{ form.title }}</CardHeader>
@@ -12,7 +12,9 @@
         />
       </CardPadding>
       <CardAction>
-        <AppButton type="submit" :loading="inertiaForm.processing" />
+        <slot name="actions" :loading="inertiaForm.processing">
+          <AppButton type="submit" :loading="inertiaForm.processing" />
+        </slot>
       </CardAction>
     </CardWrapper>
   </form>

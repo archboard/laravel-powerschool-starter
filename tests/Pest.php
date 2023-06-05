@@ -44,6 +44,6 @@ function logIn(array $attributes = []) {
     return test()->logIn(attributes: $attributes);
 }
 
-function fullPermissions() {
+function fullPermissions(): void {
     test()->fullPermission();
 }

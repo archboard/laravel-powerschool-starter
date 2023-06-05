@@ -73,7 +73,7 @@ class HandleInertiaRequests extends Middleware
 
                 return array_map(fn (NavigationItem $item) => $item->toArray(), $nav);
             },
-            'secondaryNav' => function () use ($user): array {
+            'secondaryNav' => function () use ($user, $request): array {
                 if (!$user) {
                     return [];
                 }
@@ -93,6 +93,7 @@ class HandleInertiaRequests extends Middleware
                 if ($user->can('edit tenant settings')) {
                     $nav[] = NavigationItem::make()
                         ->labeled(__('Tenant settings'))
+                        ->isCurrent($request->routeIs('settings.tenant.edit'))
                         ->to(route('settings.tenant.edit'));
                 }
 

@@ -181,13 +181,14 @@ class Tenant extends TenantBase
         return $this->getConfigFieldValue('sis_config', $key);
     }
 
-    public function getConfigFieldValue(string $configKey, ?string $key): mixed
+    public function getConfigFieldValue(string $configKey, ?string $key = null): mixed
     {
-        if (Str::startsWith($key, $configKey)) {
-            return $this->getConfigKey($configKey, $key);
+        if (!$key && Str::contains($configKey, '.')) {
+            [$configKey, $key] = explode('.', $configKey);
+            return $this->getConfigFieldValue($configKey, $key);
         }
 
-        return $this->getAttribute($key);
+        return $this->$configKey->get($key);
     }
 
     public function getInstallationFields(): FormFieldCollection
