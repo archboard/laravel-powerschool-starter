@@ -27,6 +27,14 @@ enum Sis: string
         );
     }
 
+    public static function selectOptions(): array
+    {
+        return array_map(fn (Sis $sis) => [
+            'label' => $sis->label(),
+            'value' => $sis->value,
+        ], Sis::cases());
+    }
+
     public function label(): string
     {
         return match($this) {
