@@ -20,12 +20,15 @@ class InstallationForm implements AppForm
     {
         return FormFieldCollection::make([
                 'name' => FormField::make(__('Tenant name'))
+                    ->withValue($this->tenant->name)
                     ->rules($this->nameRules()),
                 'domain' => FormField::make(__('Domain'))
+                    ->withValue($this->tenant->domain)
                     ->disabled(config('app.cloud'))
                     ->rules($this->domainRules($this->tenant)),
                 ...(config('app.cloud')
                     ? ['custom_domain' => FormField::make(__('Custom domain'))
+                        ->withValue($this->tenant->custom_domain)
                         ->rules($this->customDomainRules($this->tenant))]
                     : []),
                 'email' => FormField::make(__('Email'))
