@@ -1,6 +1,8 @@
 <template>
   <Authenticated>
     <div class="space-y-8">
+      <AppForm :form="tenantForm" />
+
       <AppForm
         v-if="smtpForm"
         :form="smtpForm"
@@ -27,5 +29,6 @@ import AppButton from '@/components/AppButton.vue'
 
 const props = defineProps({
   smtpForm: Object,
+  tenantForm: Object,
 })
 </script>

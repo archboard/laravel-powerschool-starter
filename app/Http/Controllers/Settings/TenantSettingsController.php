@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Enums\Sis;
 use App\Forms\SmtpForm;
+use App\Forms\TenantSettingsForm;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
@@ -16,17 +17,20 @@ class TenantSettingsController extends Controller
      *
      * @return \Inertia\Response|\Inertia\ResponseFactory
      */
-    public function edit()
+    public function edit(Tenant $tenant)
     {
         $title = __('Tenant Settings');
+        $tenantForm = new TenantSettingsForm($tenant);
         $smtpForm = config('app.self_hosted')
-            ? new SmtpForm(Tenant::current())
+            ? new SmtpForm($tenant)
             : null;
 
         return inertia('settings/Tenant', [
             'title' => $title,
             'tenant' => Tenant::current()->toArray(),
             'smtpForm' => $smtpForm?->toInertia(),
+            'tenantForm' => $tenantForm->toInertia(),
+            'sisOptions' => Sis::selectOptions(),
         ])->withViewData(compact('title'));
     }
 
@@ -36,31 +40,16 @@ class TenantSettingsController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request)
+    public function update(Request $request, Tenant $tenant)
     {
-        $tenant = $request->tenant();
-
-        $data = $request->validate([
-            'name' => ['required'],
-            'sis_provider' => ['required', Rule::enum(Sis::class)],
-            'allow_password_auth' => ['required', 'boolean'],
-            'allow_oidc_login' => ['required', 'boolean'],
-            'smtp_config' => ['array'],
-            'smtp_config.host' => [Rule::requiredIf(config('app.self_hosted'))],
-            'smtp_config.port' => [Rule::requiredIf(config('app.self_hosted'))],
-            'smtp_config.username' => ['nullable'],
-            'smtp_config.password' => ['nullable'],
-            'smtp_config.from_name' => [Rule::requiredIf(config('app.self_hosted'))],
-            'smtp_config.from_address' => [Rule::requiredIf(config('app.self_hosted')), 'email'],
-            'smtp_config.encryption' => ['nullable'],
-            ...$tenant->getInstallationFields()
-                ->toValidationRules(),
-        ]);
+        $data = $request->validate(
+            (new TenantSettingsForm($tenant))->rules()
+        );
 
         $tenant->update($data);
 
         session()->flash('success', __('Settings updated successfully.'));
 
-        return back();
+        return to_route('settings.tenant.edit');
     }
 }

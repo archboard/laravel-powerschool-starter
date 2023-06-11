@@ -16,6 +16,7 @@ import { useVModel } from '@vueuse/core'
 
 const props = defineProps({
   ...fieldProps,
+  modelValue: [Boolean, String, Number, Array],
 })
 const emit = defineEmits([
   ...fieldEmits,

@@ -8,9 +8,19 @@ use Illuminate\Validation\Rule;
 
 trait ValidatesTenantFields
 {
-    public function licenseRules(): array
+    public function licenseRules(Tenant $tenant): array
     {
-        return ['required', 'uuid', new ValidLicense(), 'unique:tenants:license'];
+        return [
+            'required',
+            'uuid',
+            new ValidLicense(),
+            Rule::unique('tenants', 'license')->ignoreModel($tenant),
+        ];
+    }
+
+    public function sisProviderRules(): array
+    {
+        return ['required'];
     }
 
     public function nameRules(): array
