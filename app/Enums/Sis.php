@@ -39,7 +39,7 @@ enum Sis: string
     {
         return match($this) {
             self::PS => 'PowerSchool SIS',
-            self::CLASS_LINK => throw new \Exception('To be implemented'),
+            self::CLASS_LINK => 'ClassLink',
         };
     }
 
@@ -57,7 +57,7 @@ enum Sis: string
             self::PS => $config->get('url') &&
                 $config->get('client_id') &&
                 $config->get('client_secret'),
-            self::CLASS_LINK => throw new \Exception('To be implemented'),
+            self::CLASS_LINK => false,
         };
     }
 
@@ -73,7 +73,7 @@ enum Sis: string
                 'client_secret' => FormField::make(__('PowerSchool Client Secret'))
                     ->rules(['required', 'uuid']),
             ],
-            self::CLASS_LINK => throw new \Exception('To be implemented'),
+            self::CLASS_LINK => [],
         };
 
         return FormFieldCollection::make(Arr::prependKeysWith($fields, 'sis_config.'));
