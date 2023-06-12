@@ -78,6 +78,13 @@ class User extends Authenticatable
             ->withPivot(['staff_id']);
     }
 
+    public function adminSchools(): BelongsToMany
+    {
+        return $this->schools()
+            ->active()
+            ->orderBy('name');
+    }
+
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class);

@@ -53,6 +53,14 @@
         <div class="flex flex-shrink-0 items-center px-4">
           <Logo class="h-10 w-auto" />
         </div>
+
+        <div v-if="adminSchools.length > 0" class="mt-5 px-2">
+          <label for="current-school" class="sr-only">Current school</label>
+          <AppSelect v-model="currentSchool">
+            <option v-for="school in adminSchools" :id="school.id" :value="school.id">{{ school.name }}</option>
+          </AppSelect>
+        </div>
+
         <div class="mt-5 flex flex-grow flex-col">
           <nav class="flex-1 space-y-8 px-2" aria-label="Sidebar">
             <div class="space-y-1">
@@ -143,7 +151,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { inject, ref, watch } from 'vue'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { Bars3BottomLeftIcon, SunIcon, MoonIcon, CalendarIcon, ChartBarIcon, FolderIcon, HomeIcon, InboxIcon, UsersIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
@@ -153,8 +161,10 @@ import Footer from '@/components/Footer.vue'
 import Notifications from '@/components/Notifications.vue'
 import TimezoneBanner from '@/components/banners/TimezoneBanner.vue'
 import usePageTitle from '@/composition/usePageTitle.js'
-import { usePage } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import { Modal } from 'momentum-modal'
+import useProp from '@/composition/useProp.js'
+import AppSelect from '@/components/forms/AppSelect.vue'
 
 const title = usePageTitle()
 const { props } = usePage()
@@ -165,4 +175,21 @@ const toggleTheme = () => {
   theme.value = theme.value === 'dark' ? 'light' : 'dark'
   window.changeTheme(theme.value === 'dark')
 }
+const adminSchools = useProp('adminSchools')
+const user = useProp('user')
+const $error = inject('$error')
+const currentSchool = ref(user.value.school_id)
+
+watch(currentSchool, (value) => {
+  if (value) {
+    router.put('/settings/current-school', {
+      school_id: value
+    }, {
+      preserveScroll: true,
+      onError: (errors) => {
+        $error(errors.school_id)
+      }
+    })
+  }
+})
 </script>

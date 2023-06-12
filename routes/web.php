@@ -77,6 +77,9 @@ Route::middleware('tenant')->group(function () {
                 Route::put('/timezone', \App\Http\Controllers\UpdateTimezoneController::class)
                     ->name('timezone.update');
 
+                Route::put('/current-school', \App\Http\Controllers\UpdateCurrentSchoolController::class)
+                    ->name('current-school.update');
+
                 Route::middleware('can:edit tenant settings')->group(function () {
                     Route::singleton('/tenant', \App\Http\Controllers\Settings\TenantSettingsController::class)
                         ->only('edit', 'update');

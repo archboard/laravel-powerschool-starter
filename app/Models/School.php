@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\BelongsToTenant;
 use GrantHolle\PowerSchool\Api\Facades\PowerSchool;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -23,6 +24,11 @@ class School extends Model
     protected $casts = [
         'active' => 'boolean',
     ];
+
+    public function scopeActive(Builder $builder): void
+    {
+        $builder->where('active', true);
+    }
 
     public function users(): BelongsToMany
     {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\Role;
 use App\Http\Resources\SchoolResource;
 use App\Http\Resources\UserResource;
 use App\Models\School;
@@ -43,6 +44,8 @@ class HandleInertiaRequests extends Middleware
     {
         /** @var User|null $user */
         $user = $request->user();
+        $tenant = $request->tenant();
+
         return array_merge(parent::share($request), [
             'user' => function () use ($user) {
                 if ($user) {
@@ -51,8 +54,17 @@ class HandleInertiaRequests extends Middleware
 
                 return new \stdClass();
             },
-            'school' => function () {
-                return new SchoolResource(app(School::class));
+            'school' => fn () => new SchoolResource(app(School::class)),
+            'adminSchools' => function () use ($user, $tenant) {
+                $schools = $user->isA(Role::DISTRICT_ADMIN->value)
+                    ? $tenant->schools()
+                        ->active()
+                        ->orderBy('name')
+                        ->get()
+                    : $user->adminSchools()
+                        ->get();
+
+                return SchoolResource::collection($schools);
             },
             'flash' => [
                 'success' => session('success'),
