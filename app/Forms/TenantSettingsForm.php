@@ -42,10 +42,12 @@ class TenantSettingsForm extends BaseForm
                 'domain' => FormField::make(__('Domain'))
                     ->withValue($this->tenant->domain)
                     ->disabled(config('app.cloud'))
+                    ->span(3)
                     ->rules($this->domainRules($this->tenant)),
                 'sis_provider' => FormField::make(__('SIS data provider'))
                     ->withValue($this->tenant->sis_provider->value)
                     ->component(FieldType::select)
+                    ->span(3)
                     ->withOptions(Sis::selectOptions())
                     ->rules($this->sisProviderRules()),
                 'allow_password_auth' => FormField::make(__('Allow password authentication'))
