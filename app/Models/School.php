@@ -20,6 +20,10 @@ class School extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'active' => 'boolean',
+    ];
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)

@@ -17,6 +17,7 @@ it('can be accessed with permission', function () {
             ->has('title')
             ->has('tenantForm')
             ->has('smtpForm')
+            ->has('schools')
         )
         ->assertOk();
 });

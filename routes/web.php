@@ -83,6 +83,9 @@ Route::middleware('tenant')->group(function () {
 
                     Route::put('/tenant/smtp', \App\Http\Controllers\UpdateSmtpSettingsController::class)
                         ->name('tenant.smtp');
+
+                    Route::put('/tenant/schools', \App\Http\Controllers\UpdateTenantSchoolsController::class)
+                        ->name('tenant.schools');
                 });
 
                 Route::middleware(['can:edit school settings', 'has_school'])->group(function () {

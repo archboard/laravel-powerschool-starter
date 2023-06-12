@@ -1,8 +1,13 @@
 <template>
-  <CheckboxWrapper>
-    <Checkbox v-model:checked="localValue" />
+  <CheckboxWrapper
+    :class="{
+      'pointer-not-allowed': disabled,
+    }"
+  >
+    <Checkbox v-model="localValue" @change="emitChange" :value="value" :disabled="disabled" />
     <CheckboxText>
-      <slot /> <Req v-if="required" />
+      <slot />
+      <Req v-if="required" />
     </CheckboxText>
   </CheckboxWrapper>
 </template>
@@ -15,15 +20,20 @@ import CheckboxText from './CheckboxText.vue'
 import Req from '@/components/forms/Req.vue'
 
 const props = defineProps({
-  modelValue: Boolean,
-  required: {
+  modelValue: [Boolean, Array],
+  value: [Boolean, String, Number],
+  required: Boolean,
+  disabled: {
     type: Boolean,
-    default: () => false,
-  }
+    default: false,
+  },
 })
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'change'])
 const localValue = computed({
   get: () => props.modelValue,
   set: value => emit('update:modelValue', value)
 })
+const emitChange = value => {
+  emit('change', value)
+}
 </script>

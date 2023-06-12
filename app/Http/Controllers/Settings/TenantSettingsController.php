@@ -6,6 +6,7 @@ use App\Enums\Sis;
 use App\Forms\SmtpForm;
 use App\Forms\TenantSettingsForm;
 use App\Http\Controllers\Controller;
+use App\Models\School;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -24,6 +25,9 @@ class TenantSettingsController extends Controller
         $smtpForm = config('app.self_hosted')
             ? new SmtpForm($tenant)
             : null;
+        $schools = $tenant->schools()
+            ->orderBy('name')
+            ->get();
 
         return inertia('settings/Tenant', [
             'title' => $title,
@@ -31,6 +35,12 @@ class TenantSettingsController extends Controller
             'smtpForm' => $smtpForm?->toInertia(),
             'tenantForm' => $tenantForm->toInertia(),
             'sisOptions' => Sis::selectOptions(),
+            'schools' => $schools->map(fn (School $school) => [
+                'id' => $school->id,
+                'name' => $school->name,
+                'active' => $school->active,
+            ]),
+            'editable' => config('app.self_hosted'),
         ])->withViewData(compact('title'));
     }
 
