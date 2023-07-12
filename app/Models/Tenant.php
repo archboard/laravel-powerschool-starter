@@ -19,9 +19,6 @@ use Illuminate\Validation\Rule;
 use Silber\Bouncer\BouncerFacade;
 use Spatie\Multitenancy\Models\Tenant as TenantBase;
 
-/**
- * @mixin IdeHelperTenant
- */
 class Tenant extends TenantBase
 {
     use HasFactory;
@@ -50,15 +47,6 @@ class Tenant extends TenantBase
     public function domain(): Attribute
     {
         return Attribute::get(fn ($value) => $value ?? request()->host());
-    }
-
-    public function sisProvider(): Attribute
-    {
-        return Attribute::get(
-            fn ($value) => is_string($value)
-                ? $this->castAttribute('sis_provider', $value)
-                : Sis::PS
-        );
     }
 
     public function sisConfig(): Attribute
@@ -112,7 +100,10 @@ class Tenant extends TenantBase
 
     public static function fromRequestAndFallback(Request $request): Tenant
     {
-        return static::fromRequest($request) ?? new static;
+        return static::fromRequest($request) ?? new static([
+            'domain' => $request->getHost(),
+            'sis_provider' => Sis::PS,
+        ]);
     }
 
     public static function getByHost(string $host): ?Tenant
@@ -147,14 +138,6 @@ class Tenant extends TenantBase
             ->where('sis_id', $sisId)
             ->firstOrFail();
         return $school;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'name' => $this->name,
-            'allow_password_auth' => $this->allow_password_auth,
-        ];
     }
 
     public function getConfigKey(string $configKey, ?string $key, mixed $defaultValue = null): mixed
@@ -219,7 +202,7 @@ class Tenant extends TenantBase
                 ...$this->sis_provider?->getConfigFields() ?? collect()
             ])
             ->map(fn (FormField $field, string $key) => $field
-                ->withValue($this->getInstallationFieldValue($key))
+                ->withValue($this->getInstallationFieldValue($key) ?? $this->getAttribute($key))
                 ->keyedBy($key)
             );
     }

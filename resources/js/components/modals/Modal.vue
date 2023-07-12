@@ -20,7 +20,7 @@
             </div>
           </div>
         </div>
-        <div class="bg-gray-100 dark:bg-gray-700 px-4 py-3 sm:px-6 flex flex-col space-y-2 sm:space-y-0 sm:flex-row-reverse rounded-b-2xl">
+        <div v-if="!hideActions" class="bg-gray-100 dark:bg-gray-700 px-4 py-3 sm:px-6 flex flex-col space-y-2 sm:space-y-0 sm:flex-row-reverse rounded-b-2xl">
           <slot name="actions" :close="close">
             <AppButton @click.prevent="performAction" :loading="actionLoading" type="button" :color="actionColor" class="sm:ml-2 text-sm">
               {{ computedActionText }}
@@ -37,7 +37,6 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
-import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 import ModalHeadline from '@/components/modals/ModalHeadline.vue'
 import ModalWrapper from '@/components/modals/ModalWrapper.vue'
 import DropIn from '@/components/transitions/DropIn.vue'
@@ -62,13 +61,16 @@ const props = defineProps({
   size: {
     type: String,
     default: 'lg'
+  },
+  hideActions: {
+    type: Boolean,
+    default: false,
   }
 })
 const emit = defineEmits(['close', 'action'])
 const show = ref(false)
 const close = () => {
   show.value = false
-  clearAllBodyScrollLocks()
 }
 const modal = ref()
 const performAction = () => {
@@ -107,12 +109,12 @@ onMounted(() => {
   document.removeEventListener('keydown', listener)
 
   nextTick(() => {
-    disableBodyScroll(modal.value)
+    document.body.classList.add('no-scroll')
   })
 })
 
 onUnmounted(() => {
-  clearAllBodyScrollLocks()
+  document.body.classList.remove('no-scroll')
   document.addEventListener('keydown', listener)
 })
 

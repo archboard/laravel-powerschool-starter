@@ -15,7 +15,7 @@ class CreateTenantsTable extends Migration
             $table->string('domain')->nullable();
             $table->string('custom_domain')->nullable();
             $table->boolean('allow_password_auth')->default(false);
-            $table->boolean('allow_oidc_login')->default(false);
+            $table->boolean('allow_oidc_login')->default(true);
             $table->dateTime('subscription_started_at')->nullable();
             $table->dateTime('subscription_expires_at')->nullable();
             $table->uuid('license')->nullable();

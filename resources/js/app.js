@@ -6,6 +6,7 @@ import components from '@/components'
 import get from 'just-safe-get'
 import flashesNotifications from '@/plugins/flashesNotifications.js'
 import { modal } from 'momentum-modal'
+import '../css/app.css'
 
 createInertiaApp({
   title: title => title ? `${title} | ${import.meta.env.APP_NAME}` : import.meta.env.APP_NAME,

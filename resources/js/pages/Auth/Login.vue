@@ -18,21 +18,21 @@
         <FormField :error="form.errors.email">
           {{ __('Email') }}
           <template #component="{ hasError }">
-            <AppInput v-model="form.email" class="text-lg" type="email" :has-error="hasError" />
+            <AppInput v-model="form.email" class="text-xl" type="email" :has-error="hasError" />
           </template>
         </FormField>
 
         <FormField :error="form.errors.password">
           {{ __('Password') }}
           <template #component="{ hasError }">
-            <AppInput v-model="form.password" class="text-lg" type="password" :has-error="hasError" />
+            <AppInput v-model="form.password" class="text-xl" type="password" :has-error="hasError" />
           </template>
         </FormField>
 
         <FormField>
           <template #component>
             <AppCheckbox v-model="form.remember">
-              {{ __('Remember me') }}
+              {{ __('Keep me logged in') }}
             </AppCheckbox>
           </template>
         </FormField>

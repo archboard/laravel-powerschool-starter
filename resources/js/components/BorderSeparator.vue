@@ -15,7 +15,7 @@
 const props = defineProps({
   background: {
     type: String,
-    default: 'bg-white dark:bg-gray-800',
+    default: 'bg-white dark:bg-black',
   }
 })
 </script>

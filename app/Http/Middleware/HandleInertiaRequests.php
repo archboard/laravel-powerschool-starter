@@ -56,6 +56,10 @@ class HandleInertiaRequests extends Middleware
             },
             'school' => fn () => new SchoolResource(app(School::class)),
             'adminSchools' => function () use ($user, $tenant) {
+                if (!$user) {
+                    return [];
+                }
+
                 $schools = $user->isA(Role::DISTRICT_ADMIN->value)
                     ? $tenant->schools()
                         ->active()

@@ -87,6 +87,9 @@ Route::middleware('tenant')->group(function () {
                     Route::put('/tenant/smtp', \App\Http\Controllers\UpdateSmtpSettingsController::class)
                         ->name('tenant.smtp');
 
+                    Route::post('/tenant/smtp/test', \App\Http\Controllers\SendSmtpTestController::class)
+                        ->name('tenant.smtp.test');
+
                     Route::put('/tenant/schools', \App\Http\Controllers\UpdateTenantSchoolsController::class)
                         ->name('tenant.schools');
                 });

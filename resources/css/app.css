@@ -9,3 +9,12 @@
   }
 }
 
+@layer utilities {
+  .no-scroll {
+    height: 100vh;
+    width: 100vw;
+    touch-action: none;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+}

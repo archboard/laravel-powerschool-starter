@@ -98,7 +98,7 @@ export default {
         height: '',
       },
       colors: {
-        primary: 'text-white bg-primary-500 focus:ring-primary-500 active:bg-primary-600 disabled:bg-gray-500',
+        primary: 'text-white bg-primary-600 focus:ring-primary-500 active:bg-primary-600 disabled:bg-gray-500',
         red: 'text-white bg-red-600 hover:bg-red-500 focus:border-red-700 focus:ring-red-400 active:bg-red-700 disabled:bg-red-400',
         yellow: 'text-white bg-yellow-600 hover:bg-yellow-500 focus:border-yellow-700 focus:ring-yellow-400 active:bg-yellow-700 disabled:bg-yellow-400',
         green: 'text-white bg-green-600 hover:bg-green-500 focus:border-green-700 focus:ring-green-400 active:bg-green-700 disabled:bg-green-400',

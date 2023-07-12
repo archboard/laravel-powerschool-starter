@@ -8,7 +8,7 @@
         :form="smtpForm"
       >
         <template #actions="{ loading }">
-          <AppButton color="white">{{ __('Send test') }}</AppButton>
+          <AppButton @click.prevent="sendSmtpTest" type="button" color="white" :loading="uiState === 'sending'">{{ __('Send test') }}</AppButton>
           <AppButton type="submit" :loading="loading" />
         </template>
       </AppForm>
@@ -56,7 +56,7 @@ import Authenticated from '@/layouts/Authenticated.vue'
 import CardWrapper from '@/components/CardWrapper.vue'
 import CardPadding from '@/components/CardPadding.vue'
 import CardHeader from '@/components/CardHeader.vue'
-import { useForm } from '@inertiajs/vue3'
+import { router, useForm } from '@inertiajs/vue3'
 import CardAction from '@/components/CardAction.vue'
 import AppForm from '@/components/forms/AppForm.vue'
 import AppButton from '@/components/AppButton.vue'
@@ -64,6 +64,7 @@ import HelpText from '@/components/forms/HelpText.vue'
 import AppCheckbox from '@/components/forms/AppCheckbox.vue'
 import AppLink from '@/components/AppLink.vue'
 import SimpleAlert from '@/components/alerts/SimpleAlert.vue'
+import { ref } from 'vue'
 
 const props = defineProps({
   smtpForm: Object,
@@ -71,6 +72,7 @@ const props = defineProps({
   schools: Array,
   editable: Boolean,
 })
+const uiState = ref()
 const schoolForm = useForm({
   schools: props.schools.reduce((carry, school) => {
     if (school.active) {
@@ -93,5 +95,15 @@ const saveSchools = () => {
       preserveScroll: true,
     })
   }
+}
+const sendSmtpTest = () => {
+  uiState.value = 'sending'
+
+  router.post('/settings/tenant/smtp/test', null, {
+    preserveScroll: true,
+    onSuccess: () => {
+      uiState.value = null
+    }
+  })
 }
 </script>
