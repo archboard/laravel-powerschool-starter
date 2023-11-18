@@ -380,6 +380,26 @@ class PowerSchoolProvider implements SisProvider
             'external_expression' => $results['external_expression'],
         ]);
 
+        // Sync enrollment
+        $results = $this->builder
+            ->get("/ws/v1/section/{$section->sis_id}/section_enrollment");
+
+        // When there is only one result, it gets returned as a single entry
+        // rather than an array of one entry...
+        $enrollments = Arr::isAssoc($results->toArray())
+            ? collect([$results->toArray()])
+            : $results->collect();
+        $students = $this->tenant->students()
+            ->whereIn(
+                'sis_id',
+                $enrollments
+                    ->filter(fn (array $enrollment) => !$enrollment['dropped'])
+                    ->pluck('student_id')
+            )
+            ->pluck('id');
+
+        $section->students()->sync($students);
+
         return $section;
     }
 
