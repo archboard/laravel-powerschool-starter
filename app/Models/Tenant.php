@@ -88,6 +88,11 @@ class Tenant extends TenantBase
         return $this->hasMany(Student::class);
     }
 
+    public function courses(): HasMany
+    {
+        return $this->hasMany(Course::class);
+    }
+
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class);

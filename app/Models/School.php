@@ -51,27 +51,10 @@ class School extends Model
         return $this->hasMany(Student::class);
     }
 
-    public static function getFromPowerSchool(array $ids = []): Collection
+    public function syncFromSis(): static
     {
-        $psSchools = PowerSchool::endpoint('/ws/v1/district/school')
-            ->get();
+        $provider = $this->tenant->getSisProvider();
 
-        return collect($psSchools->schools->school);
-    }
-
-    public function syncFromPowerSchool(): static
-    {
-        $psSchool = PowerSchool::endpoint("/ws/v1/school/{$this->dcid}")
-            ->get();
-
-        $this->update([
-            'name' => $psSchool->name,
-            'sis_id' => $psSchool->id,
-            'school_number' => $psSchool->school_number,
-            'high_grade' => $psSchool->high_grade,
-            'low_grade' => $psSchool->low_grade,
-        ]);
-
-        return $this;
+        return $provider->syncSchool($this);
     }
 }

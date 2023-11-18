@@ -6,11 +6,13 @@ use App\Enums\Sis;
 use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use GrantHolle\PowerSchool\Auth\UserFactory;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -33,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         JsonResource::withoutWrapping();
+        Date::use(CarbonImmutable::class);
 
         $currentTenant = fn (): Tenant =>
             Tenant::current() ?? new Tenant();

@@ -2,7 +2,9 @@
 
 namespace App\SisProviders;
 
+use App\Models\Course;
 use App\Models\School;
+use App\Models\Section;
 use App\Models\Student;
 use App\Models\Tenant;
 use App\Models\User;
@@ -16,15 +18,25 @@ interface SisProvider
 
     public function getAllSchools(): Collection;
 
-    public function syncSchools(): Collection;
+    public function syncSchools(): static;
 
-    public function syncSchool($sisId): School;
+    public function syncSchool(School $school): School;
 
-    public function fullSchoolSync($sisId): void;
+    public function fullSchoolSync(School $school): void;
 
-    public function syncStudent($sisId): Student;
+    public function syncSchoolStudents(School $school): static;
 
-    public function syncUser($sisId): User;
+    public function syncSchoolCourses(School $school): static;
 
-    public function syncTeacher($sisId): User;
+    public function syncSchoolSections(School $school): static;
+
+    public function syncStudent(Student $student): Student;
+
+    public function syncUser(User $user): User;
+
+    public function syncTeacher(User $user): User;
+
+    public function syncSection(Section $section): Section;
+
+    public function syncCourse(Course $course): Course;
 }
