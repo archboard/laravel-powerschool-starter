@@ -67,6 +67,8 @@ Route::middleware('tenant')->group(function () {
         Route::get('/select-school', [\App\Http\Controllers\SchoolSelectionController::class, 'index'])
             ->name('select-school');
         Route::post('/select-school', [\App\Http\Controllers\SchoolSelectionController::class, 'update']);
+        Route::post('/sync/{model}/{id}', \App\Http\Controllers\Settings\SyncModelController::class)
+            ->name('model.sync');
 
         Route::prefix('/settings')
             ->name('settings.')
