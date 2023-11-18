@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Contracts\ExistsInSis;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /**
  * @mixin IdeHelperSection
  */
-class Section extends Model
+class Section extends Model implements ExistsInSis
 {
     use HasFactory;
     use BelongsToTenant;
