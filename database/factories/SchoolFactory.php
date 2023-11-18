@@ -27,6 +27,7 @@ class SchoolFactory extends Factory
             'name' => $this->faker->company,
             'high_grade' => 12,
             'low_grade' => $this->faker->numberBetween(-2, 0),
+            'sis_key' => $this->faker->numberBetween(1, 100),
         ];
     }
 }
