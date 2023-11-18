@@ -19,6 +19,9 @@ use Illuminate\Validation\Rule;
 use Silber\Bouncer\BouncerFacade;
 use Spatie\Multitenancy\Models\Tenant as TenantBase;
 
+/**
+ * @mixin IdeHelperTenant
+ */
 class Tenant extends TenantBase
 {
     use HasFactory;
