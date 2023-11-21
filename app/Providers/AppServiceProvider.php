@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Enums\Sis;
+use App\Enums\UserType;
 use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
@@ -68,9 +69,13 @@ class AppServiceProvider extends ServiceProvider
 
         // Add the tenant_id to the identifying attributes when looking up a user
         UserFactory::findUserUsing(function (Collection $data, string $model, array $attributes) {
+            $tenant = Tenant::current();
+            $userType = UserType::fromData($data);
+
             return $model::firstOrNew([
                 ...$attributes,
-                'tenant_id' => Tenant::current()->id,
+                'tenant_id' => $tenant->id,
+                'sis_key' => $userType->getSisKeyFromData($data),
             ]);
         });
     }

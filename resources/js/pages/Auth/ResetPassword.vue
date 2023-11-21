@@ -1,76 +1,47 @@
 <template>
   <Layout>
-    <ValidationErrors class="mb-4" />
-
     <form @submit.prevent="submit">
       <Fieldset>
-        <InputWrap :error="form.errors.email">
-          <Label for="email" class="text-base">{{ __('Email') }}</Label>
-          <Input id="email" type="email" class="text-lg" v-model="form.email" required autofocus autocomplete="username" />
-        </InputWrap>
+        <FormField v-model="form.email" :error="form.errors.email" type="email">
+          {{ __('Email') }}
+        </FormField>
 
-        <InputWrap :error="form.errors.password">
-          <Label for="password" class="text-base">{{ __('Password') }}</Label>
-          <Input id="password" type="password" class="text-lg" v-model="form.password" required autocomplete="new-password" />
-        </InputWrap>
+        <FormField v-model="form.password" :error="form.errors.password" type="password">
+          {{ __('Password') }}
+        </FormField>
 
-        <InputWrap>
-          <Label for="password_confirmation" class="text-base">{{ __('Confirm Password') }}</Label>
-          <Input id="password_confirmation" type="password" class="text-lg" v-model="form.password_confirmation" required autocomplete="new-password" />
-        </InputWrap>
-      </Fieldset>
+        <FormField v-model="form.password_confirmation" :error="form.errors.password_confirmation" type="password">
+          {{ __('Confirm password') }}
+        </FormField>
 
-      <div class="mt-6">
-        <Button :loading="form.processing" :is-block="true" size="lg">
+        <Button :loading="form.processing" full>
           {{ __('Reset Password') }}
         </Button>
-      </div>
+      </Fieldset>
     </form>
   </Layout>
 </template>
 
-<script>
-import Fieldset from '@/components/forms/Fieldset'
-import InputWrap from '@/components/forms/InputWrap'
-import Label from '@/components/forms/Label'
-import Input from '@/components/forms/Input'
-import Button from '@/components/Button'
-import ValidationErrors from '@/components/ValidationErrors'
-import Layout from '../../layouts/Guest'
+<script setup>
+import Fieldset from '@/components/forms/AppFieldset.vue'
+import Button from '@/components/AppButton.vue'
+import Layout from '@/layouts/Guest.vue'
+import { useForm } from '@inertiajs/vue3'
+import FormField from '@/components/forms/FormField.vue'
 
-export default {
-  components: {
-    Layout,
-    ValidationErrors,
-    Button,
-    Input,
-    Label,
-    InputWrap,
-    Fieldset,
-  },
-
-  props: {
-    email: String,
-    token: String,
-  },
-
-  data() {
-    return {
-      form: this.$inertia.form({
-        token: this.token,
-        email: this.email,
-        password: '',
-        password_confirmation: '',
-      })
-    }
-  },
-
-  methods: {
-    submit() {
-      this.form.post(this.$route('password.update'), {
-        onFinish: () => this.form.reset('password', 'password_confirmation'),
-      })
-    }
-  }
+const props = defineProps({
+  email: String,
+  token: String,
+})
+const form = useForm({
+  token: props.token,
+  email: props.email,
+  password: '',
+  password_confirmation: '',
+})
+const submit = () => {
+  form.post('/reset-password', {
+    onFinish: () => form.reset('password', 'password_confirmation'),
+  })
 }
 </script>

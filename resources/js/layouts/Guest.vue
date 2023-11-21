@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen flex flex-col sm:justify-center pt-48 sm:pt-0 items-center">
-    <div class="max-w-md px-4 w-full relative">
+    <div class="max-w-sm px-4 w-full relative">
       <div class="pb-5 absolute top-0 inset-x-0 flex justify-center transform -translate-y-full">
         <InertiaLink href="/">
 <!--          <Logo class="w-20 h-20 fill-current text-white" />-->
@@ -19,8 +19,6 @@
 </template>
 
 <script setup>
-import CardWrapper from '@/components/CardWrapper.vue'
-import CardPadding from '@/components/CardPadding.vue'
 import Alert from '@/components/alerts/SimpleAlert.vue'
 import Notifications from '@/components/Notifications.vue'
 import { usePage } from '@inertiajs/vue3'
