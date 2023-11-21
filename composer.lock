@@ -1293,16 +1293,16 @@
         },
         {
             "name": "grantholle/powerschool-api",
-            "version": "4.2.3",
+            "version": "4.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/grantholle/powerschool-api.git",
-                "reference": "5eb691fc5b8c3e29331f6cbb791a3177b79f81bf"
+                "reference": "b6245f4b55bf282379e806206d44402563faeb13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/grantholle/powerschool-api/zipball/5eb691fc5b8c3e29331f6cbb791a3177b79f81bf",
-                "reference": "5eb691fc5b8c3e29331f6cbb791a3177b79f81bf",
+                "url": "https://api.github.com/repos/grantholle/powerschool-api/zipball/b6245f4b55bf282379e806206d44402563faeb13",
+                "reference": "b6245f4b55bf282379e806206d44402563faeb13",
                 "shasum": ""
             },
             "require": {
@@ -1349,9 +1349,9 @@
             ],
             "support": {
                 "issues": "https://github.com/grantholle/powerschool-api/issues",
-                "source": "https://github.com/grantholle/powerschool-api/tree/4.2.3"
+                "source": "https://github.com/grantholle/powerschool-api/tree/4.2.5"
             },
-            "time": "2023-07-17T05:44:44+00:00"
+            "time": "2023-11-21T20:15:55+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -1896,16 +1896,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v10.32.1",
+            "version": "v10.33.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "b30e44f20d244f7ba125283e14a8bbac167f4e5b"
+                "reference": "4536872e3e5b6be51b1f655dafd12c9a4fa0cfe8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/b30e44f20d244f7ba125283e14a8bbac167f4e5b",
-                "reference": "b30e44f20d244f7ba125283e14a8bbac167f4e5b",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/4536872e3e5b6be51b1f655dafd12c9a4fa0cfe8",
+                "reference": "4536872e3e5b6be51b1f655dafd12c9a4fa0cfe8",
                 "shasum": ""
             },
             "require": {
@@ -2094,7 +2094,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2023-11-14T22:57:08+00:00"
+            "time": "2023-11-21T14:49:31+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -7879,16 +7879,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "3.7.1",
+            "version": "3.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "5b7bd66c9ff58c04c5474ab85edce442f8081cb2"
+                "reference": "0ac3c270590e54910715e9a1a044cc368df282b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/5b7bd66c9ff58c04c5474ab85edce442f8081cb2",
-                "reference": "5b7bd66c9ff58c04c5474ab85edce442f8081cb2",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/0ac3c270590e54910715e9a1a044cc368df282b2",
+                "reference": "0ac3c270590e54910715e9a1a044cc368df282b2",
                 "shasum": ""
             },
             "require": {
@@ -7904,7 +7904,7 @@
                 "doctrine/coding-standard": "12.0.0",
                 "fig/log-test": "^1",
                 "jetbrains/phpstorm-stubs": "2023.1",
-                "phpstan/phpstan": "1.10.35",
+                "phpstan/phpstan": "1.10.42",
                 "phpstan/phpstan-strict-rules": "^1.5",
                 "phpunit/phpunit": "9.6.13",
                 "psalm/plugin-phpunit": "0.18.4",
@@ -7972,7 +7972,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/dbal/issues",
-                "source": "https://github.com/doctrine/dbal/tree/3.7.1"
+                "source": "https://github.com/doctrine/dbal/tree/3.7.2"
             },
             "funding": [
                 {
@@ -7988,7 +7988,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-10-06T05:06:20+00:00"
+            "time": "2023-11-19T08:06:58+00:00"
         },
         {
             "name": "doctrine/deprecations",
@@ -10695,16 +10695,16 @@
         },
         {
             "name": "spatie/ray",
-            "version": "1.40.0",
+            "version": "1.40.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ray.git",
-                "reference": "d2477d80996416ac33066f4fef8c6bd6e393fedd"
+                "reference": "8e6547ff47aae2e4f615a5dcea1e5e4911b1dc9f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ray/zipball/d2477d80996416ac33066f4fef8c6bd6e393fedd",
-                "reference": "d2477d80996416ac33066f4fef8c6bd6e393fedd",
+                "url": "https://api.github.com/repos/spatie/ray/zipball/8e6547ff47aae2e4f615a5dcea1e5e4911b1dc9f",
+                "reference": "8e6547ff47aae2e4f615a5dcea1e5e4911b1dc9f",
                 "shasum": ""
             },
             "require": {
@@ -10755,7 +10755,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/ray/issues",
-                "source": "https://github.com/spatie/ray/tree/1.40.0"
+                "source": "https://github.com/spatie/ray/tree/1.40.1"
             },
             "funding": [
                 {
@@ -10767,7 +10767,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2023-11-07T13:53:06+00:00"
+            "time": "2023-11-20T08:20:15+00:00"
         },
         {
             "name": "symfony/polyfill-iconv",
@@ -10916,16 +10916,16 @@
         },
         {
             "name": "theseer/tokenizer",
-            "version": "1.2.1",
+            "version": "1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theseer/tokenizer.git",
-                "reference": "34a41e998c2183e22995f158c581e7b5e755ab9e"
+                "reference": "b2ad5003ca10d4ee50a12da31de12a5774ba6b96"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/34a41e998c2183e22995f158c581e7b5e755ab9e",
-                "reference": "34a41e998c2183e22995f158c581e7b5e755ab9e",
+                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/b2ad5003ca10d4ee50a12da31de12a5774ba6b96",
+                "reference": "b2ad5003ca10d4ee50a12da31de12a5774ba6b96",
                 "shasum": ""
             },
             "require": {
@@ -10954,7 +10954,7 @@
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
             "support": {
                 "issues": "https://github.com/theseer/tokenizer/issues",
-                "source": "https://github.com/theseer/tokenizer/tree/1.2.1"
+                "source": "https://github.com/theseer/tokenizer/tree/1.2.2"
             },
             "funding": [
                 {
@@ -10962,7 +10962,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-07-28T10:34:58+00:00"
+            "time": "2023-11-20T00:12:19+00:00"
         },
         {
             "name": "zbateson/mail-mime-parser",

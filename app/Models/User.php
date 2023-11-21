@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Contracts\ExistsInSis;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +15,7 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
 /**
  * @mixin IdeHelperUser
  */
-class User extends Authenticatable
+class User extends Authenticatable implements ExistsInSis
 {
     use HasFactory;
     use Notifiable;
@@ -101,5 +102,13 @@ class User extends Authenticatable
                 'selected' => $this->can('change settings', $school),
             ],
         ];
+    }
+
+    public function syncFromSis(): static
+    {
+        $this->tenant->getSisProvider()
+            ->syncUser($this);
+
+        return $this;
     }
 }

@@ -11,6 +11,7 @@ use App\Models\Student;
 use App\Models\Tenant;
 use App\Models\User;
 use GrantHolle\PowerSchool\Api\RequestBuilder;
+use GrantHolle\PowerSchool\Api\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -355,7 +356,57 @@ class PowerSchoolProvider implements SisProvider
 
     public function syncUser(User $user): User
     {
-        throw new \Exception('Not implement.');
+        [$tenantId, $type, $sisId] = explode('|', $user->sis_key);
+        $method = 'sync' . ucfirst($type);
+
+        if (method_exists($this, $method)) {
+            $this->$method($user);
+        }
+
+        return $user;
+    }
+
+    protected function syncStaff(User $user): void
+    {
+        // Fetch from custom PQ
+        /** @var Response $data */
+        $data = $this->builder
+            ->pq('com.archboard.starter_sample.user.get', [
+                'dcid' => $user->sis_id
+            ]);
+
+        if ($data->count() === 1) {
+            $user->update([
+                'first_name' => $data[0]['first_name'] ?? null,
+                'last_name' => $data[0]['last_name'] ?? null,
+                'email' => $data[0]['email'] ?? null,
+            ]);
+        }
+    }
+
+    protected function syncGuardian(User $user): void
+    {
+        // First get the contact id, then the contact
+        /** @var Response $response */
+        $response = $this->builder
+            ->pq('com.archboard.starter_sample.guardian.contactid', [
+                'guardianid' => $user->sis_id,
+            ]);
+
+        if ($response->count() !== 1) {
+            return;
+        }
+
+        $contactId = $response[0]['contact_id'];
+        $data = $this->builder
+            ->get("/ws/contacts/contact/{$contactId}");
+
+        $user->update([
+            'first_name' => $data['firstName'] ?? $user->first_name,
+            'last_name' => $data['lastName'] ?? $user->last_name,
+            'email' => collect($data['emails'])
+                ->firstWhere('primary', true)['address'] ?? $user->email,
+        ]);
     }
 
     public function syncTeacher(User $user): User

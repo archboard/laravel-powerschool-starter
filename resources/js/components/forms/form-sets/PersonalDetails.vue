@@ -12,29 +12,63 @@
       <FormField v-model="form.last_name" :error="form.errors.last_name" class="col-span-6 sm:col-span-3">
         {{ __('Last name') }}
       </FormField>
-      <FormField v-model="form.email" :error="form.errors.email" type="email" class="col-span-6">
+      <FormField v-model="form.email" :error="form.errors.email" type="email" class="col-span-6 sm:col-span-3">
         {{ __('Email') }}
       </FormField>
+      <FormField :error="form.errors.timezone" class="col-span-6 sm:col-span-3">
+        {{ __('Timezone') }}
+        <template #component="{ id, hasError }">
+          <TimezoneCombobox v-model="form.timezone" :id="id" :has-error="hasError" />
+        </template>
+      </FormField>
+
+      <template #actions="{ loading }">
+        <AppButton type="button" @click.prevent="syncFromSis" :loading="syncing" color="white">{{ __('Sync from :sis', { sis: tenant.sis }) }}</AppButton>
+        <AppButton type="submit" :loading="loading">{{ __('Save') }}</AppButton>
+      </template>
     </SplitForm>
   </form>
 </template>
 
 <script setup>
-import { useForm } from '@inertiajs/vue3'
-import pick from 'just-pick'
+import { router, useForm } from '@inertiajs/vue3'
 import SplitForm from '@/components/SplitForm.vue'
 import Headline3 from '@/components/Headline3.vue'
 import HelpText from '@/components/forms/HelpText.vue'
 import FormField from '@/components/forms/FormField.vue'
 import useProp from '@/composition/useProp.js'
+import TimezoneCombobox from '@/components/forms/TimezoneCombobox.vue'
+import AppButton from '@/components/AppButton.vue'
+import { ref, watch } from 'vue'
 
 const user = useProp('user')
+const tenant = useProp('tenant')
 const form = useForm({
-  ...pick(user.value, 'first_name', 'last_name', 'email'),
+  first_name: user.value.first_name,
+  last_name: user.value.last_name,
+  email: user.value.email,
+  timezone: user.value.timezone,
 })
+const syncing = ref(false)
 const submit = () => {
-  form.post('/settings/personal', {
+  form.put('/settings/personal', {
     preserveScroll: true,
   })
 }
+const syncFromSis = () => {
+  syncing.value = true
+
+  router.post(`/sync/user/${user.value.id}`, null, {
+    onFinish: () => {
+      syncing.value = false
+    },
+  })
+}
+
+watch(user, value => {
+  form.first_name = value.first_name
+  form.last_name = value.last_name
+  form.email = value.email
+  form.timezone = value.timezone
+})
 </script>
