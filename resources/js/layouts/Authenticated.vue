@@ -79,8 +79,8 @@
               </component>
             </div>
             <div class="space-y-1">
-              <h3 class="px-3 text-sm font-medium text-primary-700 dark:text-gray-200" id="projects-headline">Projects</h3>
-              <div class="space-y-1" role="group" aria-labelledby="projects-headline">
+              <h3 class="px-3 text-sm font-medium text-primary-700 dark:text-gray-200">{{ __('Settings') }}</h3>
+              <div class="space-y-1" role="group">
                 <component
                   v-for="item in props.secondaryNav"
                   :key="item.url"
