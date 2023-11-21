@@ -14,7 +14,7 @@ import AppCombobox from '@/components/forms/AppCombobox.vue'
 
 const props = defineProps({
   modelValue: Object,
-  objectId: Number,
+  objectId: [Number, String],
   options: {
     type: Array,
     required: true,
@@ -27,6 +27,10 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
+  searchAttribute: {
+    type: String,
+    default: 'name'
+  }
 })
 const emit = defineEmits([
   'update:modelValue',
@@ -42,11 +46,12 @@ const localValue = computed({
 const query = ref()
 const filteredOptions = computed(() => {
   if (!query.value || typeof query.value !== 'string') {
-    return props.options
+    return props.options.splice(0, 10)
   }
 
   const q = query.value.toLowerCase()
 
-  return props.options.filter(o => o.name.toLowerCase().includes(q))
+  return props.options.filter(o => o[props.searchAttribute]?.toLowerCase()?.includes(q))
+    .splice(0, 10)
 })
 </script>
