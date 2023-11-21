@@ -50,12 +50,10 @@ return [
             'lastName' => 'last_name',
             'family_name' => 'last_name',
             'email' => 'email',
-        ],
-        'guard' => 'web',
-        'identifying_attributes' => [
-            'usersDCID' => 'sis_id',
             'ps_dcid' => 'sis_id',
         ],
+        'guard' => 'web',
+        'identifying_attributes' => [],
         'attribute_transformers' => [
             'email' => \GrantHolle\PowerSchool\Auth\Transformers\Lowercase::class,
         ],
@@ -68,12 +66,14 @@ return [
         'attributes' => [
             'firstName' => 'first_name',
             'lastName' => 'last_name',
+            'given_name' => 'first_name',
+            'family_name' => 'last_name',
             'email' => 'email',
+            'ps_dcid' => 'sis_id',
+            'dcid' => 'sis_id',
         ],
         'guard' => 'web',
-        'identifying_attributes' => [
-            'email' => 'email',
-        ],
+        'identifying_attributes' => [],
         'attribute_transformers' => [
             'email' => \GrantHolle\PowerSchool\Auth\Transformers\Lowercase::class,
         ],
