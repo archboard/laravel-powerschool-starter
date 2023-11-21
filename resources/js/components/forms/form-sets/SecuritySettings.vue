@@ -6,13 +6,13 @@
         <HelpText>{{ __(`Change your password.`) }}</HelpText>
       </template>
 
-      <FormField v-model="form.current_password" :error="form.errors.current_password" type="password" class="col-span-6">
+      <FormField v-if="hasPassword" v-model="form.current_password" :error="form.errors.current_password" type="password" class="col-span-6 sm:col-span-3">
         {{ __('Current password') }}
       </FormField>
-      <FormField v-model="form.password" :error="form.errors.password" type="password" class="col-span-6">
-        {{ __('Current password') }}
+      <FormField v-model="form.password" :error="form.errors.password" type="password" class="col-span-6 sm:col-span-3 sm:col-start-1">
+        {{ __('New password') }}
       </FormField>
-      <FormField v-model="form.password_configuration" :error="form.errors.password_configuration" type="password" class="col-span-6">
+      <FormField v-model="form.password_confirmation" :error="form.errors.password_confirmation" type="password" class="col-span-6 sm:col-span-3">
         {{ __('Confirm new password') }}
       </FormField>
     </SplitForm>
@@ -26,10 +26,13 @@ import Headline3 from '@/components/Headline3.vue'
 import HelpText from '@/components/forms/HelpText.vue'
 import FormField from '@/components/forms/FormField.vue'
 
+const props = defineProps({
+  hasPassword: Boolean,
+})
 const form = useForm({
-  current_password: '',
-  password: '',
-  password_configuration: '',
+  current_password: null,
+  password: null,
+  password_confirmation: null,
 })
 const submit = () => {
   form.put('/user/password', {

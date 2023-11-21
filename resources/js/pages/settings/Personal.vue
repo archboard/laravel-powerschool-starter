@@ -2,7 +2,7 @@
   <Authenticated>
     <div class="space-y-10">
       <PersonalDetails />
-      <SecuritySettings v-if="tenant.allow_password_auth" />
+      <SecuritySettings v-if="tenant.allow_password_auth" :has-password="hasPassword" />
     </div>
   </Authenticated>
 </template>
@@ -15,5 +15,6 @@ import SecuritySettings from '@/components/forms/form-sets/SecuritySettings.vue'
 const props = defineProps({
   user: Object,
   tenant: Object,
+  hasPassword: Boolean,
 })
 </script>

@@ -18,12 +18,14 @@ class PersonalSettingsController extends Controller
      *
      * @return \Inertia\Response|\Inertia\ResponseFactory
      */
-    public function edit()
+    public function edit(Request $request)
     {
         $title = __('Personal settings');
+        $user = $request->user();
 
         return inertia('settings/Personal', [
             'title' => $title,
+            'hasPassword' => !!$user->password,
         ])->withViewData(compact('title'));
     }
 
