@@ -13,7 +13,9 @@
           </div>
         </div>
       </CardPadding>
-      <CardAction :loading="loading" />
+      <CardAction :loading="loading">
+        <slot name="actions" :loading="loading" />
+      </CardAction>
     </CardWrapper>
   </div>
 </template>
