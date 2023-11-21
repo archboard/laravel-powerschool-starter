@@ -34,8 +34,6 @@ interface SisProvider
 
     public function syncUser(User $user): User;
 
-    public function syncTeacher(User $user): User;
-
     public function syncSection(Section $section): Section;
 
     public function syncCourse(Course $course): Course;

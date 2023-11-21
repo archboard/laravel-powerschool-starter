@@ -409,11 +409,6 @@ class PowerSchoolProvider implements SisProvider
         ]);
     }
 
-    public function syncTeacher(User $user): User
-    {
-        throw new \Exception('Not implement.');
-    }
-
     public function configured(): bool
     {
         return Arr::get($this->tenant->sis_config, 'url') &&
