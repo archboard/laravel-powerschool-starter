@@ -19,6 +19,7 @@ class SyncModelController extends Controller
 
             if ($instance instanceof ExistsInSis) {
                 $instance->syncFromSis();
+                session()->flash('success', __('Sync successful.'));
             }
         }
 
