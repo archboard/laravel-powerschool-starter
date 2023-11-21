@@ -54,11 +54,7 @@ Route::middleware('tenant')->group(function () {
         Route::get('/csrf-token', \App\Http\Controllers\RefreshCsrfTokenController::class)
             ->name('csrf-token');
 
-        Route::get('/timezones',
-            fn () => timezones()
-                ->map(fn (string $label, string $value) => compact('label', 'value'))
-                ->values()
-        );
+        Route::get('/timezones', fn () => timezones());
 
         Route::get('/', function () {
             return inertia('Index');
