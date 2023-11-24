@@ -23,7 +23,7 @@
       </FormField>
 
       <template #actions="{ loading }">
-        <AppButton type="button" @click.prevent="syncFromSis" :loading="syncing" color="white">{{ __('Sync from :sis', { sis: tenant.sis }) }}</AppButton>
+        <AppButton type="button" @click.prevent="sync" :loading="syncing" color="white">{{ __('Sync from :sis', { sis: tenant.sis }) }}</AppButton>
         <AppButton type="submit" :loading="loading">{{ __('Save') }}</AppButton>
       </template>
     </SplitForm>
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { router, useForm } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
 import SplitForm from '@/components/SplitForm.vue'
 import Headline3 from '@/components/Headline3.vue'
 import HelpText from '@/components/forms/HelpText.vue'
@@ -39,7 +39,8 @@ import FormField from '@/components/forms/FormField.vue'
 import useProp from '@/composition/useProp.js'
 import TimezoneCombobox from '@/components/forms/TimezoneCombobox.vue'
 import AppButton from '@/components/AppButton.vue'
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
+import useSisObjectSync from '@/composition/useSisObjectSync.js'
 
 const user = useProp('user')
 const tenant = useProp('tenant')
@@ -49,19 +50,10 @@ const form = useForm({
   email: user.value.email,
   timezone: user.value.timezone,
 })
-const syncing = ref(false)
+const { syncing, sync } = useSisObjectSync('user', user)
 const submit = () => {
   form.put('/settings/personal', {
     preserveScroll: true,
-  })
-}
-const syncFromSis = () => {
-  syncing.value = true
-
-  router.post(`/sync/user/${user.value.id}`, null, {
-    onFinish: () => {
-      syncing.value = false
-    },
   })
 }
 
