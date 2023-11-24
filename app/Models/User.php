@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserType;
 use App\Models\Contracts\ExistsInSis;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Builder;
@@ -44,7 +45,9 @@ class User extends Authenticatable implements ExistsInSis
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'user_type' => UserType::class,
+    ];
 
     /**
      * Gets the users who have an ability directly or through a role

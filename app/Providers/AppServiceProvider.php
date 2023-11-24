@@ -72,11 +72,14 @@ class AppServiceProvider extends ServiceProvider
             $tenant = Tenant::current();
             $userType = UserType::fromData($data);
 
-            return $model::firstOrNew([
+            $user = $model::firstOrNew([
                 ...$attributes,
                 'tenant_id' => $tenant->id,
                 'sis_key' => $userType->getSisKeyFromData($data),
             ]);
+            $user->user_type = $userType;
+
+            return $user;
         });
     }
 }
