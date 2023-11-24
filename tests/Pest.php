@@ -44,6 +44,10 @@ function logIn(array $attributes = []) {
     return test()->logIn(attributes: $attributes);
 }
 
-function fullPermissions(): void {
-    test()->fullPermission();
+function fullPermissions() {
+    return test()->fullPermission();
+}
+
+function setSchool() {
+    return test()->setSchool();
 }

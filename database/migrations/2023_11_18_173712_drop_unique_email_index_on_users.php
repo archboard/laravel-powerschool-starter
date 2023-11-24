@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Force the unique for some reason
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('email')->unique()->change();
+        });
+
         Schema::table('users', function (Blueprint $table) {
             $table->dropUnique(['email']);
             $table->string('email')->nullable()->change();

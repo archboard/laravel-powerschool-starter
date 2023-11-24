@@ -37,13 +37,7 @@ class Tenant extends TenantBase
     protected static function booted()
     {
         static::created(function (Tenant $tenant) {
-            // Seed the roles and abilities for this tenant scope
-             BouncerFacade::scope()->onceTo($tenant->id, function () {
-                BouncerFacade::allow(Role::DISTRICT_ADMIN->value)->everything();
-
-                // Additional seeding as the project needs
-             });
-
+            //
         });
     }
 

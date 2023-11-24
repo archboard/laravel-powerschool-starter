@@ -100,7 +100,7 @@ class HandleInertiaRequests extends Middleware
                         ->to(route('settings.personal.edit')),
                 ];
 
-                if ($user->can('edit school settings')) {
+                if ($user->can('edit school settings') && $request->school()) {
                     $nav[] = NavigationItem::make()
                         ->labeled(__('School settings'))
                         ->to(route('settings.school.edit'));

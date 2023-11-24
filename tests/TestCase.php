@@ -62,9 +62,24 @@ abstract class TestCase extends BaseTestCase
         return $this;
     }
 
-    public function fullPermission(): void
+    public function fullPermission(): static
     {
         BouncerFacade::allow($this->user)->everything();
+
+        return $this;
+    }
+
+    public function setSchool(): static
+    {
+        $school = $this->tenant->schools()->save(
+            School::factory()->make()
+        );
+        $this->user->schools()->attach($school);
+        $this->user->update([
+            'school_id' => $school->id,
+        ]);
+
+        return $this;
     }
 
     public function asCloud(): static
