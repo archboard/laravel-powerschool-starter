@@ -102,7 +102,7 @@
 
     <div class="flex flex-1 min-h-screen flex-col justify-between md:pl-64">
       <div class="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white dark:bg-gray-800 shadow">
-        <button type="button" class="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500 md:hidden" @click="sidebarOpen = true">
+        <button type="button" class="border-r border-gray-200 dark:border-gray-600 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500 md:hidden" @click="sidebarOpen = true">
           <span class="sr-only">Open sidebar</span>
           <Bars3BottomLeftIcon class="h-6 w-6" aria-hidden="true" />
         </button>
@@ -129,14 +129,17 @@
 
       <main class="flex-1">
         <div class="py-6">
-          <div class="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-            <h1 v-if="title" class="text-2xl font-semibold">{{ title }}</h1>
-          </div>
-          <div class="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+          <Container>
+            <div class="md:flex justify-between items-start">
+              <h1 v-if="title" class="text-2xl font-semibold">{{ title }}</h1>
+
+              <slot name="actions" />
+            </div>
+
             <div class="py-4">
               <slot />
             </div>
-          </div>
+          </Container>
         </div>
       </main>
 
@@ -165,6 +168,7 @@ import { router, usePage } from '@inertiajs/vue3'
 import { Modal } from 'momentum-modal'
 import useProp from '@/composition/useProp.js'
 import AppSelect from '@/components/forms/AppSelect.vue'
+import Container from '@/components/Container.vue'
 
 const title = usePageTitle()
 const { props } = usePage()
