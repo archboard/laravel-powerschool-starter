@@ -24,6 +24,8 @@ interface SisProvider
 
     public function fullSchoolSync(School $school): void;
 
+    public function syncSchoolStaff(School $school): static;
+
     public function syncSchoolStudents(School $school): static;
 
     public function syncSchoolCourses(School $school): static;

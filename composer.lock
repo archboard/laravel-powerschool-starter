@@ -1293,16 +1293,16 @@
         },
         {
             "name": "grantholle/powerschool-api",
-            "version": "4.2.5",
+            "version": "4.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/grantholle/powerschool-api.git",
-                "reference": "b6245f4b55bf282379e806206d44402563faeb13"
+                "reference": "cde38270bf559b0d8b1f0d83b554b1db2f9691dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/grantholle/powerschool-api/zipball/b6245f4b55bf282379e806206d44402563faeb13",
-                "reference": "b6245f4b55bf282379e806206d44402563faeb13",
+                "url": "https://api.github.com/repos/grantholle/powerschool-api/zipball/cde38270bf559b0d8b1f0d83b554b1db2f9691dc",
+                "reference": "cde38270bf559b0d8b1f0d83b554b1db2f9691dc",
                 "shasum": ""
             },
             "require": {
@@ -1349,9 +1349,9 @@
             ],
             "support": {
                 "issues": "https://github.com/grantholle/powerschool-api/issues",
-                "source": "https://github.com/grantholle/powerschool-api/tree/4.2.5"
+                "source": "https://github.com/grantholle/powerschool-api/tree/4.2.6"
             },
-            "time": "2023-11-21T20:15:55+00:00"
+            "time": "2023-11-24T18:39:16+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",

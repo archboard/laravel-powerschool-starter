@@ -95,6 +95,9 @@ Route::middleware('tenant')->group(function () {
                 Route::middleware(['can:edit school settings', 'has_school'])->group(function () {
                     Route::singleton('/school', \App\Http\Controllers\Settings\SchoolSettingsController::class)
                         ->only('edit', 'update');
+
+                    Route::post('/school/sync/{item}', \App\Http\Controllers\Settings\SyncSchoolItemController::class)
+                        ->name('school.item-sync');
                 });
             });
     });

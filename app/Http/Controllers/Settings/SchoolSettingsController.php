@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Enums\UserType;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\SchoolResource;
 use Illuminate\Http\Request;
 
 class SchoolSettingsController extends Controller
@@ -13,8 +13,28 @@ class SchoolSettingsController extends Controller
         $school = $request->school();
 
         return inertia('settings/School', [
-            'title' => __('School Settings'),
-            'school' => new SchoolResource($school),
+            'title' => __('Settings for :school', ['school' => $school->name]),
+            'counts' => [
+                [
+                    'key' => 'staff',
+                    'label' => __('Total staff'),
+                    'value' => $school->users()
+                        ->where('user_type', UserType::staff)
+                        ->count(),
+                ],
+                [
+                    'key' => 'students',
+                    'label' => __('Total students'),
+                    'value' => $school->students()
+                        ->count(),
+                ],
+                [
+                    'key' => 'sections',
+                    'label' => __('Total sections'),
+                    'value' => $school->sections()
+                        ->count(),
+                ],
+            ],
         ]);
     }
 }

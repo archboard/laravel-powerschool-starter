@@ -116,20 +116,24 @@ class PowerSchoolProvider implements SisProvider
             ->to("/ws/v1/school/{$school->sis_id}/staff")
             ->expansions('emails');
         $now = now()->toDateTimeString();
+        $count = 0;
 
         while ($results = $builder->paginate()) {
-            $entries = $results->collect()
-                ->map(fn (array $user) => [
-                    'tenant_id' => $this->tenant->id,
-                    'school_id' => $school->id,
-                    'email' => strtolower(Arr::get($user, 'emails.work_email', '')) ?: null,
-                    'first_name' => Arr::get($user, 'name.first_name'),
-                    'last_name' => Arr::get($user, 'name.last_name'),
-                    'sis_id' => $user['users_dcid'],
-                    'sis_key' => $this->makeSisKey(UserType::staff->value . '|' . $user['users_dcid']),
-                    'updated_at' => $now,
-                    'created_at' => $now,
-                ]);
+            $filteredStaff = $results->collect()
+                ->filter(fn (array $user) => isset($user['users_dcid']));
+
+            $entries = $filteredStaff->map(fn (array $user) => [
+                'tenant_id' => $this->tenant->id,
+                'school_id' => $school->id,
+                'email' => strtolower(Arr::get($user, 'emails.work_email', '')) ?: null,
+                'first_name' => Arr::get($user, 'name.first_name'),
+                'last_name' => Arr::get($user, 'name.last_name'),
+                'sis_id' => $user['users_dcid'],
+                'sis_key' => $this->makeSisKey(UserType::staff->value . '|' . $user['users_dcid']),
+                'user_type' => UserType::staff->value,
+                'updated_at' => $now,
+                'created_at' => $now,
+            ]);
 
             User::upsert(
                 $entries->toArray(),
@@ -143,18 +147,21 @@ class PowerSchoolProvider implements SisProvider
                 ->whereIn('sis_key', Arr::pluck($entries, 'sis_key'))
                 ->pluck('id', 'sis_id');
 
-            $pivotEntries = $results->collect()
-                ->map(fn (array $entry) => [
-                    'school_id' => $school->id,
-                    'user_id' => $users->get($entry['users_dcid']),
-                    'staff_id' => $entry['id'],
-                ]);
+            $pivotEntries = $filteredStaff->map(fn (array $entry) => [
+                'school_id' => $school->id,
+                'user_id' => $users->get($entry['users_dcid']),
+                'staff_id' => $entry['id'],
+            ]);
 
             DB::table('school_user')->upsert(
                 $pivotEntries->toArray(),
                 ['school_id', 'user_id'],
                 ['staff_id']
             );
+
+            if (++$count > 5) {
+                rd($results, $builder);
+            }
         }
 
         return $this;
@@ -165,8 +172,8 @@ class PowerSchoolProvider implements SisProvider
         $builder = $this->builder
             ->method('get')
             ->to("/ws/v1/school/{$school->sis_id}/student")
-            ->q('school_enrollment.enroll_status==A')
-            ->expansions('contact_info');
+            ->q('school_enrollment.enroll_status==(A,P)')
+            ->expansions('contact_info,school_enrollment');
         $now = now()->toDateTimeString();
 
         while ($results = $builder->paginate()) {
@@ -182,14 +189,31 @@ class PowerSchoolProvider implements SisProvider
                     'created_at' => $now,
                     'updated_at' => $now,
                     'sis_key' => $this->makeSisKey($student),
+                    'grade_level' => Arr::get($student, 'school_enrollment.grade_level'),
+                    'deleted_at' => null,
                 ]);
 
             Student::upsert(
                 $entries->toArray(),
                 ['sis_key'],
-                ['student_number', 'school_id', 'first_name', 'last_name', 'email', 'updated_at']
+                ['student_number', 'school_id', 'first_name', 'last_name', 'email', 'grade_level', 'updated_at', 'deleted_at']
             );
         }
+
+        // Process students that shouldn't be enrolled anymore
+//        $builder = $this->builder
+//            ->method('get')
+//            ->to("/ws/v1/school/{$school->sis_id}/student")
+//            ->q('school_enrollment.enroll_status==(T,G,H,I)');
+//
+//        while ($results = $builder->paginate()) {
+//            $entries = $results->collect()
+//                ->map(fn (array $student) => $this->makeSisKey($student));
+//
+//            ray(Student::query()
+//                ->whereIn('sis_key', $entries)
+//                ->delete());
+//        }
 
         return $this;
     }

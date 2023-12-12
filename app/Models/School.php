@@ -56,4 +56,28 @@ class School extends Model implements ExistsInSis
 
         return $provider->syncSchool($this);
     }
+
+    public function syncStaff(): static
+    {
+        $provider = $this->tenant->getSisProvider();
+        $provider->syncSchoolStaff($this);
+
+        return $this;
+    }
+
+    public function syncStudents(): static
+    {
+        $provider = $this->tenant->getSisProvider();
+        $provider->syncSchoolStudents($this);
+
+        return $this;
+    }
+
+    public function syncSections(): static
+    {
+        $provider = $this->tenant->getSisProvider();
+        $provider->syncSchoolSections($this);
+
+        return $this;
+    }
 }
