@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -44,7 +43,7 @@ class PasswordResetTest extends TestCase
             ->assertRedirect();
 
         Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-            $this->get('/reset-password/' . $notification->token)
+            $this->get('/reset-password/'.$notification->token)
                 ->assertOk()
                 ->assertViewHas('title')
                 ->assertInertia(fn (AssertableInertia $page) => $page
@@ -55,11 +54,11 @@ class PasswordResetTest extends TestCase
                 );
 
             $this->post('/reset-password', [
-                    'token' => $notification->token,
-                    'email' => $user->email,
-                    'password' => 'password',
-                    'password_confirmation' => 'password',
-                ])
+                'token' => $notification->token,
+                'email' => $user->email,
+                'password' => 'password',
+                'password_confirmation' => 'password',
+            ])
                 ->assertSessionHasNoErrors()
                 ->assertRedirect();
 

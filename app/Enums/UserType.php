@@ -17,7 +17,7 @@ enum UserType: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::staff => __('Staff'),
             self::guardian => __('Contact'),
             self::student => __('Student'),

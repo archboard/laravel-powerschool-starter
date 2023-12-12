@@ -5,12 +5,19 @@ namespace App\Navigation;
 class NavigationItem
 {
     public string $component = 'InertiaLink';
+
     public string $method = 'get';
+
     public string $target = '_self';
+
     public string $label = '';
+
     public string $endpoint = '';
+
     public string $as = 'a';
+
     public string $icon = '';
+
     public bool $current = false;
 
     public static function make(): static

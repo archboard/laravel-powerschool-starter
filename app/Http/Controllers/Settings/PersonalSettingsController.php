@@ -4,10 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\FlashesAndRedirects;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Hash;
 
 class PersonalSettingsController extends Controller
 {
@@ -25,14 +22,13 @@ class PersonalSettingsController extends Controller
 
         return inertia('settings/Personal', [
             'title' => $title,
-            'hasPassword' => !!$user->password,
+            'hasPassword' => (bool) $user->password,
         ])->withViewData(compact('title'));
     }
 
     /**
      * Updates a users name, email, and password
      *
-     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request)

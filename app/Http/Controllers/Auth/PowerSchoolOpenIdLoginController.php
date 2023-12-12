@@ -21,16 +21,13 @@ class PowerSchoolOpenIdLoginController extends Controller
     /**
      * The user has been authenticated.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param User $user
-     * @param \Illuminate\Support\Collection $data
      * @return mixed
      */
     protected function authenticated(Request $request, User $user, Collection $data)
     {
         $adminSchools = $data->get('adminSchools', []);
 
-        if (!empty($adminSchools)) {
+        if (! empty($adminSchools)) {
             $schools = School::whereIn('school_number', $adminSchools)
                 ->pluck('id');
             $user->schools()->syncWithoutDetaching($schools);

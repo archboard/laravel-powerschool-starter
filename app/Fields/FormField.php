@@ -8,16 +8,27 @@ use Illuminate\Support\Arr;
 class FormField
 {
     protected ?string $label = '';
+
     protected ?string $help = '';
+
     protected FieldType $component = FieldType::input;
+
     protected string $type = 'text';
+
     protected bool $required = false;
+
     protected array $rules = ['nullable'];
+
     protected mixed $options = [];
+
     protected bool $disabled = false;
+
     protected ?string $key = null;
+
     protected ?string $placeholder = null;
+
     protected mixed $value = null;
+
     protected int $span = 6;
 
     public static function make(string $label = null): static

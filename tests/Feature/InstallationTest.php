@@ -28,7 +28,7 @@ class InstallationTest extends TestCase
     protected function fakeLicenseValidation(bool $valid = true): static
     {
         Http::fake([
-            'archboard.io/verify/*' => Http::response(compact('valid'))
+            'archboard.io/verify/*' => Http::response(compact('valid')),
         ]);
 
         return $this;

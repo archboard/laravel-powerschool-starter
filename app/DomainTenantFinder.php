@@ -2,9 +2,9 @@
 
 namespace App;
 
+use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantModel;
-use App\Models\Tenant;
 use Spatie\Multitenancy\TenantFinder\TenantFinder;
 
 class DomainTenantFinder extends TenantFinder

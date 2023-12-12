@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Section extends Model implements ExistsInSis
 {
-    use HasFactory;
     use BelongsToTenant;
+    use HasFactory;
 
     protected $guarded = [];
 

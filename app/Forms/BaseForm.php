@@ -21,7 +21,7 @@ abstract class BaseForm implements AppForm
         return '';
     }
 
-    public function title(): String
+    public function title(): string
     {
         return Str::of(class_basename($this))
             ->replace('Form', '')

@@ -7,7 +7,8 @@ beforeEach(function () {
     logIn();
 });
 
-it('will redirect when no school is set', function () {});
+it('will redirect when no school is set', function () {
+});
 
 it('will throw an exception without schools', function () {
     $this->tenant->schools()->delete();
@@ -32,8 +33,8 @@ it("'can update a user's school'", function () {
     $school = $this->tenant->schools->random();
 
     $this->post(route('select-school'), [
-            'school_id' => $school->id,
-        ])
+        'school_id' => $school->id,
+    ])
         ->assertSessionHas('success')
         ->assertRedirect(route('home'));
 

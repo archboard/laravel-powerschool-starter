@@ -4,14 +4,13 @@ namespace App\Notifications;
 
 use App\Notifications\Traits\FormatsSubject;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class SmtpTest extends Notification
 {
-    use Queueable;
     use FormatsSubject;
+    use Queueable;
 
     /**
      * Create a new notification instance.

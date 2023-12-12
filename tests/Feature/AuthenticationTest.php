@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -18,9 +17,9 @@ class AuthenticationTest extends TestCase
         $this->tenant->update(['allow_password_auth' => false]);
 
         $this->post('/login', [
-                'email' => $user->email,
-                'password' => 'password',
-            ])->assertNotFound();
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertNotFound();
     }
 
     public function test_login_screen_can_be_rendered()
@@ -40,9 +39,9 @@ class AuthenticationTest extends TestCase
         $user = $this->seedUser();
 
         $this->post('/login', [
-                'email' => $user->email,
-                'password' => 'password',
-            ])
+            'email' => $user->email,
+            'password' => 'password',
+        ])
             ->assertRedirect(RouteServiceProvider::HOME);
 
         $this->assertAuthenticatedAs($user);

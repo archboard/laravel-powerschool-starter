@@ -82,7 +82,7 @@ class PowerSchoolProvider implements SisProvider
 
         throw_if(
             config('app.cloud') && $this->tenant->schools()->where('sis_id', $school->sis_id)->doesntExist(),
-            new LicenseException("Your license does not support this school. Please update your license and try again.")
+            new LicenseException('Your license does not support this school. Please update your license and try again.')
         );
 
         return $results->toArray();
@@ -129,7 +129,7 @@ class PowerSchoolProvider implements SisProvider
                 'first_name' => Arr::get($user, 'name.first_name'),
                 'last_name' => Arr::get($user, 'name.last_name'),
                 'sis_id' => $user['users_dcid'],
-                'sis_key' => $this->makeSisKey(UserType::staff->value . '|' . $user['users_dcid']),
+                'sis_key' => $this->makeSisKey(UserType::staff->value.'|'.$user['users_dcid']),
                 'user_type' => UserType::staff->value,
                 'updated_at' => $now,
                 'created_at' => $now,
@@ -201,19 +201,19 @@ class PowerSchoolProvider implements SisProvider
         }
 
         // Process students that shouldn't be enrolled anymore
-//        $builder = $this->builder
-//            ->method('get')
-//            ->to("/ws/v1/school/{$school->sis_id}/student")
-//            ->q('school_enrollment.enroll_status==(T,G,H,I)');
-//
-//        while ($results = $builder->paginate()) {
-//            $entries = $results->collect()
-//                ->map(fn (array $student) => $this->makeSisKey($student));
-//
-//            ray(Student::query()
-//                ->whereIn('sis_key', $entries)
-//                ->delete());
-//        }
+        //        $builder = $this->builder
+        //            ->method('get')
+        //            ->to("/ws/v1/school/{$school->sis_id}/student")
+        //            ->q('school_enrollment.enroll_status==(T,G,H,I)');
+        //
+        //        while ($results = $builder->paginate()) {
+        //            $entries = $results->collect()
+        //                ->map(fn (array $student) => $this->makeSisKey($student));
+        //
+        //            ray(Student::query()
+        //                ->whereIn('sis_key', $entries)
+        //                ->delete());
+        //        }
 
         return $this;
     }
@@ -226,7 +226,7 @@ class PowerSchoolProvider implements SisProvider
         $now = now()->toDateTimeString();
 
         while ($results = $builder->paginate()) {
-            $entries =$results->collect()
+            $entries = $results->collect()
                 ->map(fn (array $course) => [
                     'tenant_id' => $this->tenant->id,
                     'school_id' => $school->id,
@@ -270,7 +270,7 @@ class PowerSchoolProvider implements SisProvider
                     $teacher = $staff->get($section['staff_id']);
 
                     // If the course or staff doesn't exist, don't do anything
-                    if (!$course || !$teacher) {
+                    if (! $course || ! $teacher) {
                         return $entries;
                     }
 
@@ -327,7 +327,7 @@ class PowerSchoolProvider implements SisProvider
 
                 // Get the sis id's of the students who haven't dropped
                 $studentEnrollment = $enrollments
-                    ->filter(fn (array $enrollment) => !$enrollment['dropped'] &&
+                    ->filter(fn (array $enrollment) => ! $enrollment['dropped'] &&
                         $students->has($enrollment['student_id']))
                     ->map(fn (array $enrollment) => $students->get($enrollment['student_id']));
 
@@ -381,7 +381,7 @@ class PowerSchoolProvider implements SisProvider
     public function syncUser(User $user): User
     {
         [$tenantId, $type, $sisId] = explode('|', $user->sis_key);
-        $method = 'sync' . ucfirst($type);
+        $method = 'sync'.ucfirst($type);
 
         if (method_exists($this, $method)) {
             $this->$method($user);
@@ -396,7 +396,7 @@ class PowerSchoolProvider implements SisProvider
         /** @var Response $data */
         $data = $this->builder
             ->pq('com.archboard.starter_sample.user.get', [
-                'dcid' => $user->sis_id
+                'dcid' => $user->sis_id,
             ]);
 
         if ($data->count() === 1) {
@@ -463,7 +463,7 @@ class PowerSchoolProvider implements SisProvider
             ->whereIn(
                 'sis_id',
                 $enrollments
-                    ->filter(fn (array $enrollment) => !$enrollment['dropped'])
+                    ->filter(fn (array $enrollment) => ! $enrollment['dropped'])
                     ->pluck('student_id')
             )
             ->pluck('id');
@@ -488,13 +488,13 @@ class PowerSchoolProvider implements SisProvider
     protected function makeSisKey($subject): string
     {
         if (is_array($subject)) {
-            return $this->tenant->id . '|' . $subject['id'];
+            return $this->tenant->id.'|'.$subject['id'];
         }
 
         if ($subject instanceof Model) {
-            return $this->tenant->id . '|' . $subject->sis_id;
+            return $this->tenant->id.'|'.$subject->sis_id;
         }
 
-        return $this->tenant->id . '|' . $subject;
+        return $this->tenant->id.'|'.$subject;
     }
 }

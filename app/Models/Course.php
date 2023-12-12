@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Course extends Model implements ExistsInSis
 {
-    use HasFactory;
     use BelongsToTenant;
+    use HasFactory;
 
     protected $guarded = [];
 

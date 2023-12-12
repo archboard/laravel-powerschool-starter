@@ -22,7 +22,7 @@ class StudentFactory extends Factory
             'email' => $this->faker->email(),
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
-            'sis_key' =>$this->faker->numberBetween(1, 100),
+            'sis_key' => $this->faker->numberBetween(1, 100),
         ];
     }
 }

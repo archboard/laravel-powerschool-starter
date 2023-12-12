@@ -9,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Models\School;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class TenantSettingsController extends Controller
 {
@@ -47,7 +46,6 @@ class TenantSettingsController extends Controller
     /**
      * Updates attributes for the tenant
      *
-     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Tenant $tenant)

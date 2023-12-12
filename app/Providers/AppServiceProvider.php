@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Enums\Sis;
 use App\Enums\UserType;
 use App\Models\School;
 use App\Models\Tenant;
@@ -38,8 +37,7 @@ class AppServiceProvider extends ServiceProvider
         JsonResource::withoutWrapping();
         Date::use(CarbonImmutable::class);
 
-        $currentTenant = fn (): Tenant =>
-            Tenant::current() ?? new Tenant();
+        $currentTenant = fn (): Tenant => Tenant::current() ?? new Tenant();
 
         $currentSchool = function (): School {
             /** @var User $user */

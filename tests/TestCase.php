@@ -14,8 +14,11 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
 
     protected bool $signIn = false;
+
     protected bool $cloud = false;
+
     protected Tenant $tenant;
+
     protected User $user;
 
     protected function setUp(): void

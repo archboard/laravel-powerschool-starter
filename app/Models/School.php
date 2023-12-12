@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class School extends Model implements ExistsInSis
 {
-    use HasFactory;
     use BelongsToTenant;
+    use HasFactory;
 
     protected $guarded = [];
 

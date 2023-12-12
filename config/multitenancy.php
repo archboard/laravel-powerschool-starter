@@ -37,7 +37,7 @@ return [
         \App\Tasks\ChangeConfigTask::class,
         // This shouldn't be enabled because the scope will need to be set
         // to a school, not a district/tenant in general
-//        \App\Tasks\ScopeBouncer::class,
+        //        \App\Tasks\ScopeBouncer::class,
     ],
 
     /*

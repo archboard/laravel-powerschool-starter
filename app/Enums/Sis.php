@@ -21,6 +21,7 @@ enum Sis: string
             Sis::cases(),
             function (array $carry, Sis $sis) {
                 $carry[$sis->value] = $sis->label();
+
                 return $carry;
             },
             []
@@ -37,7 +38,7 @@ enum Sis: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PS => 'PowerSchool SIS',
             self::CLASS_LINK => 'ClassLink',
         };
@@ -45,7 +46,7 @@ enum Sis: string
 
     public function getProvider(Tenant $tenant): SisProvider
     {
-        return match($this) {
+        return match ($this) {
             self::PS => new PowerSchoolProvider($tenant),
             self::CLASS_LINK => throw new \Exception('To be implemented'),
         };
@@ -53,7 +54,7 @@ enum Sis: string
 
     public function isConfigured(Collection $config): bool
     {
-        return match($this) {
+        return match ($this) {
             self::PS => $config->get('url') &&
                 $config->get('client_id') &&
                 $config->get('client_secret'),
@@ -63,7 +64,7 @@ enum Sis: string
 
     public function getConfigFields(): FormFieldCollection
     {
-        $fields = match($this) {
+        $fields = match ($this) {
             self::PS => [
                 'url' => FormField::make(__('PowerSchool URL'))
                     ->type('url')

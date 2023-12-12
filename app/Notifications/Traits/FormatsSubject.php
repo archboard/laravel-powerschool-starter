@@ -6,6 +6,6 @@ trait FormatsSubject
 {
     public function formatSubject(string $subject): string
     {
-        return '[' . config('app.name') . '] ' . $subject;
+        return '['.config('app.name').'] '.$subject;
     }
 }

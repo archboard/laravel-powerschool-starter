@@ -24,7 +24,7 @@ class UpdateCurrentSchoolController extends Controller
         ]);
         $user->update($data);
 
-        session()->flash('success', __("School changed to :school.", [
+        session()->flash('success', __('School changed to :school.', [
             'school' => $user->school->name,
         ]));
 

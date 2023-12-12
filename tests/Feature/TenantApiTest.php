@@ -17,6 +17,7 @@ class TenantApiTest extends TestCase
     use WithFaker;
 
     protected string $token;
+
     protected array $headers;
 
     protected function setUp(): void

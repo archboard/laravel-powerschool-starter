@@ -38,7 +38,7 @@ class CheckAppKey extends Command
      */
     public function handle()
     {
-        if (!config('app.key')) {
+        if (! config('app.key')) {
             Artisan::call('key:generate --force');
         }
 

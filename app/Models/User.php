@@ -18,10 +18,10 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
  */
 class User extends Authenticatable implements ExistsInSis
 {
-    use HasFactory;
-    use Notifiable;
-    use HasRolesAndAbilities;
     use BelongsToTenant;
+    use HasFactory;
+    use HasRolesAndAbilities;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -51,9 +51,6 @@ class User extends Authenticatable implements ExistsInSis
 
     /**
      * Gets the users who have an ability directly or through a role
-     *
-     * @param Builder $query
-     * @param string $ability
      */
     public function scopeWhereCan(Builder $query, string $ability)
     {
@@ -64,11 +61,11 @@ class User extends Authenticatable implements ExistsInSis
             });
             // through roles
             $query->orWhereHas('roles', function ($query) use ($ability) {
-                 $query->whereHas('abilities', function ($query) use ($ability) {
-                     $query->byName($ability);
-                 });
-             });
-         });
+                $query->whereHas('abilities', function ($query) use ($ability) {
+                    $query->byName($ability);
+                });
+            });
+        });
     }
 
     public function getSchoolPermissionsAttribute(): array

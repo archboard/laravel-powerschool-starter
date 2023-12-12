@@ -29,7 +29,7 @@ class TenantFactory extends Factory
                 'url' => env('POWERSCHOOL_ADDRESS'),
                 'client_id' => env('POWERSCHOOL_CLIENT_ID'),
                 'client_secret' => env('POWERSCHOOL_CLIENT_SECRET'),
-            ]
+            ],
         ];
     }
 }

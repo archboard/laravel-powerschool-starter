@@ -22,7 +22,7 @@ it('can be accessed with permission', function () {
         ->assertOk();
 });
 
-it("can update smtp settings", function () {
+it('can update smtp settings', function () {
     fullPermissions();
 
     $data = [

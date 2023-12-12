@@ -40,14 +40,17 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function logIn(array $attributes = []) {
+function logIn(array $attributes = [])
+{
     return test()->logIn(attributes: $attributes);
 }
 
-function fullPermissions() {
+function fullPermissions()
+{
     return test()->fullPermission();
 }
 
-function setSchool() {
+function setSchool()
+{
     return test()->setSchool();
 }

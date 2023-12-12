@@ -31,6 +31,7 @@ class GenerateMachineToken extends Command
     {
         if (config('app.self_hosted')) {
             $this->error('This command is only available in the cloud version of the app.');
+
             return static::SUCCESS;
         }
 

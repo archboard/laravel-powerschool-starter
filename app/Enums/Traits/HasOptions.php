@@ -10,6 +10,7 @@ trait HasOptions
             static::cases(),
             function (array $carry, $sis) {
                 $carry[$sis->value] = $sis->label();
+
                 return $carry;
             },
             []

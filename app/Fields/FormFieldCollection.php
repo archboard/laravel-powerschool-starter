@@ -3,7 +3,6 @@
 namespace App\Fields;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class FormFieldCollection extends Collection
 {
@@ -25,6 +24,7 @@ class FormFieldCollection extends Collection
             // we have to escape the dot in the validation rule
             $escapedKey = implode('\.', explode('.', $key));
             $rules[$escapedKey] = $field->getRules();
+
             return $rules;
         }, []);
     }

@@ -77,10 +77,10 @@ return [
             'model' => App\Models\User::class,
         ],
 
-         'machine' => [
-             'driver' => 'database',
-             'table' => 'machine_api_tokens',
-         ],
+        'machine' => [
+            'driver' => 'database',
+            'table' => 'machine_api_tokens',
+        ],
     ],
 
     /*

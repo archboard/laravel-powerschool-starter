@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\Role;
 use App\Enums\Sis;
 use App\Fields\FormField;
 use App\Fields\FormFieldCollection;
@@ -16,7 +15,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Silber\Bouncer\BouncerFacade;
 use Spatie\Multitenancy\Models\Tenant as TenantBase;
 
 /**
@@ -27,6 +25,7 @@ class Tenant extends TenantBase
     use HasFactory;
 
     protected $guarded = [];
+
     protected $casts = [
         'sis_provider' => Sis::class,
         'sis_config' => 'encrypted:collection',
@@ -139,6 +138,7 @@ class Tenant extends TenantBase
         $school = $this->schools()
             ->where('sis_id', $sisId)
             ->firstOrFail();
+
         return $school;
     }
 
@@ -166,10 +166,11 @@ class Tenant extends TenantBase
         return $this->getConfigFieldValue('sis_config', $key);
     }
 
-    public function getConfigFieldValue(string $configKey, ?string $key = null): mixed
+    public function getConfigFieldValue(string $configKey, string $key = null): mixed
     {
-        if (!$key && Str::contains($configKey, '.')) {
+        if (! $key && Str::contains($configKey, '.')) {
             [$configKey, $key] = explode('.', $configKey);
+
             return $this->getConfigFieldValue($configKey, $key);
         }
 
@@ -179,30 +180,30 @@ class Tenant extends TenantBase
     public function getInstallationFields(): FormFieldCollection
     {
         return FormFieldCollection::make([
-                'name' => FormField::make(__('Tenant name'))
-                    ->rules(['required', 'string', 'max:255']),
-                'domain' => FormField::make(__('Domain'))
-                    ->disabled(config('app.cloud'))
+            'name' => FormField::make(__('Tenant name'))
+                ->rules(['required', 'string', 'max:255']),
+            'domain' => FormField::make(__('Domain'))
+                ->disabled(config('app.cloud'))
+                ->rules([
+                    'required',
+                    Rule::unique('tenants', 'domain')->ignoreModel($this),
+                ]),
+            ...(config('app.cloud')
+                ? ['custom_domain' => FormField::make(__('Custom domain'))
                     ->rules([
-                        'required',
+                        'nullable',
                         Rule::unique('tenants', 'domain')->ignoreModel($this),
-                    ]),
-                ...(config('app.cloud')
-                    ? ['custom_domain' => FormField::make(__('Custom domain'))
-                        ->rules([
-                            'nullable',
-                            Rule::unique('tenants', 'domain')->ignoreModel($this),
-                            Rule::unique('tenants', 'custom_domain')->ignoreModel($this),
-                        ])]
-                    : []),
-                'email' => FormField::make(__('Email'))
-                    ->help(__('This is the email address for a system admin and should match your email that is used in your SIS.'))
-                    ->rules([
-                        'required',
-                        'email',
-                    ]),
-                ...$this->sis_provider?->getConfigFields() ?? collect()
-            ])
+                        Rule::unique('tenants', 'custom_domain')->ignoreModel($this),
+                    ])]
+                : []),
+            'email' => FormField::make(__('Email'))
+                ->help(__('This is the email address for a system admin and should match your email that is used in your SIS.'))
+                ->rules([
+                    'required',
+                    'email',
+                ]),
+            ...$this->sis_provider?->getConfigFields() ?? collect(),
+        ])
             ->map(fn (FormField $field, string $key) => $field
                 ->withValue($this->getInstallationFieldValue($key) ?? $this->getAttribute($key))
                 ->keyedBy($key)
