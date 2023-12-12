@@ -7,6 +7,7 @@
           <Th>{{ __('Grade') }}</Th>
           <Th>{{ __('Name') }}</Th>
           <Th>{{ __('Email') }}</Th>
+          <Th></Th>
         </tr>
       </Thead>
       <Tbody>
@@ -15,6 +16,11 @@
           <Td>{{ student.grade_level }}</Td>
           <Td>{{ student.name }}</Td>
           <Td>{{ student.email }}</Td>
+          <ActionColumn>
+            <AppLink :href="`/students/${student.id}`">
+              {{ __('View') }}
+            </AppLink>
+          </ActionColumn>
         </tr>
       </Tbody>
     </Table>
@@ -26,9 +32,10 @@
 <script setup>
 import { ref } from 'vue'
 import Authenticated from '@/layouts/Authenticated.vue'
-import { Table, Tbody, Th, Thead } from '@/components/tables/index.js'
+import { ActionColumn, Table, Tbody, Th, Thead } from '@/components/tables/index.js'
 import Td from '@/components/tables/Td.vue'
 import Pagination from '@/components/tables/Pagination.vue'
+import AppLink from '@/components/AppLink.vue'
 
 const props = defineProps({
   students: Object,

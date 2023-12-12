@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Contracts\ExistsInSis;
+use App\Traits\BelongsToSchool;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 class Student extends Model implements ExistsInSis
 {
     use BelongsToTenant;
+    use BelongsToSchool;
     use HasFactory;
     use SoftDeletes;
 

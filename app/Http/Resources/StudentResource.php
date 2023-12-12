@@ -26,6 +26,7 @@ class StudentResource extends JsonResource
             'last_name' => $this->resource->last_name,
             'email' => $this->resource->email,
             'grade_level' => $this->resource->grade_level,
+            'sections' => SectionResource::collection($this->whenLoaded('sections')),
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Contracts\ExistsInSis;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
@@ -21,6 +22,11 @@ class Section extends Model implements ExistsInSis
     public function students(): BelongsToMany
     {
         return $this->belongsToMany(Student::class);
+    }
+
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class);
     }
 
     public function syncFromSis(): static

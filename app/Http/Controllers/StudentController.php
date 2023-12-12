@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\StudentResource;
 use App\Models\School;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -43,9 +44,15 @@ class StudentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Student $student)
     {
-        //
+        $title = $student->name;
+        $student->load('school', 'sections', 'sections.course');
+
+        return inertia('students/Show', [
+            'title' => $title,
+            'student' => new StudentResource($student),
+        ])->withViewData(compact('title'));
     }
 
     /**
