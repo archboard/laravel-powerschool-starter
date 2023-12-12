@@ -66,6 +66,9 @@ Route::middleware('tenant')->group(function () {
         Route::post('/sync/{model}/{id}', \App\Http\Controllers\Settings\SyncModelController::class)
             ->name('model.sync');
 
+        Route::resource('/students', \App\Http\Controllers\StudentController::class)
+            ->only('index', 'show');
+
         Route::prefix('/settings')
             ->name('settings.')
             ->group(function () {
