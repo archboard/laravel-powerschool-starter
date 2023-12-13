@@ -21,6 +21,8 @@ class CourseResource extends JsonResource
             'sis_id' => $this->resource->sis_id,
             'course_number' => $this->resource->course_number,
             'name' => $this->resource->name,
+            'sections_count' => $this->resource->sections_count,
+            'sections' => SectionResource::collection($this->whenLoaded('sections')),
         ];
     }
 }
