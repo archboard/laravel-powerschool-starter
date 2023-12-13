@@ -5,12 +5,14 @@ namespace App\Models;
 use App\Enums\UserType;
 use App\Models\Contracts\ExistsInSis;
 use App\Traits\BelongsToTenant;
+use App\Traits\HasFirstAndLastName;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Silber\Bouncer\Database\HasRolesAndAbilities;
 
 /**
@@ -22,6 +24,7 @@ class User extends Authenticatable implements ExistsInSis
     use HasFactory;
     use HasRolesAndAbilities;
     use Notifiable;
+    use HasFirstAndLastName;
 
     /**
      * The attributes that are mass assignable.
@@ -52,7 +55,7 @@ class User extends Authenticatable implements ExistsInSis
     /**
      * Gets the users who have an ability directly or through a role
      */
-    public function scopeWhereCan(Builder $query, string $ability)
+    public function scopeWhereCan(Builder $query, string $ability): void
     {
         $query->where(function ($query) use ($ability) {
             // direct
@@ -68,6 +71,21 @@ class User extends Authenticatable implements ExistsInSis
         });
     }
 
+    public function scopeFilter(Builder $builder, array $filters = []): void
+    {
+        $builder->when($filters['search'] ?? null, function (Builder $builder, string $search) {
+            $builder->search($search);
+        })->orderBy($filters['sort'] ?? 'last_name', $filters['dir'] ?? 'asc');
+    }
+
+    public function scopeSearch(Builder $builder, string $search): void
+    {
+        $builder->where(function (Builder $builder) use ($search) {
+            $builder->where(DB::raw("(first_name || ' ' || last_name)"), 'ilike', "%{$search}%")
+                ->orWhere('email', 'ilike', "%{$search}%");
+        });
+    }
+
     public function getSchoolPermissionsAttribute(): array
     {
         return $this->getPermissionsForSchool();
@@ -76,7 +94,12 @@ class User extends Authenticatable implements ExistsInSis
     public function schools(): BelongsToMany
     {
         return $this->belongsToMany(School::class)
-            ->withPivot(['staff_id']);
+            ->withPivot(['relationship']);
+    }
+
+    public function students(): BelongsToMany
+    {
+        return $this->belongsToMany(Student::class);
     }
 
     public function adminSchools(): BelongsToMany

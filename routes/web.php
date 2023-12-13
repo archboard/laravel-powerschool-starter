@@ -66,14 +66,20 @@ Route::middleware('tenant')->group(function () {
         Route::post('/sync/{model}/{id}', \App\Http\Controllers\Settings\SyncModelController::class)
             ->name('model.sync');
 
-        Route::resource('/students', \App\Http\Controllers\StudentController::class)
-            ->only('index', 'show');
+        Route::middleware(['has_school'])
+            ->group(function () {
+                Route::resource('/students', \App\Http\Controllers\StudentController::class)
+                    ->only('index', 'show');
 
-        Route::resource('/sections', \App\Http\Controllers\SectionController::class)
-            ->only('index', 'show');
+                Route::resource('/sections', \App\Http\Controllers\SectionController::class)
+                    ->only('index', 'show');
 
-        Route::resource('/courses', \App\Http\Controllers\CourseController::class)
-            ->only('index', 'show');
+                Route::resource('/courses', \App\Http\Controllers\CourseController::class)
+                    ->only('index', 'show');
+
+                Route::resource('/users', \App\Http\Controllers\UserController::class)
+                    ->only('index', 'show');
+            });
 
         Route::prefix('/settings')
             ->name('settings.')

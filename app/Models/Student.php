@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Contracts\ExistsInSis;
 use App\Traits\BelongsToSchool;
 use App\Traits\BelongsToTenant;
+use App\Traits\HasFirstAndLastName;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,6 +24,7 @@ class Student extends Model implements ExistsInSis
     use BelongsToSchool;
     use HasFactory;
     use SoftDeletes;
+    use HasFirstAndLastName;
 
     protected $guarded = [];
 
@@ -49,16 +51,6 @@ class Student extends Model implements ExistsInSis
                 ->orWhere('student_number', 'ilike', "%{$search}%")
                 ->orWhere('email', 'ilike', "%{$search}%");
         });
-    }
-
-    public function name(): Attribute
-    {
-        return Attribute::get(fn () => "{$this->first_name} {$this->last_name}");
-    }
-
-    public function lastFirst(): Attribute
-    {
-        return Attribute::get(fn () => "{$this->last_name}, {$this->first_name}");
     }
 
     public function sections(): BelongsToMany

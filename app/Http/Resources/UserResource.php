@@ -18,11 +18,15 @@ class UserResource extends JsonResource
     {
         return [
             'id' => $this->resource->id,
+            'name' => $this->resource->name,
+            'last_first' => $this->resource->last_first,
             'first_name' => $this->resource->first_name,
             'last_name' => $this->resource->last_name,
             'email' => $this->resource->email,
             'timezone' => $this->resource->timezone,
             'school_id' => $this->resource->school_id,
+            'user_type' => $this->resource->user_type?->value,
+            'user_type_display' => $this->resource->user_type?->label(),
             'schools' => SchoolResource::collection($this->whenLoaded('schools')),
             'school' => new SchoolResource($this->whenLoaded('schoool')),
             'permissions' => $this->whenLoaded('school', function () {
