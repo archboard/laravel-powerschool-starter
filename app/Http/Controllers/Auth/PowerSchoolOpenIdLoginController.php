@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserType;
 use App\Http\Controllers\Controller;
 use App\Models\School;
 use App\Models\User;
@@ -31,6 +32,10 @@ class PowerSchoolOpenIdLoginController extends Controller
             $schools = School::whereIn('school_number', $adminSchools)
                 ->pluck('id');
             $user->schools()->syncWithoutDetaching($schools);
+        }
+
+        if ($user->user_type === UserType::guardian) {
+            $user->syncFromSis();
         }
     }
 }

@@ -449,7 +449,6 @@ class PowerSchoolProvider implements SisProvider
                 'relationship' => Arr::get($students->get($dcid), 'studentDetails.0.relationship'),
             ],
         ]);
-        ray($sync->toArray());
 
         $user->students()
             ->sync($sync->toArray());
