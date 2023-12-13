@@ -14,7 +14,7 @@ class TenantScope implements Scope
         $tenant = Tenant::current();
 
         if ($tenant) {
-            $builder->where('tenant_id', $tenant->id);
+            $builder->where($model->getTable().'.tenant_id', $tenant->id);
         }
     }
 

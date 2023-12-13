@@ -69,6 +69,9 @@ Route::middleware('tenant')->group(function () {
         Route::resource('/students', \App\Http\Controllers\StudentController::class)
             ->only('index', 'show');
 
+        Route::resource('/sections', \App\Http\Controllers\SectionController::class)
+            ->only('index', 'show');
+
         Route::prefix('/settings')
             ->name('settings.')
             ->group(function () {
