@@ -16,7 +16,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { MenuItem } from '@headlessui/vue'
-import menuItemClasses from '@/composition/usesMenuItemClasses'
+import menuItemClasses from '@/composition/useMenuItemClasses.js'
 
 export default defineComponent({
   inheritAttrs: false,
