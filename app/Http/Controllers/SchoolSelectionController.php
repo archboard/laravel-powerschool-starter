@@ -21,6 +21,7 @@ class SchoolSelectionController extends Controller
             ->when($user->user_type === UserType::guardian, function (Builder $builder) use ($user) {
                 $builder->whereIn('id', $user->students()->pluck('school_id'));
             })
+            ->where('active', true)
             ->get();
         $title = __('Select school');
 
