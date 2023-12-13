@@ -14,7 +14,7 @@
       <MenuButton as="button" class="focus:ring-brand-primary rounded-full inline-flex items-center justify-center p-1">
         <div class="sr-only">Open menu</div>
         <slot name="icon">
-          <EllipsisVerticalIcon :class="['text-black', iconSize]" />
+          <EllipsisVerticalIcon :class="['text-black dark:text-white', iconSize]" />
         </slot>
       </MenuButton>
 
