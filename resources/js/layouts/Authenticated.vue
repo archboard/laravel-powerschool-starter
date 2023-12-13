@@ -54,7 +54,7 @@
           <Logo class="h-10 w-auto" />
         </div>
 
-        <div v-if="adminSchools.length > 0" class="mt-5 px-2">
+        <div v-if="adminSchools.length > 1" class="mt-5 px-2">
           <label for="current-school" class="sr-only">Current school</label>
           <AppSelect v-model="currentSchool" class="bg-primary-200 dark:bg-primary-800 border-primary-300 dark:border-primary-900">
             <option v-for="school in adminSchools" :id="school.id" :value="school.id">{{ school.name }}</option>
