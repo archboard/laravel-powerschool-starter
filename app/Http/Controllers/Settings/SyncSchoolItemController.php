@@ -13,10 +13,11 @@ class SyncSchoolItemController extends Controller
     public function __invoke(Request $request, string $item)
     {
         $school = $request->school();
-        $method = 'sync'.ucfirst($item);
+        $method = 'syncSchool'.ucfirst($item);
+        $provider = $school->tenant->getSisProvider();
 
-        if (method_exists($school, $method)) {
-            $school->$method();
+        if (method_exists($provider, $method)) {
+            $provider->$method($school);
             session()->flash('success', __('Synced successfully'));
         }
 

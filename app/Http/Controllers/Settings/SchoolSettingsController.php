@@ -29,6 +29,12 @@ class SchoolSettingsController extends Controller
                         ->count(),
                 ],
                 [
+                    'key' => 'courses',
+                    'label' => __('Total courses'),
+                    'value' => $school->courses()
+                        ->count(),
+                ],
+                [
                     'key' => 'sections',
                     'label' => __('Total sections'),
                     'value' => $school->sections()
