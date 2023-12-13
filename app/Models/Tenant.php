@@ -166,7 +166,7 @@ class Tenant extends TenantBase
         return $this->getConfigFieldValue('sis_config', $key);
     }
 
-    public function getConfigFieldValue(string $configKey, string $key = null): mixed
+    public function getConfigFieldValue(string $configKey, ?string $key = null): mixed
     {
         if (! $key && Str::contains($configKey, '.')) {
             [$configKey, $key] = explode('.', $configKey);

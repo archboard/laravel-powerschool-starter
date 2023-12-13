@@ -19,6 +19,6 @@ class HasSchoolSet
             return $next($request);
         }
 
-        return to_route('school-selection');
+        return to_route('select-school');
     }
 }

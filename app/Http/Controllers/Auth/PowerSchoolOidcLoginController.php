@@ -35,6 +35,8 @@ class PowerSchoolOidcLoginController extends Controller
 
     protected function authenticated(Request $request, Authenticatable $user, Collection $data)
     {
-        ray($user, $data);
+        if (method_exists($user, 'syncFromSis')) {
+            $user->syncFromSis();
+        }
     }
 }

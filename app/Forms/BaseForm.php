@@ -42,7 +42,7 @@ abstract class BaseForm implements AppForm
             ->toValidationRules();
     }
 
-    public function toInertia(string $method = null, string $endpoint = null): array
+    public function toInertia(?string $method = null, ?string $endpoint = null): array
     {
         return [
             'title' => $this->title(),

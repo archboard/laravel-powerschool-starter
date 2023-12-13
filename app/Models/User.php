@@ -22,9 +22,9 @@ class User extends Authenticatable implements ExistsInSis
 {
     use BelongsToTenant;
     use HasFactory;
+    use HasFirstAndLastName;
     use HasRolesAndAbilities;
     use Notifiable;
-    use HasFirstAndLastName;
 
     /**
      * The attributes that are mass assignable.
@@ -93,13 +93,13 @@ class User extends Authenticatable implements ExistsInSis
 
     public function schools(): BelongsToMany
     {
-        return $this->belongsToMany(School::class)
-            ->withPivot(['relationship']);
+        return $this->belongsToMany(School::class);
     }
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(Student::class);
+        return $this->belongsToMany(Student::class)
+            ->withPivot(['relationship']);
     }
 
     public function adminSchools(): BelongsToMany
@@ -114,7 +114,7 @@ class User extends Authenticatable implements ExistsInSis
         return $this->belongsTo(School::class);
     }
 
-    public function getPermissionsForSchool(School $school = null): array
+    public function getPermissionsForSchool(?School $school = null): array
     {
         $school = $school ?? $this->school;
 

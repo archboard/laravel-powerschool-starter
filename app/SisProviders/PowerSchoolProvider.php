@@ -431,6 +431,28 @@ class PowerSchoolProvider implements SisProvider
             'email' => collect($data['emails'])
                 ->firstWhere('primary', true)['address'] ?? $user->email,
         ]);
+
+        // Sync the student relationships
+        $students = collect($data['contactStudents'])
+            ->filter(fn (array $student) => $student['deleted'] === false &&
+                $student['canAccessData'] === true &&
+                Arr::get($student, 'studentDetails.0.active') === true
+            )
+            ->keyBy('dcid');
+
+        $studentIds = $this->tenant
+            ->students()
+            ->whereIn('sis_id', $students->keys())
+            ->pluck('id', 'sis_id');
+        $sync = $studentIds->mapWithKeys(fn ($id, $dcid) => [
+            $id => [
+                'relationship' => Arr::get($students->get($dcid), 'studentDetails.0.relationship'),
+            ],
+        ]);
+        ray($sync->toArray());
+
+        $user->students()
+            ->sync($sync->toArray());
     }
 
     public function configured(): bool

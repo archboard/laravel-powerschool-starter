@@ -31,20 +31,20 @@ class FormField
 
     protected int $span = 6;
 
-    public static function make(string $label = null): static
+    public static function make(?string $label = null): static
     {
         return (new static())
             ->label($label);
     }
 
-    public function label(string $label = null): static
+    public function label(?string $label = null): static
     {
         $this->label = $label;
 
         return $this;
     }
 
-    public function help(string $help = null): static
+    public function help(?string $help = null): static
     {
         $this->help = $help;
 

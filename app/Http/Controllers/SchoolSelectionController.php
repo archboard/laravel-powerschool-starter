@@ -2,17 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserType;
 use App\Exceptions\SisNotConfiguredException;
 use App\Http\Resources\SchoolResource;
 use App\Models\Tenant;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class SchoolSelectionController extends Controller
 {
-    public function index(Tenant $tenant)
+    public function index(Request $request, Tenant $tenant)
     {
-        $schools = $tenant->schools;
+        /** @var User $user */
+        $user = $request->user();
+        $schools = $tenant->schools()
+            ->when($user->user_type === UserType::guardian, function (Builder $builder) use ($user) {
+                $builder->whereIn('id', $user->students()->pluck('school_id'));
+            })
+            ->get();
         $title = __('Select school');
 
         throw_if($schools->isEmpty(), new SisNotConfiguredException('No schools configured'));

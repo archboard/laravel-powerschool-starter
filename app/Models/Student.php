@@ -7,7 +7,6 @@ use App\Traits\BelongsToSchool;
 use App\Traits\BelongsToTenant;
 use App\Traits\HasFirstAndLastName;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,11 +19,11 @@ use Illuminate\Support\Facades\DB;
  */
 class Student extends Model implements ExistsInSis
 {
-    use BelongsToTenant;
     use BelongsToSchool;
+    use BelongsToTenant;
     use HasFactory;
-    use SoftDeletes;
     use HasFirstAndLastName;
+    use SoftDeletes;
 
     protected $guarded = [];
 
@@ -56,6 +55,12 @@ class Student extends Model implements ExistsInSis
     public function sections(): BelongsToMany
     {
         return $this->belongsToMany(Section::class);
+    }
+
+    public function contacts(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot(['relationship']);
     }
 
     public function syncFromSis(): static
