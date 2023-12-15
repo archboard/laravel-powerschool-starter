@@ -42,6 +42,6 @@ class InstallationController extends Controller
 
         session()->flash('success', __('Installation complete. Sync has been started.'));
 
-        return to_route('settings.tenant.edit');
+        return to_route('install.user');
     }
 }

@@ -132,7 +132,7 @@ class InstallationTest extends TestCase
             ->asSelfHosted()
             ->post('/install', $data)
             ->assertSessionHas('success')
-            ->assertRedirect(route('settings.tenant.edit'));
+            ->assertRedirect(route('install.user'));
 
         $this->assertDatabaseHas('tenants', Arr::only($data, ['name', 'domain']));
         $tenant = Tenant::firstWhere('domain', $data['domain']);
@@ -153,7 +153,7 @@ class InstallationTest extends TestCase
             ->removeSisConfig()
             ->post('/install', $data)
             ->assertSessionHas('success')
-            ->assertRedirect(route('settings.tenant.edit'));
+            ->assertRedirect(route('install.user'));
 
         $this->assertDatabaseHas('tenants', Arr::only($data, ['name', 'domain']));
         $tenant = Tenant::firstWhere('domain', $data['domain']);
