@@ -39,7 +39,6 @@ class InstallationTest extends TestCase
         return [
             'name' => $this->faker->company(),
             'domain' => env('TESTING_APP_URL'),
-            'email' => $this->faker->email(),
             'sis_config.url' => env('POWERSCHOOL_ADDRESS'),
             'sis_config.client_id' => env('POWERSCHOOL_CLIENT_ID'),
             'sis_config.client_secret' => env('POWERSCHOOL_CLIENT_SECRET'),
@@ -96,7 +95,6 @@ class InstallationTest extends TestCase
                 ->has('title')
                 ->where('form', $this->tenant->getInstallationFields()->toInertia())
                 ->where('fields', $this->tenant->getInstallationFields()->toResource())
-                ->where('email', null)
                 ->component('Install')
             );
     }
@@ -116,7 +114,6 @@ class InstallationTest extends TestCase
                 ->has('title')
                 ->where('form', $this->tenant->getInstallationFields()->toInertia())
                 ->where('fields', $this->tenant->getInstallationFields()->toResource())
-                ->where('email', $this->user->email)
                 ->component('Install')
             );
     }
