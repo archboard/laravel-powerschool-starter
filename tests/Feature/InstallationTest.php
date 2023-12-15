@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\Role;
 use App\Jobs\SyncSchools;
 use App\Models\Tenant;
 use App\Models\User;
@@ -160,5 +161,35 @@ class InstallationTest extends TestCase
         $this->assertEquals($tenant->sis_config->toArray(), Arr::undot(Arr::only($data, ['sis_config.url', 'sis_config.client_secret', 'sis_config.client_id']))['sis_config']);
 
         Queue::assertPushed(SyncSchools::class);
+    }
+
+    public function test_cant_view_user_selection_when_uninstalled()
+    {
+        $this->asSelfHosted()
+            ->removeSisConfig()
+            ->get(route('install.user'))
+            ->assertRedirect(route('install'));
+    }
+
+    public function test_cant_view_when_admin_user_already_exists()
+    {
+        $admin = $this->seedUser();
+        $admin->assignRole(Role::DISTRICT_ADMIN);
+
+        $this->asSelfHosted()
+            ->get(route('install.user'))
+            ->assertSessionHas('error')
+            ->assertRedirect();
+    }
+
+    public function test_can_view_user_import_page()
+    {
+        $this->asSelfHosted()
+            ->get(route('install.user'))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('InstallUser')
+                ->where('endpoint', route('install.user'))
+            );
     }
 }
