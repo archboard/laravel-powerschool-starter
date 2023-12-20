@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use Carbon\Factory;
+use Carbon\FactoryImmutable as Factory;
 
 trait HasTimezone
 {
