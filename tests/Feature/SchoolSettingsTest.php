@@ -3,7 +3,7 @@
 use Inertia\Testing\AssertableInertia;
 
 beforeEach(function () {
-    logIn();
+    logIn()->setSchool();
 });
 
 it("can't be accessed without permission", function () {
