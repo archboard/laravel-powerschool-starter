@@ -7,6 +7,7 @@ use App\Enums\UserType;
 use App\Models\Contracts\ExistsInSis;
 use App\Traits\BelongsToTenant;
 use App\Traits\HasFirstAndLastName;
+use App\Traits\HasPermissions;
 use App\Traits\HasTimezone;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,6 +29,7 @@ class User extends Authenticatable implements ExistsInSis
     use HasRolesAndAbilities;
     use Notifiable;
     use HasTimezone;
+    use HasPermissions;
 
     /**
      * The attributes that are mass assignable.
