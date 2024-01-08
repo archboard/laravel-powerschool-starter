@@ -46,6 +46,11 @@ function fullPermissions()
     return test()->fullPermission();
 }
 
+function seedUser(array $attributes = []): App\Models\User
+{
+    return test()->seedUser($attributes);
+}
+
 function givePermission(App\Enums\Permission $permission)
 {
     return test()->givePermission($permission);
