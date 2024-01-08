@@ -118,8 +118,6 @@ trait HasPermissions
                 BouncerFacade::refreshFor($this);
             });
 
-        ray($this->getAbilities());
-
         return $this;
     }
 }
