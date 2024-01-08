@@ -60,6 +60,7 @@ class HandleInertiaRequests extends Middleware
                 ? $user->permissions
                 : new \stdClass(),
             'school' => fn () => new SchoolResource($school),
+            'breadcrumbs' => [],
             'adminSchools' => function () use ($user, $tenant) {
                 if (! $user) {
                     return [];
