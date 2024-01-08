@@ -9,10 +9,14 @@ use App\Traits\BelongsToTenant;
 use App\Traits\HasFirstAndLastName;
 use App\Traits\HasPermissions;
 use App\Traits\HasTimezone;
+use App\Traits\Selectable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +34,7 @@ class User extends Authenticatable implements ExistsInSis
     use Notifiable;
     use HasTimezone;
     use HasPermissions;
+    use Selectable;
 
     /**
      * The attributes that are mass assignable.
@@ -56,6 +61,10 @@ class User extends Authenticatable implements ExistsInSis
     protected $casts = [
         'user_type' => UserType::class,
     ];
+
+    //-------------------------------------------------------------------------
+    // Query scopes
+    //-------------------------------------------------------------------------
 
     /**
      * Gets the users who have an ability directly or through a role
@@ -91,10 +100,9 @@ class User extends Authenticatable implements ExistsInSis
         });
     }
 
-    public function getSchoolPermissionsAttribute(): array
-    {
-        return $this->getPermissionsForSchool();
-    }
+    //-------------------------------------------------------------------------
+    // Relationships
+    //-------------------------------------------------------------------------
 
     public function schools(): BelongsToMany
     {
@@ -119,18 +127,14 @@ class User extends Authenticatable implements ExistsInSis
         return $this->belongsTo(School::class);
     }
 
-    public function getPermissionsForSchool(?School $school = null): array
+    public function selectedModels(): HasMany
     {
-        $school = $school ?? $this->school;
-
-        return [
-            [
-                'label' => __('Change school settings'),
-                'permission' => 'change settings',
-                'selected' => $this->can('change settings', $school),
-            ],
-        ];
+        return $this->hasMany(SelectedModel::class);
     }
+
+    //-------------------------------------------------------------------------
+    // Instance functions
+    //-------------------------------------------------------------------------
 
     public function syncFromSis(): static
     {
@@ -143,5 +147,23 @@ class User extends Authenticatable implements ExistsInSis
     public function assignRole(Role|string $role): static
     {
         return $this->assign($role?->value ?? $role);
+    }
+
+    public function toggleSelectedModel(Model $model): static
+    {
+        $selection = $this->selectedModels()
+            ->firstOrCreate([
+                'tenant_id' => $this->tenant_id,
+                'school_id' => $this->school_id,
+                'user_id' => $this->id,
+                'selectable_type' => $model->getMorphClass(),
+                'selectable_id' => $model->getKey(),
+            ]);
+
+        if (! $selection->wasRecentlyCreated) {
+            $selection->delete();
+        }
+
+        return $this;
     }
 }
