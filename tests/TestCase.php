@@ -69,7 +69,7 @@ abstract class TestCase extends BaseTestCase
         /** @var User $user */
         $user = $user ?? $this->seedUser($attributes);
 
-//        $user->assign($role->value);
+        //        $user->assign($role->value);
         $this->be($user);
         $this->user = $user;
 

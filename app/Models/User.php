@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
@@ -30,10 +29,10 @@ class User extends Authenticatable implements ExistsInSis
     use BelongsToTenant;
     use HasFactory;
     use HasFirstAndLastName;
-    use HasRolesAndAbilities;
-    use Notifiable;
-    use HasTimezone;
     use HasPermissions;
+    use HasRolesAndAbilities;
+    use HasTimezone;
+    use Notifiable;
     use Selectable;
 
     /**
