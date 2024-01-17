@@ -30,7 +30,6 @@ export default function useModelSelection (model) {
   const fetchSelection = async () => {
     try {
       const { data } = await $http.get(`/selection/${model}`)
-      console.log(data)
       selection.value = data
     } catch (e) { }
   }
