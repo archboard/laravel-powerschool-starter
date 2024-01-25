@@ -1,6 +1,14 @@
 <template>
   <Authenticated>
-    <Table>
+    <Filters
+      v-model="filters"
+      v-model:search="search"
+      :available-filters="availableFilters"
+      @update="updateResults()"
+      :loading="updatingResults"
+    />
+
+    <Table no-top-radius>
       <Thead>
         <tr>
           <Th class="pr-0 w-4"><Checkbox v-model="selectedAll" /></Th>
@@ -31,6 +39,12 @@
             </ContextMenu>
           </ActionColumn>
         </tr>
+
+        <tr v-if="users.data.length === 0">
+          <Td class="text-center" colspan="5">
+            {{ __('No results found.') }}
+          </Td>
+        </tr>
       </Tbody>
     </Table>
 
@@ -47,10 +61,14 @@ import ContextMenu from '@/components/ContextMenu.vue'
 import AppMenuItem from '@/components/AppMenuItem.vue'
 import Checkbox from '@/components/forms/Checkbox.vue'
 import useModelSelection from '@/composition/useModelSelection.js'
+import Filters from '@/components/tables/Filters.vue'
+import useFilters from '@/composition/useFilters.js'
 
 const props = defineProps({
   users: Object,
+  availableFilters: Array,
+  currentFilters: [Array, Object],
 })
 const { selection, selectedAll, toggleSelection } = useModelSelection('user')
-
+const { filters, search, updateResults, updatingResults } = useFilters()
 </script>

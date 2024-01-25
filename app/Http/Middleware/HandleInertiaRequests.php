@@ -161,6 +161,7 @@ class HandleInertiaRequests extends Middleware
 
                 return array_map(fn (NavigationItem $item) => $item->toArray(), $nav);
             },
+            'filterKey' => fn () => config('model-filters.filter_key'),
         ]);
     }
 }

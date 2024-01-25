@@ -3,6 +3,7 @@
 namespace App\Enums\Traits;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 trait HasOptions
 {
@@ -10,8 +11,8 @@ trait HasOptions
     {
         return array_reduce(
             static::cases(),
-            function (array $carry, $sis) {
-                $carry[$sis->value] = $sis->label();
+            function (array $carry, $enum) {
+                $carry[$enum->value] = $enum->label();
 
                 return $carry;
             },
@@ -34,6 +35,8 @@ trait HasOptions
 
     public function label(): string
     {
-        return 'Default label';
+        return Str::of($this->value)
+            ->replace(['-', '_'], ' ')
+            ->ucfirst();
     }
 }

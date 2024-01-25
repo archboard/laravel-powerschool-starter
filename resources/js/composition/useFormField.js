@@ -17,7 +17,8 @@ export const fieldProps = {
   hasError: {
     type: Boolean,
     default: () => false,
-  }
+  },
+  id: String,
 }
 
 export const fieldEmits = ['update:modelValue']

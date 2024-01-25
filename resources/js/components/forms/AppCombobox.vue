@@ -1,7 +1,7 @@
 <template>
   <Combobox v-model="localValue">
     <div
-      class="relative w-full cursor-default"
+      class="relative cursor-default"
     >
       <ComboboxInput
         class="bg-white dark:bg-gray-900 shadow-sm block w-full rounded-lg text-sm focus:outline-none focus:ring-2"
