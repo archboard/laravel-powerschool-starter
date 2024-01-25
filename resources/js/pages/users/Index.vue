@@ -8,10 +8,17 @@
       :loading="updatingResults"
     />
 
+    <div v-if="selection.length > 0" class="px-4 sm:px-5 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-600 text-sm">
+      <div class="flex items-center space-x-2">
+        <span>{{ __(':count selected', { count: selection.length }) }}</span>
+        <AppLink is="button" @click.prevent="selectedAll = false">{{ __('Remove selection') }}</AppLink>
+      </div>
+    </div>
+
     <Table no-top-radius>
       <Thead>
         <tr>
-          <Th class="pr-0 w-4"><Checkbox v-model="selectedAll" /></Th>
+          <Th class="pr-0 w-4"><Checkbox @change="selectedAll = !selectedAll" :checked="selectedAll" /></Th>
           <Th>{{ __('Name') }}</Th>
           <Th>{{ __('Email') }}</Th>
           <Th>{{ __('Type') }}</Th>
@@ -63,12 +70,13 @@ import Checkbox from '@/components/forms/Checkbox.vue'
 import useModelSelection from '@/composition/useModelSelection.js'
 import Filters from '@/components/tables/Filters.vue'
 import useFilters from '@/composition/useFilters.js'
+import AppLink from '@/components/AppLink.vue'
 
 const props = defineProps({
   users: Object,
   availableFilters: Array,
   currentFilters: [Array, Object],
 })
-const { selection, selectedAll, toggleSelection } = useModelSelection('user')
+const { selection, selectedAll, toggleSelection, selectNone } = useModelSelection('user')
 const { filters, search, updateResults, updatingResults } = useFilters()
 </script>

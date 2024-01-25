@@ -79,7 +79,11 @@
         <label for="search-filter" class="sr-only">Search results</label>
         <SearchInput v-model="localSearch" id="search-filter" />
       </div>
-      <div class="flex w-full justify-end mt-4 sm:mt-0">
+      <div class="flex w-full justify-end space-x-2 mt-4 sm:mt-0">
+        <button v-if="Object.keys(localValue).length > 0" @click.prevent="reset">
+          <span class="sr-only">Reset filters</span>
+          <TrashIcon class="h-5 w-5 text-red-500 dark:text-red-400" />
+        </button>
         <button class="relative block" @click.prevent="showFilters = !showFilters">
           <span class="absolute -top-2 -right-2 inline-flex items-center rounded-md bg-primary-400/20 px-1 text-xs font-medium text-primary-400 ring-1 ring-inset ring-primary-400/20">{{ Object.keys(localValue).length }}</span>
           <FunnelIcon class="w-5 h-5 text-gray-500 dark:text-gray-300" />

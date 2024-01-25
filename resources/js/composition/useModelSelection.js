@@ -22,6 +22,7 @@ export default function useModelSelection (model) {
   }
   const selectNone = async () => {
     selection.value = []
+    selectedAll.value = false
 
     try {
       await $http.delete(`/selection/${model}`)
