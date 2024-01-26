@@ -1,7 +1,7 @@
 <template>
   <Combobox v-model="localValue">
     <div
-      class="relative cursor-default"
+      class="relative w-full cursor-default"
     >
       <ComboboxInput
         class="bg-white dark:bg-gray-900 shadow-sm block w-full rounded-lg text-sm focus:outline-none focus:ring-2"
@@ -12,7 +12,7 @@
         @change="$emit('update:query', $event.target.value)"
         :display-value="handleDisplay"
         :id="id"
-        :placeholder="placeholder"
+        :placeholder="placeholder || __('Type for options…')"
       />
 
       <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
