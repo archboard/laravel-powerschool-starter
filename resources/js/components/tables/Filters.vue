@@ -77,14 +77,14 @@
     <div class="px-4 py-3 sm:flex sm:items-center sm:justify-between">
       <div class="relative w-full sm:w-[350px]">
         <label for="search-filter" class="sr-only">Search results</label>
-        <SearchInput v-model="localSearch" id="search-filter" />
+        <SearchInput v-model="localSearch" id="search-filter" :placeholder="searchPlaceholder" />
       </div>
       <div class="flex w-full justify-end space-x-2 mt-4 sm:mt-0">
         <button v-if="Object.keys(localValue).length > 0" @click.prevent="reset">
           <span class="sr-only">Reset filters</span>
           <TrashIcon class="h-5 w-5 text-red-500 dark:text-red-400" />
         </button>
-        <button class="relative block" @click.prevent="showFilters = !showFilters">
+        <button v-if="availableFilters.length > 0" class="relative block" @click.prevent="showFilters = !showFilters">
           <span class="absolute -top-2 -right-2 inline-flex items-center rounded-md bg-primary-400/20 px-1 text-xs font-medium text-primary-400 ring-1 ring-inset ring-primary-400/20">{{ Object.keys(localValue).length }}</span>
           <FunnelIcon class="w-5 h-5 text-gray-500 dark:text-gray-300" />
         </button>
@@ -116,6 +116,7 @@ const props = defineProps({
     required: true,
   },
   loading: Boolean,
+  searchPlaceholder: String,
 })
 const emit = defineEmits(['update', 'update:modelValue', 'update:search'])
 const localValue = useVModel(props, 'modelValue', emit)
