@@ -92,13 +92,6 @@ class User extends Authenticatable implements ExistsInSis
         });
     }
 
-    //    public function scopeFilter(Builder $builder, array $filters = []): void
-    //    {
-    //        $builder->when($filters['search'] ?? null, function (Builder $builder, string $search) {
-    //            $builder->search($search);
-    //        })->orderBy($filters['sort'] ?? 'last_name', $filters['dir'] ?? 'asc');
-    //    }
-
     public function scopeSearch(Builder $builder, string $search): void
     {
         $builder->where(function (Builder $builder) use ($search) {
