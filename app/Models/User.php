@@ -10,6 +10,10 @@ use App\Traits\HasFirstAndLastName;
 use App\Traits\HasPermissions;
 use App\Traits\HasTimezone;
 use App\Traits\Selectable;
+use GrantHolle\ModelFilters\Enums\Component;
+use GrantHolle\ModelFilters\Filters\MultipleSelectFilter;
+use GrantHolle\ModelFilters\Filters\TextFilter;
+use GrantHolle\ModelFilters\Traits\HasFilters;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,6 +32,7 @@ class User extends Authenticatable implements ExistsInSis
 {
     use BelongsToTenant;
     use HasFactory;
+    use HasFilters;
     use HasFirstAndLastName;
     use HasPermissions;
     use HasRolesAndAbilities;
@@ -225,5 +230,24 @@ class User extends Authenticatable implements ExistsInSis
             ->where('selectable_type', $modelAlias)
             ->pluck('selectable_id')
             ->values();
+    }
+
+    public function filters(): array
+    {
+        return [
+            TextFilter::make('search', __('Search'))
+                ->hide()
+                ->using(fn (Builder $builder, string $search) => $builder->search($search)),
+            TextFilter::make('first_name', __('First name')),
+            TextFilter::make('last_name', __('Last name')),
+            MultipleSelectFilter::make('user_type', __('Checkbox group'))
+                ->options(UserType::options()),
+            MultipleSelectFilter::make('user_type', __('Combobox'))
+                ->withComponent(Component::combobox)
+                ->options(UserType::options()),
+            MultipleSelectFilter::make('user_type', __('Select'))
+                ->withComponent(Component::combobox)
+                ->options(UserType::options()),
+        ];
     }
 }
