@@ -19,7 +19,7 @@ class TenantFactory extends Factory
     {
         return [
             'name' => $this->faker->company(),
-            'domain' => env('TESTING_APP_URL'),
+            'domain' => env('TESTING_APP_HOSTNAME'),
             'allow_password_auth' => true,
             'allow_oidc_login' => true,
             'subscription_started_at' => now(),

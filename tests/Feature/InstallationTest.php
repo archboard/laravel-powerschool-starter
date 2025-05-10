@@ -39,10 +39,12 @@ class InstallationTest extends TestCase
     {
         return [
             'name' => $this->faker->company(),
-            'domain' => env('TESTING_APP_URL'),
-            'sis_config.url' => env('POWERSCHOOL_ADDRESS'),
-            'sis_config.client_id' => env('POWERSCHOOL_CLIENT_ID'),
-            'sis_config.client_secret' => env('POWERSCHOOL_CLIENT_SECRET'),
+            'domain' => env('TESTING_APP_HOSTNAME'),
+            'sis_config' => [
+                'url' => env('POWERSCHOOL_ADDRESS'),
+                'client_id' => env('POWERSCHOOL_CLIENT_ID'),
+                'client_secret' => env('POWERSCHOOL_CLIENT_SECRET'),
+            ],
             ...$attributes,
         ];
     }

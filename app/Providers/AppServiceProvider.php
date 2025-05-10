@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
         JsonResource::withoutWrapping();
         Date::use(CarbonImmutable::class);
 
-        $currentTenant = fn (): Tenant => Tenant::current() ?? new Tenant();
+        $currentTenant = fn (): Tenant => Tenant::current() ?? new Tenant;
 
         $currentSchool = function (): School {
             /** @var User $user */
@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
                 return $school;
             }
 
-            return new School();
+            return new School;
         };
 
         $this->app->bind(Tenant::class, $currentTenant);

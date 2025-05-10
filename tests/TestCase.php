@@ -28,7 +28,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $domain = env('TESTING_APP_URL');
+        $domain = env('TESTING_APP_HOSTNAME');
 
         $this->tenant = Tenant::factory()->create(compact('domain'));
         $this->tenant->domain = $domain;
