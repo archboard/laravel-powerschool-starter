@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import laravel from 'laravel-vite-plugin'
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
 
 export default ({ mode }) => {
   process.env = {
@@ -11,6 +12,7 @@ export default ({ mode }) => {
 
   return defineConfig({
     plugins: [
+      tailwindcss(),
       laravel({
         input: [
           'resources/js/app.js',
