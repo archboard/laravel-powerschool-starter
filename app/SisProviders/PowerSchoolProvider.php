@@ -209,10 +209,6 @@ class PowerSchoolProvider implements SisProvider
         //        while ($results = $builder->paginate()) {
         //            $entries = $results->collect()
         //                ->map(fn (array $student) => $this->makeSisKey($student));
-        //
-        //            ray(Student::query()
-        //                ->whereIn('sis_key', $entries)
-        //                ->delete());
         //        }
 
         return $this;
