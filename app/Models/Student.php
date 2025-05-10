@@ -14,9 +14,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
-/**
- * @mixin IdeHelperStudent
- */
 class Student extends Model implements ExistsInSis
 {
     use BelongsToSchool;

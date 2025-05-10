@@ -17,9 +17,6 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\Multitenancy\Models\Tenant as TenantBase;
 
-/**
- * @mixin IdeHelperTenant
- */
 class Tenant extends TenantBase
 {
     use HasFactory;
