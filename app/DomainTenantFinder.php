@@ -4,16 +4,15 @@ namespace App;
 
 use App\Models\Tenant;
 use Illuminate\Http\Request;
-use Spatie\Multitenancy\Models\Concerns\UsesTenantModel;
+use phpDocumentor\Reflection\Types\ClassString;
+use Spatie\Multitenancy\Contracts\IsTenant;
 use Spatie\Multitenancy\TenantFinder\TenantFinder;
 
 class DomainTenantFinder extends TenantFinder
 {
-    use UsesTenantModel;
-
-    public function findForRequest(Request $request): ?Tenant
+    public function findForRequest(Request $request): ?IsTenant
     {
-        $model = $this->getTenantModel();
+        $model = app(IsTenant::class);
 
         return config('app.cloud')
             ? $model::fromRequest($request)
