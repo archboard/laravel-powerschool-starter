@@ -4,12 +4,6 @@ import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
 export default ({ mode }) => {
-  process.env = {
-    ...process.env,
-    ...loadEnv(mode, process.cwd(), 'APP_'),
-  }
-  const domain = (new URL(process.env.APP_URL)).hostname
-
   return defineConfig({
     plugins: [
       tailwindcss(),
@@ -18,7 +12,6 @@ export default ({ mode }) => {
           'resources/js/app.js',
         ],
         refresh: true,
-        valetTls: domain.split('.').slice(-2).join('.'),
       }),
       vue({
         template: {
