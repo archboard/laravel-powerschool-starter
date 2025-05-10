@@ -14,7 +14,7 @@ class ClassLinkOAuthController extends Controller
 
     public function login(Request $request)
     {
-        ray($request->all());
+        dump($request->all());
 
         return response();
     }
