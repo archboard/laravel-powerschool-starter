@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Spatie\Multitenancy\Contracts\IsTenant;
-use Spatie\Multitenancy\Models\Tenant;
 use Spatie\Multitenancy\Tasks\SwitchTenantTask;
 
 class ChangeConfigTask implements SwitchTenantTask

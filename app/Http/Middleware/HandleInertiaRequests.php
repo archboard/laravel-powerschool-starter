@@ -54,11 +54,11 @@ class HandleInertiaRequests extends Middleware
                     return new UserResource($user);
                 }
 
-                return new \stdClass();
+                return new \stdClass;
             },
             'permissions' => fn () => $user && $school
                 ? $user->permissions
-                : new \stdClass(),
+                : new \stdClass,
             'school' => fn () => new SchoolResource($school),
             'breadcrumbs' => [],
             'adminSchools' => function () use ($user, $tenant) {

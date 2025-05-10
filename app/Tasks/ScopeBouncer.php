@@ -4,7 +4,6 @@ namespace App\Tasks;
 
 use Silber\Bouncer\BouncerFacade;
 use Spatie\Multitenancy\Contracts\IsTenant;
-use Spatie\Multitenancy\Models\Tenant;
 use Spatie\Multitenancy\Tasks\SwitchTenantTask;
 
 class ScopeBouncer implements SwitchTenantTask

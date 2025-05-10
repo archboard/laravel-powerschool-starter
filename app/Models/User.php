@@ -66,9 +66,9 @@ class User extends Authenticatable implements ExistsInSis
         'user_type' => UserType::class,
     ];
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Query scopes
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     /**
      * Gets the users who have an ability directly or through a role
@@ -97,9 +97,9 @@ class User extends Authenticatable implements ExistsInSis
         });
     }
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Relationships
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     public function schools(): BelongsToMany
     {
@@ -129,9 +129,9 @@ class User extends Authenticatable implements ExistsInSis
         return $this->hasMany(SelectedModel::class);
     }
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Instance functions
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     public function syncFromSis(): static
     {
@@ -222,7 +222,7 @@ class User extends Authenticatable implements ExistsInSis
     public function getModelSelection(string $model): Collection
     {
         $modelAlias = class_exists($model)
-            ? (new $model())->getMorphClass()
+            ? (new $model)->getMorphClass()
             : $model;
 
         return $this->selectedModels()

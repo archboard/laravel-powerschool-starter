@@ -2,9 +2,7 @@
 
 namespace App;
 
-use App\Models\Tenant;
 use Illuminate\Http\Request;
-use phpDocumentor\Reflection\Types\ClassString;
 use Spatie\Multitenancy\Contracts\IsTenant;
 use Spatie\Multitenancy\TenantFinder\TenantFinder;
 
