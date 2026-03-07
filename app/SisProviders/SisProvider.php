@@ -14,7 +14,7 @@ interface SisProvider
     public function configured(): bool;
 
     /**
-     * @return Collection<int, School>
+     * @return Collection<int, array<string, mixed>>
      */
     public function getAllSchools(): Collection;
 

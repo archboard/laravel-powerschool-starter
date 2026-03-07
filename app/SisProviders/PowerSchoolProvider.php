@@ -33,7 +33,7 @@ class PowerSchoolProvider implements SisProvider
     }
 
     /**
-     * @return Collection<int, array{id: int, name: string, school_number: int|string|null, low_grade: int|null, high_grade: int|null}>
+     * @return Collection<int, array<string, mixed>>
      */
     public function getAllSchools(): Collection
     {
@@ -77,6 +77,9 @@ class PowerSchoolProvider implements SisProvider
         return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSchool(School $school): array
     {
         $results = $this->builder
@@ -119,7 +122,6 @@ class PowerSchoolProvider implements SisProvider
             ->to("/ws/v1/school/{$school->sis_id}/staff")
             ->expansions('emails');
         $now = now()->toDateTimeString();
-        $count = 0;
 
         while ($results = $builder->paginate()) {
             $filteredStaff = $results->collect()
@@ -161,10 +163,6 @@ class PowerSchoolProvider implements SisProvider
                 ['school_id', 'user_id'],
                 ['staff_id']
             );
-
-            if (++$count > 5) {
-                rd($results, $builder);
-            }
         }
 
         return $this;
@@ -379,11 +377,11 @@ class PowerSchoolProvider implements SisProvider
 
     public function syncUser(User $user): User
     {
-        $method = 'sync'.ucfirst($user->user_type->value);
-
-        if (method_exists($this, $method)) {
-            $this->$method($user);
-        }
+        match ($user->user_type) {
+            UserType::staff => $this->syncStaff($user),
+            UserType::guardian => $this->syncGuardian($user),
+            default => null,
+        };
 
         return $user;
     }
@@ -402,7 +400,7 @@ class PowerSchoolProvider implements SisProvider
                 'first_name' => $user['first_name'] ?? null,
                 'last_name' => $user['last_name'] ?? null,
                 'email' => $user['email'] ?? null,
-                'sis_key' => UserType::staff->getSisKeyFromSisId($user['dcid']),
+                'sis_key' => UserType::staff->getSisKeyFromSisId((int) $user['dcid']),
                 'user_type' => UserType::staff,
             ]));
     }
@@ -422,7 +420,7 @@ class PowerSchoolProvider implements SisProvider
                 'last_name' => $data[0]['last_name'] ?? null,
                 'email' => $data[0]['email'] ? strtolower($data[0]['email']) : null,
                 'user_type' => UserType::staff,
-                'sis_key' => UserType::staff->getSisKeyFromSisId($user->sis_id),
+                'sis_key' => UserType::staff->getSisKeyFromSisId((int) $user->sis_id),
             ]);
             $user->save();
         }
@@ -445,15 +443,19 @@ class PowerSchoolProvider implements SisProvider
         $data = $this->builder
             ->get("/ws/contacts/contact/{$contactId}");
 
+        /** @var array<int, array<string, mixed>> $emails */
+        $emails = $data['emails'] ?? [];
         $user->update([
             'first_name' => $data['firstName'] ?? $user->first_name,
             'last_name' => $data['lastName'] ?? $user->last_name,
-            'email' => collect($data['emails'])
+            'email' => collect($emails)
                 ->firstWhere('primary', true)['address'] ?? $user->email,
         ]);
 
         // Sync the student relationships
-        $students = collect($data['contactStudents'])
+        /** @var array<int, array<string, mixed>> $contactStudents */
+        $contactStudents = $data['contactStudents'] ?? [];
+        $students = collect($contactStudents)
             ->filter(fn (array $student) => $student['deleted'] === false &&
                 $student['canAccessData'] === true &&
                 Arr::get($student, 'studentDetails.0.active') === true
@@ -466,7 +468,7 @@ class PowerSchoolProvider implements SisProvider
             ->pluck('id', 'sis_id');
         $sync = $studentIds->mapWithKeys(fn ($id, $dcid) => [
             $id => [
-                'relationship' => Arr::get($students->get($dcid), 'studentDetails.0.relationship'),
+                'relationship' => Arr::get($students->get($dcid) ?? [], 'studentDetails.0.relationship'),
             ],
         ]);
 
@@ -526,14 +528,17 @@ class PowerSchoolProvider implements SisProvider
         return $course;
     }
 
-    protected function makeSisKey($subject): string
+    /**
+     * @param  array<string, mixed>|Model|string  $subject
+     */
+    protected function makeSisKey(array|Model|string $subject): string
     {
         if (is_array($subject)) {
-            return $this->tenant->id.'|'.$subject['id'];
+            return $this->tenant->id.'|'.(string) $subject['id'];
         }
 
         if ($subject instanceof Model) {
-            return $this->tenant->id.'|'.$subject->sis_id;
+            return $this->tenant->id.'|'.(string) $subject->getAttribute('sis_id');
         }
 
         return $this->tenant->id.'|'.$subject;
