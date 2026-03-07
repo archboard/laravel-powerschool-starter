@@ -8,6 +8,8 @@ use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Uri;
 use Silber\Bouncer\BouncerFacade;
 
 abstract class TestCase extends BaseTestCase
@@ -28,7 +30,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $domain = env('TESTING_APP_HOSTNAME');
+        $domain = Uri::of(config('app.url'))->host();
 
         $this->tenant = Tenant::factory()->create(compact('domain'));
         $this->tenant->domain = $domain;

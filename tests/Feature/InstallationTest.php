@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Uri;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
@@ -39,7 +40,7 @@ class InstallationTest extends TestCase
     {
         return [
             'name' => $this->faker->company(),
-            'domain' => env('TESTING_APP_HOSTNAME'),
+            'domain' => Uri::of(config('app.url'))->host(),
             'sis_config' => [
                 'url' => env('POWERSCHOOL_ADDRESS'),
                 'client_id' => env('POWERSCHOOL_CLIENT_ID'),
@@ -152,7 +153,7 @@ class InstallationTest extends TestCase
         $this->fakeLicenseValidation()
             ->asSelfHosted()
             ->removeSisConfig()
-            ->post('/install', $data)
+            ->postJson('/install', $data)
             ->assertSessionHas('success')
             ->assertRedirect(route('install.user'));
 

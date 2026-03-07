@@ -7,7 +7,10 @@ beforeEach(function () {
     logIn();
 });
 
-it('will redirect when no school is set', function () {});
+it('will redirect when no school is set', function () {
+    $this->get(route('students.index'))
+        ->assertRedirect(route('select-school'));
+});
 
 it('will throw an exception without schools', function () {
     $this->tenant->schools()->delete();

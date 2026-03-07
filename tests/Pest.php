@@ -16,6 +16,19 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)->in('Feature');
 
 /*
 |--------------------------------------------------------------------------
+| Browser Tests
+|--------------------------------------------------------------------------
+|
+| Browser tests use Playwright via pest-plugin-browser to test the live
+| Herd-served application at APP_URL. They run against the real app and
+| do not use RefreshDatabase — they are intentionally kept to public pages
+| that do not require database setup.
+|
+*/
+pest()->extend(Tests\TestCase::class)->group('browser')->in('Browser');
+
+/*
+|--------------------------------------------------------------------------
 | Expectations
 |--------------------------------------------------------------------------
 |
