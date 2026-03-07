@@ -22,3 +22,4 @@ _ide_*
 .mcp.json
 opencode.json
 boost.json
+.claude/settings.local.json

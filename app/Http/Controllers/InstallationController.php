@@ -13,12 +13,20 @@ class InstallationController extends Controller
     {
         $title = __('Installation');
         $tenant = Tenant::fromRequestAndFallback($request);
-        $fields = $tenant->getInstallationFields();
 
         return inertia('Install', [
             'title' => $title,
-            'form' => $fields->toInertia(),
-            'fields' => $fields->toResource(),
+            'installationValues' => [
+                'name' => $tenant->name,
+                'domain' => $tenant->domain,
+                'custom_domain' => $tenant->custom_domain,
+                'sis_config' => [
+                    'url' => $tenant->sis_config?->get('url'),
+                    'client_id' => $tenant->sis_config?->get('client_id'),
+                    'client_secret' => $tenant->sis_config?->get('client_secret'),
+                ],
+            ],
+            'isCloud' => (bool) config('app.cloud'),
         ])->withViewData(compact('title'));
     }
 
@@ -26,10 +34,7 @@ class InstallationController extends Controller
     {
         $tenant = Tenant::fromRequestAndFallback($request);
 
-        $data = $request->validate(
-            $tenant->getInstallationFields()
-                ->toValidationRules()
-        );
+        $data = $request->validate($tenant->getInstallationRules());
 
         $tenant->fill(Arr::undot(Arr::except($data, 'email')))
             ->save();

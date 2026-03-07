@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Enums\Sis;
-use App\Fields\FormField;
-use App\Fields\FormFieldCollection;
 use App\SisProviders\SisProvider;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -255,30 +253,22 @@ class Tenant extends TenantBase
         return $this->$configKey->get($key);
     }
 
-    public function getInstallationFields(): FormFieldCollection
+    /**
+     * @return array<string, array<int, mixed>>
+     */
+    public function getInstallationRules(): array
     {
-        return FormFieldCollection::make([
-            'name' => FormField::make(__('Tenant name'))
-                ->rules(['required', 'string', 'max:255']),
-            'domain' => FormField::make(__('Domain'))
-                ->disabled(config('app.cloud'))
-                ->rules([
-                    'required',
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'domain' => ['required', Rule::unique('tenants', 'domain')->ignoreModel($this)],
+            ...(config('app.cloud') ? [
+                'custom_domain' => [
+                    'nullable',
                     Rule::unique('tenants', 'domain')->ignoreModel($this),
-                ]),
-            ...(config('app.cloud')
-                ? ['custom_domain' => FormField::make(__('Custom domain'))
-                    ->rules([
-                        'nullable',
-                        Rule::unique('tenants', 'domain')->ignoreModel($this),
-                        Rule::unique('tenants', 'custom_domain')->ignoreModel($this),
-                    ])]
-                : []),
-            ...$this->sis_provider?->getConfigFields() ?? collect(),
-        ])
-            ->map(fn (FormField $field, string $key) => $field
-                ->withValue($this->getInstallationFieldValue($key) ?? $this->getAttribute($key))
-                ->keyedBy($key)
-            );
+                    Rule::unique('tenants', 'custom_domain')->ignoreModel($this),
+                ],
+            ] : []),
+            ...$this->sis_provider?->getRules() ?? [],
+        ];
     }
 }

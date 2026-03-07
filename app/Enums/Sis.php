@@ -2,12 +2,9 @@
 
 namespace App\Enums;
 
-use App\Fields\FormField;
-use App\Fields\FormFieldCollection;
 use App\Models\Tenant;
 use App\SisProviders\PowerSchoolProvider;
 use App\SisProviders\SisProvider;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 enum Sis: string
@@ -68,31 +65,18 @@ enum Sis: string
         };
     }
 
-    public function getConfigFields(): FormFieldCollection
-    {
-        $fields = match ($this) {
-            self::PS => [
-                'url' => FormField::make(__('PowerSchool URL'))
-                    ->type('url')
-                    ->rules(['required', 'url']),
-                'client_id' => FormField::make(__('PowerSchool Client ID'))
-                    ->rules(['required', 'uuid']),
-                'client_secret' => FormField::make(__('PowerSchool Client Secret'))
-                    ->rules(['required', 'uuid']),
-            ],
-            self::CLASS_LINK => [],
-        };
-
-        return FormFieldCollection::make(Arr::prependKeysWith($fields, 'sis_config.'));
-    }
-
     /**
      * @return array<string, array<int, string>>
      */
     public function getRules(): array
     {
-        return $this->getConfigFields()
-            ->map(fn (FormField $field): array => $field->getRules())
-            ->toArray();
+        return match ($this) {
+            self::PS => [
+                'sis_config.url' => ['required', 'url'],
+                'sis_config.client_id' => ['required', 'uuid'],
+                'sis_config.client_secret' => ['required', 'uuid'],
+            ],
+            self::CLASS_LINK => [],
+        };
     }
 }
