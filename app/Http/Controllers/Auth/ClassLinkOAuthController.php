@@ -7,15 +7,15 @@ use Illuminate\Http\Request;
 
 class ClassLinkOAuthController extends Controller
 {
-    public function authenticate()
+    public function authenticate(): void
     {
         //
     }
 
-    public function login(Request $request)
+    public function login(Request $request): \Illuminate\Http\Response
     {
         dump($request->all());
 
-        return response();
+        return response('', 200);
     }
 }

@@ -12,9 +12,9 @@ class UserResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             'id' => $this->resource->id,
@@ -29,11 +29,13 @@ class UserResource extends JsonResource
             'user_type_display' => $this->resource->user_type?->label(),
             'schools' => SchoolResource::collection($this->whenLoaded('schools')),
             'school' => new SchoolResource($this->whenLoaded('schoool')),
-            'permissions' => $this->whenLoaded('school', function () {
-                return collect($this->resource->school_permissions)
-                    ->mapWithKeys(function ($perm) {
-                        return [$perm['permission'] => $perm['selected']];
-                    });
+            'permissions' => $this->whenLoaded('school', function (): array {
+                /** @var array<int, array{permission: string, selected: bool}> $schoolPermissions */
+                $schoolPermissions = $this->resource->getAttribute('school_permissions') ?? [];
+
+                return collect($schoolPermissions)
+                    ->mapWithKeys(fn (array $perm) => [$perm['permission'] => $perm['selected']])
+                    ->toArray();
             }, []),
         ];
     }

@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class InstallationController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): \Inertia\Response
     {
         $title = __('Installation');
         $tenant = Tenant::fromRequestAndFallback($request);

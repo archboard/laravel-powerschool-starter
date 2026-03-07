@@ -10,14 +10,14 @@ use Silber\Bouncer\BouncerFacade;
 
 class InstallFirstUserController extends Controller
 {
-    public function index()
+    public function index(): \Inertia\Response
     {
         return inertia('InstallUser', [
             'endpoint' => route('install.user'),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $data = $request->validate([
             'user.sis_id' => ['required'],

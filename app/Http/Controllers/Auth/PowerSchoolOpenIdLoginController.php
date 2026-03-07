@@ -22,9 +22,9 @@ class PowerSchoolOpenIdLoginController extends Controller
     /**
      * The user has been authenticated.
      *
-     * @return mixed
+     * @param  Collection<int|string, mixed>  $data
      */
-    protected function authenticated(Request $request, User $user, Collection $data)
+    protected function authenticated(Request $request, User $user, Collection $data): void
     {
         $adminSchools = $data->get('adminSchools', []);
 

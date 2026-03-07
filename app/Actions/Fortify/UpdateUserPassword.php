@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
@@ -15,7 +16,7 @@ class UpdateUserPassword implements UpdatesUserPasswords
      *
      * @param  array<string, mixed>  $input
      */
-    public function update(\Illuminate\Database\Eloquent\Model $user, array $input): void
+    public function update(User $user, array $input): void
     {
         Validator::make($input, [
             'current_password' => [$user->password ? 'required' : 'nullable', 'string'],

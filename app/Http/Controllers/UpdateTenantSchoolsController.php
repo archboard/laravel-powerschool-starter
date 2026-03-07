@@ -11,7 +11,7 @@ class UpdateTenantSchoolsController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request, Tenant $tenant)
+    public function __invoke(Request $request, Tenant $tenant): \Illuminate\Http\RedirectResponse
     {
         $data = $request->validate([
             'schools' => ['required', 'array'],

@@ -76,7 +76,8 @@ class Course extends Model implements ExistsInSis
 
     public function syncFromSis(): static
     {
-        return $this->tenant->getSisProvider()
-            ->syncCourse($this);
+        $this->tenant->getSisProvider()?->syncCourse($this);
+
+        return $this;
     }
 }

@@ -94,7 +94,8 @@ class Section extends Model implements ExistsInSis
 
     public function syncFromSis(): static
     {
-        return $this->tenant->getSisProvider()
-            ->syncSection($this);
+        $this->tenant->getSisProvider()?->syncSection($this);
+
+        return $this;
     }
 }

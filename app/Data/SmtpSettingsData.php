@@ -18,6 +18,9 @@ class SmtpSettingsData extends Data
         public ?string $encryption,
     ) {}
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public static function rules(): array
     {
         return [
@@ -32,13 +35,13 @@ class SmtpSettingsData extends Data
     public static function fromTenant(Tenant $tenant): self
     {
         return new self(
-            host: $tenant->smtp_config?->get('host'),
-            port: ($port = $tenant->smtp_config?->get('port')) !== null ? (int) $port : null,
-            username: $tenant->smtp_config?->get('username'),
-            password: $tenant->smtp_config?->get('password'),
-            from_name: $tenant->smtp_config?->get('from_name'),
-            from_address: $tenant->smtp_config?->get('from_address'),
-            encryption: $tenant->smtp_config?->get('encryption'),
+            host: $tenant->smtp_config->get('host'),
+            port: ($port = $tenant->smtp_config->get('port')) !== null ? (int) $port : null,
+            username: $tenant->smtp_config->get('username'),
+            password: $tenant->smtp_config->get('password'),
+            from_name: $tenant->smtp_config->get('from_name'),
+            from_address: $tenant->smtp_config->get('from_address'),
+            encryption: $tenant->smtp_config->get('encryption'),
         );
     }
 }

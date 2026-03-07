@@ -165,11 +165,17 @@ trait HasPermissions
     public function permissionsToFrontend(School $school): array
     {
         $matrix = $this->getPermissionMatrix(school: $school);
-        $abilities = collect($matrix['permissions'])
+        /** @var array<int, array{key: string, granted: bool}> $permissionsArray */
+        $permissionsArray = $matrix['permissions'];
+        $abilities = collect($permissionsArray)
             ->mapWithKeys(fn (array $permission) => [$permission['key'] => $permission['granted']]);
-        $permissions = collect(Arr::get($matrix, 'schools.'.$school->id.'.permissions', []))
+        /** @var array<int, array{key: string, granted: bool}> $schoolPermissions */
+        $schoolPermissions = Arr::get($matrix, 'schools.'.$school->id.'.permissions', []);
+        $permissions = collect($schoolPermissions)
             ->mapWithKeys(fn (array $permission) => [$permission['key'] => $permission['granted']]);
-        $models = collect(Arr::get($matrix, 'schools.'.$school->id.'.models', []))
+        /** @var array<int, array{model: string, permissions: array<int, array{key: string, granted: bool}>}> $schoolModels */
+        $schoolModels = Arr::get($matrix, 'schools.'.$school->id.'.models', []);
+        $models = collect($schoolModels)
             ->mapWithKeys(fn (array $model) => [
                 $model['model'] => collect($model['permissions'])
                     ->mapWithKeys(fn (array $permission) => [$permission['key'] => $permission['granted']]),

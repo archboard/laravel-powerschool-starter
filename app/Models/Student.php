@@ -116,7 +116,8 @@ class Student extends Model implements ExistsInSis
 
     public function syncFromSis(): static
     {
-        return $this->tenant->getSisProvider()
-            ->syncStudent($this);
+        $this->tenant->getSisProvider()?->syncStudent($this);
+
+        return $this;
     }
 }

@@ -8,13 +8,13 @@ class TenantApiResource extends TenantResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array<string, mixed>
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             ...parent::toArray($request),
-            'id' => $this->id,
+            'id' => $this->resource->id,
         ];
     }
 }

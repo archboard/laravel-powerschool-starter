@@ -17,12 +17,13 @@ class NoDistrictAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Tenant::current()->users()->whereIs(Role::DISTRICT_ADMIN->value)->doesntExist()) {
-            return $next($request);
+        $tenant = Tenant::current();
+        if (! $tenant || $tenant->users()->whereIs(Role::DISTRICT_ADMIN->value)->exists()) {
+            session()->flash('error', __('A district admin already exists.'));
+
+            return back();
         }
 
-        session()->flash('error', __('A district admin already exists.'));
-
-        return back();
+        return $next($request);
     }
 }

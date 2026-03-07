@@ -219,8 +219,7 @@ class User extends Authenticatable implements ExistsInSis
 
     public function syncFromSis(): static
     {
-        $this->tenant->getSisProvider()
-            ->syncUser($this);
+        $this->tenant->getSisProvider()?->syncUser($this);
 
         return $this;
     }

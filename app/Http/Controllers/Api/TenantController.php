@@ -12,10 +12,8 @@ class TenantController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index()
+    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $tenants = Tenant::query()
             ->orderBy('created_at')
@@ -26,10 +24,8 @@ class TenantController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @return TenantApiResource
      */
-    public function store(Request $request)
+    public function store(Request $request): TenantApiResource
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -51,32 +47,29 @@ class TenantController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id): \Illuminate\Http\Response
     {
-        //
+        return response()->noContent();
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): \Illuminate\Http\Response
     {
-        //
+        return response()->noContent();
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id): \Illuminate\Http\Response
     {
-        //
+        return response()->noContent();
     }
 }

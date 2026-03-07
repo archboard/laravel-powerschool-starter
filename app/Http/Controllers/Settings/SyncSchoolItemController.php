@@ -10,13 +10,13 @@ class SyncSchoolItemController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request, string $item)
+    public function __invoke(Request $request, string $item): \Illuminate\Http\RedirectResponse
     {
         $school = $request->school();
         $method = 'syncSchool'.ucfirst($item);
         $provider = $school->tenant->getSisProvider();
 
-        if (method_exists($provider, $method)) {
+        if ($provider && method_exists($provider, $method)) {
             $provider->$method($school);
             session()->flash('success', __('Synced successfully'));
         }

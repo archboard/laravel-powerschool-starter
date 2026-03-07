@@ -12,7 +12,7 @@ class SyncModelController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request, string $model, int $id)
+    public function __invoke(Request $request, string $model, int $id): \Illuminate\Http\RedirectResponse
     {
         if ($className = Relation::getMorphedModel($model)) {
             $instance = $className::find($id);

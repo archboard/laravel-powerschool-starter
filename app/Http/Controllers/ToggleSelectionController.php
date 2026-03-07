@@ -10,9 +10,13 @@ class ToggleSelectionController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request, School $school, string $model)
+    public function __invoke(Request $request, School $school, string $model): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $user = $request->user();
+
+        if (! $user) {
+            return back();
+        }
 
         if ($request->isMethod('delete')) {
             $user->deselectAllModel($model);

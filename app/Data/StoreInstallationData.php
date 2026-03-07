@@ -16,13 +16,16 @@ class StoreInstallationData extends Data
         public array $sis_config,
     ) {}
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public static function rules(): array
     {
         $tenant = Tenant::fromRequestAndFallback(request());
 
         $rules = [
             'domain' => ['required', Rule::unique('tenants', 'domain')->ignoreModel($tenant)],
-            ...$tenant->sis_provider?->getRules() ?? [],
+            ...($tenant->sis_provider->getRules()),
         ];
 
         if (config('app.cloud')) {

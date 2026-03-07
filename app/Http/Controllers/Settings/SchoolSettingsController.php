@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class SchoolSettingsController extends Controller
 {
-    public function edit(Request $request)
+    public function edit(Request $request): \Inertia\Response
     {
         $school = $request->school();
 

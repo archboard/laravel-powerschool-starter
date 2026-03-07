@@ -12,26 +12,22 @@ class PersonalSettingsController extends Controller
 
     /**
      * Show the settings page
-     *
-     * @return \Inertia\Response|\Inertia\ResponseFactory
      */
-    public function edit(Request $request)
+    public function edit(Request $request): \Inertia\Response
     {
         $title = __('Personal settings');
         $user = $request->user();
 
         return inertia('settings/Personal', [
             'title' => $title,
-            'hasPassword' => (bool) $user->password,
+            'hasPassword' => $user && (bool) $user->password,
         ])->withViewData(compact('title'));
     }
 
     /**
      * Updates a users name, email, and password
-     *
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request)
+    public function update(Request $request): \Illuminate\Http\RedirectResponse
     {
         $data = $request->validate([
             'first_name' => ['required'],
@@ -40,8 +36,7 @@ class PersonalSettingsController extends Controller
             'timezone' => ['required', 'timezone'],
         ]);
 
-        $request->user()
-            ->update($data);
+        $request->user()?->update($data);
 
         return $this->flashAndBack();
     }

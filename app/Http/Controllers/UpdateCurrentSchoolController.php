@@ -10,9 +10,13 @@ class UpdateCurrentSchoolController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): \Illuminate\Http\RedirectResponse
     {
         $user = $request->user();
+        if (! $user) {
+            return back();
+        }
+
         $data = $request->validate([
             'school_id' => [
                 'required',
@@ -25,7 +29,7 @@ class UpdateCurrentSchoolController extends Controller
         $user->update($data);
 
         session()->flash('success', __('School changed to :school.', [
-            'school' => $user->school->name,
+            'school' => $user->school?->name,
         ]));
 
         return back();

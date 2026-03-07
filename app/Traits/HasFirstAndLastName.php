@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 trait HasFirstAndLastName
 {
     /**
-     * @return Attribute<string, never>
+     * @return Attribute<non-falsy-string, never>
      */
     public function name(): Attribute
     {
@@ -15,7 +15,7 @@ trait HasFirstAndLastName
     }
 
     /**
-     * @return Attribute<string, never>
+     * @return Attribute<non-falsy-string, never>
      */
     public function lastFirst(): Attribute
     {

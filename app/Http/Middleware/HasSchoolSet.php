@@ -15,10 +15,8 @@ class HasSchoolSet
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->school()?->id) {
-            return $next($request);
-        }
+        $school = $request->school();
 
-        return to_route('select-school');
+        return $school->id ? $next($request) : to_route('select-school');
     }
 }

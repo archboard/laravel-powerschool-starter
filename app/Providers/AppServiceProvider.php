@@ -40,10 +40,10 @@ class AppServiceProvider extends ServiceProvider
         $currentTenant = fn (): Tenant => Tenant::current() ?? new Tenant;
 
         $currentSchool = function (): School {
-            /** @var User $user */
+            /** @var User|null $user */
             $user = auth()->user();
 
-            if ($user && $school = $user->school) {
+            if ($user !== null && $school = $user->school) {
                 return $school;
             }
 
@@ -67,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Add the tenant_id to the identifying attributes when looking up a user
         UserFactory::findUserUsing(function (Collection $data, string $model, array $attributes) {
+            /** @var Tenant $tenant */
             $tenant = Tenant::current();
             $userType = UserType::fromData($data);
 

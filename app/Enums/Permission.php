@@ -39,11 +39,11 @@ enum Permission: string
     public function description(): ?string
     {
         return match ($this) {
-            self::viewAny => __('View resource listing'),
-            self::view => __('View individual resource details'),
-            self::everything => __('Gives the user full access to the entire tenancy with full permissions for everything.'),
-            self::editSchoolSettings => __('Allows the user to edit all school settings.'),
-            self::editTenantSettings => __('Allows the user to edit all tenant settings.'),
+            self::viewAny => (string) __('View resource listing'),
+            self::view => (string) __('View individual resource details'),
+            self::everything => (string) __('Gives the user full access to the entire tenancy with full permissions for everything.'),
+            self::editSchoolSettings => (string) __('Allows the user to edit all school settings.'),
+            self::editTenantSettings => (string) __('Allows the user to edit all tenant settings.'),
             default => null,
         };
     }

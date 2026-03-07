@@ -15,7 +15,7 @@ use Illuminate\Validation\Rules\Enum;
 
 class UserPermissionController extends Controller
 {
-    public function index(Request $request, User $user)
+    public function index(Request $request, User $user): \Inertia\Response
     {
         $title = __('Permissions for :name', ['name' => $user->name]);
         $authUser = $request->user();
@@ -23,7 +23,7 @@ class UserPermissionController extends Controller
         return inertia('users/Permissions', [
             'title' => $title,
             'subject' => new UserResource($user),
-            'userPermissions' => $user->getPermissionMatrix($authUser, $authUser->school),
+            'userPermissions' => $user->getPermissionMatrix($authUser, $authUser?->school),
             'breadcrumbs' => $this->withBreadcrumbs(
                 NavigationItem::make()
                     ->labeled(__('Users'))
@@ -39,7 +39,7 @@ class UserPermissionController extends Controller
         ])->withViewData(compact('title'));
     }
 
-    public function update(Request $request, Tenant $tenant, User $user)
+    public function update(Request $request, Tenant $tenant, User $user): \Illuminate\Http\JsonResponse
     {
         $validModels = array_reduce($user->getPermissionSubjectModels(), function (array $carry, string $model) {
             $carry[] = (new $model)->getMorphClass();
@@ -59,12 +59,13 @@ class UserPermissionController extends Controller
 
             if ($permission->shouldBeScoped() && $noSchool) {
                 $validator->errors()->add('school', __('This permission requires a school to be selected.'));
-            } elseif ($noSchool && $authUser->cant(Permission::editTenantSettings->value)) {
+            } elseif ($noSchool && $authUser && $authUser->cant(Permission::editTenantSettings->value)) {
                 $validator->errors()->add('permission', __('You are not allowed to grant this permission.'));
             }
         })->validateWithBag('default');
 
         $permission = Permission::from($data['permission']);
+        /** @var \App\Models\School|null */
         $school = School::find($data['school']);
 
         $user->updateAppPermission($permission, $data['granted'], $school, $data['model']);

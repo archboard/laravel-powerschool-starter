@@ -11,7 +11,7 @@ class SendSmtpTestController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): \Illuminate\Http\RedirectResponse
     {
         /** @var User $user */
         $user = $request->user();

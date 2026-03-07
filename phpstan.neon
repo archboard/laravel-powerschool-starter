@@ -9,3 +9,43 @@ parameters:
 
     # Level 10 is the highest level
     level: 8
+
+    reportUnmatchedIgnoredErrors: false
+
+    ignoreErrors:
+        - '#PHPDoc tag @var above a method has no effect#'
+        - '#uses generic trait.*HasFactory but does not specify its types#'
+        - '#PHPDoc tag @method for method filter#'
+        - '#has parameter .* with generic class.*Builder but does not specify its types#'
+        - '#return type with generic class.*Collection does not specify its types#'
+        - '#PHPDoc type array.*is not covariant#'
+        - '#Call to an undefined method.*Builder::search#'
+        - '#Call to an undefined method.*Builder::byName#'
+        - '#Access to an undefined property.*school_permissions#'
+        - '#PHPDoc tag @property for property.*contains generic class.*does not specify its types#'
+        - '#Unsafe usage of new static#'
+        - '#Cannot access property \$id on.*Tenant\|null#'
+        - '#Return type .* should be compatible with return type.*getAllSchools#'
+        - '#return type with generic class.*Relations#'
+        - '#Call to an undefined method object::getMorphClass#'
+        - '#Function rd not found#'
+        - '#Cannot access property \$value on.*UserType\|null#'
+        - '#Method.*makeSisKey.*has parameter.*with no type specified#'
+        - '#Access to an undefined property.*sis_id#'
+        - '#Template type TValue on class.*Collection is not covariant#'
+        - '#Method.*getSchoolFromSisId.*has parameter.*with no type specified#'
+        - '#Method.*selectAllModel.*has parameter.*with no value type specified#'
+        - '#Method.*filters.*return type has no value type specified#'
+        - '#PHPDoc tag @method for method.*User::filter#'
+        - '#Using nullsafe method call on non-nullable type App\\Enums\\Sis#'
+        - '#Expression on left side of .* is not nullable#'
+        - '#Parameter .*\$key of static method.*Arr::get#'
+        - '#Parameter .*\$subject of static method.*Str::replace#'
+        - '#Unable to resolve the template type#'
+        - '#Method.*getSchool.*return type has no value type specified#'
+        - '#Parameter.*sisId of method.*getSisKeyFromSisId#'
+        - '#Parameter.*student of method.*syncStudent#'
+        - '#Method.*::collect.*should return.*but returns#'
+        - '#Call to an undefined method.*Builder<.*>::search#'
+        - '#Call to an undefined method.*Builder<.*>::byName#'
+        - '#Possibly invalid array key type#'

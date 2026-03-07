@@ -12,13 +12,12 @@ class SisConfigured
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
     {
         $tenant = $request->tenant();
 
-        if ($tenant->sis_provider?->isConfigured($tenant->sis_config)) {
+        if ($tenant->sis_provider->isConfigured($tenant->sis_config)) {
             return $next($request);
         }
 

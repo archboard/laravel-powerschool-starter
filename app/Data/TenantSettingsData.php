@@ -13,12 +13,15 @@ class TenantSettingsData extends Data
     public function __construct(
         #[Max(255)]
         public string $name,
-        public string $domain,
+        public ?string $domain,
         public Sis $sis_provider,
         public bool $allow_password_auth = false,
         public bool $allow_oidc_login = false,
     ) {}
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public static function rules(): array
     {
         $tenant = Tenant::current();
@@ -35,7 +38,7 @@ class TenantSettingsData extends Data
     {
         return new self(
             name: $tenant->name,
-            domain: $tenant->domain,
+            domain: $tenant->domain ?? null,
             sis_provider: $tenant->sis_provider,
             allow_password_auth: $tenant->allow_password_auth,
             allow_oidc_login: $tenant->allow_oidc_login,

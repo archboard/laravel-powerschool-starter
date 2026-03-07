@@ -12,16 +12,17 @@ class UpdateTimezoneController extends Controller
 
     /**
      * Handle the incoming request.
-     *
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): \Illuminate\Http\RedirectResponse
     {
+        /** @var \Illuminate\Support\Collection<string, string> $timezones */
+        $timezones = timezones();
+
         $data = $request->validate([
-            'timezone' => ['required', Rule::in(timezones()->keys())],
+            'timezone' => ['required', Rule::in($timezones->keys())],
         ]);
 
-        $request->user()->update($data);
+        $request->user()?->update($data);
 
         return $this->flashAndBack();
     }

@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 
 class SchoolSelectionController extends Controller
 {
-    public function index(Request $request, Tenant $tenant)
+    public function index(Request $request, Tenant $tenant): \Inertia\Response
     {
         /** @var User $user */
         $user = $request->user();
@@ -34,7 +34,7 @@ class SchoolSelectionController extends Controller
         ])->withViewData(compact('title'));
     }
 
-    public function update(Request $request, Tenant $tenant)
+    public function update(Request $request, Tenant $tenant): \Illuminate\Http\RedirectResponse
     {
         $data = $request->validate([
             'school_id' => [
@@ -45,6 +45,10 @@ class SchoolSelectionController extends Controller
         ]);
 
         $user = $request->user();
+        if (! $user) {
+            return back();
+        }
+
         $user->update($data);
         $user->schools()->syncWithoutDetaching($data['school_id']);
 

@@ -34,6 +34,7 @@ enum UserType: string
                 'student' => self::student,
                 'staff', 'teacher' => self::staff,
                 'guardian', 'parent' => self::guardian,
+                default => throw new UnknownPersonaException("Unknown persona type: {$persona}"),
             };
         }
 
@@ -50,13 +51,13 @@ enum UserType: string
             $data->get('ps_dcid') ??
             $data->get('dcid');
 
-        return "{$tenant->id}|{$this->value}|{$id}";
+        return "{$tenant?->id}|{$this->value}|{$id}";
     }
 
     public function getSisKeyFromSisId(string|int $sisId): string
     {
         $tenant = Tenant::current();
 
-        return "{$tenant->id}|{$this->value}|{$sisId}";
+        return "{$tenant?->id}|{$this->value}|{$sisId}";
     }
 }

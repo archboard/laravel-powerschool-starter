@@ -33,10 +33,16 @@ class PowerSchoolOidcLoginController extends Controller
         return '/';
     }
 
-    protected function authenticated(Request $request, Authenticatable $user, Collection $data)
+    /**
+     * @param  Collection<int|string, mixed>  $data
+     */
+    protected function authenticated(Request $request, Authenticatable $user, Collection $data): void
     {
-        if (method_exists($user, 'syncFromSis')) {
-            $user->syncFromSis();
+        if ($user instanceof \App\Models\User) {
+            // @phpstan-ignore-next-line method_exists.alreadyNarrowedType
+            if (method_exists($user, 'syncFromSis')) {
+                $user->syncFromSis();
+            }
         }
     }
 }

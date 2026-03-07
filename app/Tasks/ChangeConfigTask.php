@@ -3,6 +3,7 @@
 namespace App\Tasks;
 
 use App\Http\Resources\TenantResource;
+use App\Models\Tenant;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
@@ -17,6 +18,7 @@ class ChangeConfigTask implements SwitchTenantTask
     {
         $this->originalUrl = config('app.url');
 
+        /** @var Tenant $tenant */
         Config::set('app.url', "https://{$tenant->domain}");
         URL::useOrigin(config('app.url'));
 

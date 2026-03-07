@@ -8,7 +8,6 @@ use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Uri;
 use Silber\Bouncer\BouncerFacade;
 

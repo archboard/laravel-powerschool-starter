@@ -13,14 +13,22 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    /**
+     * @return array<int|string, array<string, bool|string>>
+     */
     protected function withBreadcrumbs(NavigationItem ...$item): array
     {
         return array_map(fn (NavigationItem $item) => $item->toArray(), $item);
     }
 
-    public function authorize($ability, $arguments = [])
+    /**
+     * @param  string|\BackedEnum|null  $ability
+     * @param  array<mixed>  $arguments
+     */
+    public function authorize($ability, $arguments = []): \Illuminate\Auth\Access\Response
     {
-        [$ability, $arguments] = $this->parseAbilityAndArguments($ability?->value ?? $ability, $arguments);
+        $abilityValue = $ability instanceof \BackedEnum ? $ability->value : $ability;
+        [$ability, $arguments] = $this->parseAbilityAndArguments($abilityValue, $arguments);
 
         return app(Gate::class)->authorize($ability, $arguments);
     }

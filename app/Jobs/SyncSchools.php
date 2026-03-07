@@ -23,11 +23,9 @@ class SyncSchools implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
-        $this->tenant->getSisProvider()->syncSchools();
+        $this->tenant->getSisProvider()?->syncSchools();
     }
 }

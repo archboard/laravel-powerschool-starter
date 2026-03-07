@@ -16,7 +16,8 @@ class ScopeBouncerToSchool
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($school = $request->user()->school_id) {
+        $user = $request->user();
+        if ($user && ($school = $user->school_id)) {
             BouncerFacade::scope()->to($school);
 
             return $next($request);

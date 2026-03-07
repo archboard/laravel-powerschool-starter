@@ -56,6 +56,9 @@ enum Sis: string
         };
     }
 
+    /**
+     * @param  Collection<string, mixed>  $config
+     */
     public function isConfigured(Collection $config): bool
     {
         return match ($this) {

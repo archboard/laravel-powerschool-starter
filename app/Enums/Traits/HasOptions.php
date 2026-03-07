@@ -2,7 +2,6 @@
 
 namespace App\Enums\Traits;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 trait HasOptions
@@ -24,10 +23,11 @@ trait HasOptions
     }
 
     /**
-     * @return Collection<int, static>
+     * @return \Illuminate\Support\Collection<int, static>
      */
-    public static function collect(): Collection
+    public static function collect(): \Illuminate\Support\Collection
     {
+        /** @var \Illuminate\Support\Collection<int, static> */
         return collect(static::cases());
     }
 

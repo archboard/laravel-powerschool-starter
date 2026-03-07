@@ -20,61 +20,61 @@ class NavigationItem
 
     public bool $current = false;
 
-    public static function make(): static
+    public static function make(): self
     {
-        return new static;
+        return new self;
     }
 
-    public function useComponent(string $component): static
+    public function useComponent(string $component): self
     {
         $this->component = $component;
 
         return $this;
     }
 
-    public function inNewTab(): static
+    public function inNewTab(): self
     {
         $this->target = '_blank';
 
         return $this;
     }
 
-    public function method(string $method): static
+    public function method(string $method): self
     {
         $this->method = $method;
 
         return $this;
     }
 
-    public function labeled(string $label): static
+    public function labeled(string $label): self
     {
         $this->label = $label;
 
         return $this;
     }
 
-    public function to(string $url): static
+    public function to(string $url): self
     {
         $this->endpoint = $url;
 
         return $this;
     }
 
-    public function asButton(): static
+    public function asButton(): self
     {
         $this->as = 'button';
 
         return $this;
     }
 
-    public function withIcon(string $icon): static
+    public function withIcon(string $icon): self
     {
         $this->icon = $icon;
 
         return $this;
     }
 
-    public function isCurrent(bool $current = true): static
+    public function isCurrent(bool $current = true): self
     {
         $this->current = $current;
 
