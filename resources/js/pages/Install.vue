@@ -18,14 +18,15 @@
             <div v-if="isCloud" class="md:col-span-6">
               <InputField v-model="inertiaForm.custom_domain" :error="inertiaForm.errors.custom_domain" :label="__('Custom domain')" />
             </div>
-            <div class="md:col-span-6">
-              <InputField v-model="inertiaForm.sis_config.url" :error="inertiaForm.errors['sis_config.url']" :label="__('PowerSchool URL')" type="url" required />
-            </div>
-            <div class="md:col-span-6">
-              <InputField v-model="inertiaForm.sis_config.client_id" :error="inertiaForm.errors['sis_config.client_id']" :label="__('PowerSchool Client ID')" required />
-            </div>
-            <div class="md:col-span-6">
-              <InputField v-model="inertiaForm.sis_config.client_secret" :error="inertiaForm.errors['sis_config.client_secret']" :label="__('PowerSchool Client Secret')" required />
+            <div v-for="field in installationValues.sis_config_fields" :key="field.key" class="md:col-span-6">
+              <component
+                :is="fieldComponents[field.type]"
+                v-model="inertiaForm.sis_config[field.key]"
+                :error="inertiaForm.errors['sis_config.' + field.key]"
+                :label="__(field.label)"
+                :type="field.type"
+                :required="field.required"
+              />
             </div>
           </div>
         </CardPadding>
@@ -46,8 +47,15 @@ import CardPadding from '@/components/CardPadding.vue'
 import CardHeader from '@/components/CardHeader.vue'
 import AppButton from '@/components/AppButton.vue'
 import CardAction from '@/components/CardAction.vue'
+import CheckboxField from '@/components/forms/fields/CheckboxField.vue'
 import InputField from '@/components/forms/fields/InputField.vue'
 import Installation from '@/layouts/Installation.vue'
+
+const fieldComponents = {
+  text: InputField,
+  url: InputField,
+  checkbox: CheckboxField,
+}
 
 const props = defineProps({
   installationValues: Object,
@@ -57,10 +65,6 @@ const inertiaForm = useForm({
   name: props.installationValues.name,
   domain: props.installationValues.domain,
   custom_domain: props.installationValues.custom_domain,
-  sis_config: {
-    url: props.installationValues.sis_config.url,
-    client_id: props.installationValues.sis_config.client_id,
-    client_secret: props.installationValues.sis_config.client_secret,
-  },
+  sis_config: { ...props.installationValues.sis_config },
 })
 </script>

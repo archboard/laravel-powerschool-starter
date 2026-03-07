@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Data\SmtpSettingsData;
+use App\Data\TenantSettingsData;
 use App\Enums\Sis;
-use App\Forms\Traits\ValidatesTenantFields;
 use App\Http\Controllers\Controller;
 use App\Models\School;
 use App\Models\Tenant;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class TenantSettingsController extends Controller
 {
-    use ValidatesTenantFields;
-
     /**
      * Shows the tenant settings form
      *
@@ -27,22 +26,8 @@ class TenantSettingsController extends Controller
 
         return inertia('settings/Tenant', [
             'title' => $title,
-            'tenantSettings' => [
-                'name' => $tenant->name,
-                'domain' => $tenant->domain,
-                'sis_provider' => $tenant->sis_provider->value,
-                'allow_password_auth' => $tenant->allow_password_auth,
-                'allow_oidc_login' => $tenant->allow_oidc_login,
-            ],
-            'smtpSettings' => config('app.self_hosted') ? [
-                'host' => $tenant->getConfigFieldValue('smtp_config', 'host'),
-                'port' => $tenant->getConfigFieldValue('smtp_config', 'port'),
-                'username' => $tenant->getConfigFieldValue('smtp_config', 'username'),
-                'password' => $tenant->getConfigFieldValue('smtp_config', 'password'),
-                'from_name' => $tenant->getConfigFieldValue('smtp_config', 'from_name'),
-                'from_address' => $tenant->getConfigFieldValue('smtp_config', 'from_address'),
-                'encryption' => $tenant->getConfigFieldValue('smtp_config', 'encryption'),
-            ] : null,
+            'tenantSettings' => TenantSettingsData::fromTenant($tenant),
+            'smtpSettings' => config('app.self_hosted') ? SmtpSettingsData::fromTenant($tenant) : null,
             'sisOptions' => Sis::selectOptions(),
             'schools' => $schools->map(fn (School $school) => [
                 'id' => $school->id,
@@ -55,20 +40,10 @@ class TenantSettingsController extends Controller
 
     /**
      * Updates attributes for the tenant
-     *
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, Tenant $tenant)
+    public function update(TenantSettingsData $data, Tenant $tenant): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => $this->nameRules(),
-            'domain' => $this->domainRules($tenant),
-            'sis_provider' => $this->sisProviderRules(),
-            'allow_password_auth' => ['boolean'],
-            'allow_oidc_login' => ['boolean'],
-        ]);
-
-        $tenant->update($data);
+        $tenant->update($data->toArray());
 
         session()->flash('success', __('Settings updated successfully.'));
 

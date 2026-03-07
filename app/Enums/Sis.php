@@ -2,6 +2,7 @@
 
 namespace App\Enums;
 
+use App\Data\SisConfigFieldData;
 use App\Models\Tenant;
 use App\SisProviders\PowerSchoolProvider;
 use App\SisProviders\SisProvider;
@@ -62,6 +63,21 @@ enum Sis: string
                 $config->get('client_id') &&
                 $config->get('client_secret'),
             self::CLASS_LINK => false,
+        };
+    }
+
+    /**
+     * @return SisConfigFieldData[]
+     */
+    public function getConfigFieldDefinitions(): array
+    {
+        return match ($this) {
+            self::PS => [
+                new SisConfigFieldData(key: 'url', label: __('PowerSchool URL'), type: SisConfigFieldType::URL, required: true),
+                new SisConfigFieldData(key: 'client_id', label: __('PowerSchool Client ID'), type: SisConfigFieldType::TEXT, required: true),
+                new SisConfigFieldData(key: 'client_secret', label: __('PowerSchool Client Secret'), type: SisConfigFieldType::TEXT, required: true),
+            ],
+            self::CLASS_LINK => [],
         };
     }
 
