@@ -1,196 +1,169 @@
 <?php
 
-namespace Tests\Feature;
-
-use App\Enums\Role;
 use App\Jobs\SyncSchools;
 use App\Models\Tenant;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Uri;
 use Inertia\Testing\AssertableInertia;
-use Tests\TestCase;
 
-class InstallationTest extends TestCase
+function fakeLicenseValidation(bool $valid = true): void
 {
-    use RefreshDatabase;
-    use WithFaker;
-
-    protected function removeSisConfig(): static
-    {
-        $this->tenant->update(['sis_config' => null]);
-
-        return $this;
-    }
-
-    protected function fakeLicenseValidation(bool $valid = true): static
-    {
-        Http::fake([
-            'archboard.io/verify/*' => Http::response(compact('valid')),
-        ]);
-
-        return $this;
-    }
-
-    protected function getPowerSchoolInstallationRequest(array $attributes = []): array
-    {
-        return [
-            'name' => $this->faker->company(),
-            'domain' => Uri::of(config('app.url'))->host(),
-            'sis_config' => [
-                'url' => env('POWERSCHOOL_ADDRESS'),
-                'client_id' => env('POWERSCHOOL_CLIENT_ID'),
-                'client_secret' => env('POWERSCHOOL_CLIENT_SECRET'),
-            ],
-            ...$attributes,
-        ];
-    }
-
-    public function test_cant_access_installation_on_cloud()
-    {
-        $this->asCloud()
-            ->get('/install')
-            ->assertNotFound();
-    }
-
-    public function test_cant_access_installation_when_already_installed()
-    {
-        $this->get('/install')
-            ->assertNotFound();
-    }
-
-    public function test_cant_access_installation_when_user_has_no_permission()
-    {
-        $this->logIn()
-            ->removeSisConfig()
-            ->get('/install')
-            ->assertNotFound();
-    }
-
-    public function test_can_view_installation_page_when_not_installed_and_unauthenticated()
-    {
-        $this->asSelfHosted()
-            ->removeSisConfig()
-            ->get('/login')
-            ->assertRedirect('/install');
-    }
-
-    public function test_can_view_installation_page_when_not_installed_and_authenticated()
-    {
-        $this->asSelfHosted()
-            ->logIn()
-            ->removeSisConfig()
-            ->get('/')
-            ->assertRedirect('/install');
-    }
-
-    public function test_installation_page_unauthenticated()
-    {
-        $this->removeSisConfig()
-            ->asSelfHosted()
-            ->get('/install')
-            ->assertViewHas('title')
-            ->assertOk()
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->has('title')
-                ->has('installationValues')
-                ->has('isCloud')
-                ->component('Install')
-            );
-    }
-
-    public function test_installation_page_authenticated()
-    {
-        $this->removeSisConfig()
-            ->asSelfHosted()
-            ->logIn()
-            ->tapUser(function (User $user) {
-                $user->allow()->everything();
-            })
-            ->get('/install')
-            ->assertViewHas('title')
-            ->assertOk()
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->has('title')
-                ->has('installationValues')
-                ->has('isCloud')
-                ->component('Install')
-            );
-    }
-
-    public function test_can_successfully_install_without_existing_tenant()
-    {
-        Queue::fake();
-
-        $this->tenant->delete();
-        Tenant::forgetCurrent();
-
-        $data = $this->getPowerSchoolInstallationRequest();
-
-        $this->fakeLicenseValidation()
-            ->asSelfHosted()
-            ->post('/install', $data)
-            ->assertSessionHas('success')
-            ->assertRedirect(route('install.user'));
-
-        $this->assertDatabaseHas('tenants', Arr::only($data, ['name', 'domain']));
-        $tenant = Tenant::firstWhere('domain', $data['domain']);
-        $this->assertEquals($tenant->sis_config->toArray(), $data['sis_config']);
-
-        Queue::assertPushed(SyncSchools::class);
-    }
-
-    public function test_can_successfully_install_with_existing_tenant()
-    {
-        Queue::fake();
-
-        $data = $this->getPowerSchoolInstallationRequest();
-
-        $this->fakeLicenseValidation()
-            ->asSelfHosted()
-            ->removeSisConfig()
-            ->postJson('/install', $data)
-            ->assertSessionHas('success')
-            ->assertRedirect(route('install.user'));
-
-        $this->assertDatabaseHas('tenants', Arr::only($data, ['name', 'domain']));
-        $tenant = Tenant::firstWhere('domain', $data['domain']);
-        $this->assertEquals($tenant->sis_config->toArray(), $data['sis_config']);
-
-        Queue::assertPushed(SyncSchools::class);
-    }
-
-    public function test_cant_view_user_selection_when_uninstalled()
-    {
-        $this->asSelfHosted()
-            ->removeSisConfig()
-            ->get(route('install.user'))
-            ->assertRedirect(route('install'));
-    }
-
-    public function test_cant_view_when_admin_user_already_exists()
-    {
-        $admin = $this->seedUser();
-        $admin->assignRole(Role::DISTRICT_ADMIN);
-
-        $this->asSelfHosted()
-            ->get(route('install.user'))
-            ->assertSessionHas('error')
-            ->assertRedirect();
-    }
-
-    public function test_can_view_user_import_page()
-    {
-        $this->asSelfHosted()
-            ->get(route('install.user'))
-            ->assertOk()
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('InstallUser')
-                ->where('endpoint', route('install.user'))
-            );
-    }
+    Http::fake([
+        'archboard.io/verify/*' => Http::response(compact('valid')),
+    ]);
 }
+
+function getPowerSchoolInstallationRequest(array $attributes = []): array
+{
+    return [
+        'name' => fake()->company(),
+        'domain' => Uri::of(config('app.url'))->host(),
+        'sis_config' => [
+            'url' => env('POWERSCHOOL_ADDRESS'),
+            'client_id' => env('POWERSCHOOL_CLIENT_ID'),
+            'client_secret' => env('POWERSCHOOL_CLIENT_SECRET'),
+        ],
+        ...$attributes,
+    ];
+}
+
+it('cant access installation on cloud', function () {
+    $this->asCloud()
+        ->get('/install')
+        ->assertNotFound();
+});
+
+it('cant access installation when already installed', function () {
+    $this->get('/install')
+        ->assertNotFound();
+});
+
+it('cant access installation when user has no permission', function () {
+    logIn();
+    $this->tenant->update(['sis_config' => null]);
+
+    $this->get('/install')
+        ->assertNotFound();
+});
+
+it('redirects to install page when not installed and unauthenticated', function () {
+    $this->asSelfHosted();
+    $this->tenant->update(['sis_config' => null]);
+
+    $this->get('/login')
+        ->assertRedirect('/install');
+});
+
+it('redirects to install page when not installed and authenticated', function () {
+    $this->asSelfHosted();
+    logIn();
+    $this->tenant->update(['sis_config' => null]);
+
+    $this->get('/')
+        ->assertRedirect('/install');
+});
+
+it('can view installation page unauthenticated', function () {
+    $this->tenant->update(['sis_config' => null]);
+    $this->asSelfHosted();
+
+    $this->get('/install')
+        ->assertViewHas('title')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('title')
+            ->has('installationValues')
+            ->has('isCloud')
+            ->component('Install')
+        );
+});
+
+it('can view installation page authenticated', function () {
+    $this->tenant->update(['sis_config' => null]);
+    $this->asSelfHosted();
+    logIn();
+
+    $this->user->allow()->everything();
+
+    $this->get('/install')
+        ->assertViewHas('title')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('title')
+            ->has('installationValues')
+            ->has('isCloud')
+            ->component('Install')
+        );
+});
+
+it('can successfully install without existing tenant', function () {
+    Queue::fake();
+
+    $this->tenant->delete();
+    Tenant::forgetCurrent();
+
+    $data = getPowerSchoolInstallationRequest();
+
+    fakeLicenseValidation();
+
+    $this->asSelfHosted()
+        ->post('/install', $data)
+        ->assertSessionHas('success')
+        ->assertRedirect(route('install.user'));
+
+    $this->assertDatabaseHas('tenants', Arr::only($data, ['name', 'domain']));
+    $tenant = Tenant::firstWhere('domain', $data['domain']);
+    $this->assertEquals($tenant->sis_config->toArray(), $data['sis_config']);
+
+    Queue::assertPushed(SyncSchools::class);
+});
+
+it('can successfully install with existing tenant', function () {
+    Queue::fake();
+
+    $data = getPowerSchoolInstallationRequest();
+
+    fakeLicenseValidation();
+    $this->tenant->update(['sis_config' => null]);
+
+    $this->asSelfHosted()
+        ->postJson('/install', $data)
+        ->assertSessionHas('success')
+        ->assertRedirect(route('install.user'));
+
+    $this->assertDatabaseHas('tenants', Arr::only($data, ['name', 'domain']));
+    $tenant = Tenant::firstWhere('domain', $data['domain']);
+    $this->assertEquals($tenant->sis_config->toArray(), $data['sis_config']);
+
+    Queue::assertPushed(SyncSchools::class);
+});
+
+it('cant view user selection when uninstalled', function () {
+    $this->tenant->update(['sis_config' => null]);
+
+    $this->asSelfHosted()
+        ->get(route('install.user'))
+        ->assertRedirect(route('install'));
+});
+
+it('cant view user selection when admin user already exists', function () {
+    $admin = seedUser();
+    $admin->assignRole(App\Enums\Role::DISTRICT_ADMIN);
+
+    $this->asSelfHosted()
+        ->get(route('install.user'))
+        ->assertSessionHas('error')
+        ->assertRedirect();
+});
+
+it('can view user import page', function () {
+    $this->asSelfHosted()
+        ->get(route('install.user'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('InstallUser')
+            ->where('endpoint', route('install.user'))
+        );
+});
