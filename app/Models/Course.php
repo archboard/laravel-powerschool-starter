@@ -9,6 +9,38 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $tenant_id
+ * @property int $school_id
+ * @property string $name
+ * @property int $sis_id
+ * @property string|null $course_number
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property string $sis_key
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Section> $sections
+ * @property-read int|null $sections_count
+ * @property-read \App\Models\Tenant $tenant
+ *
+ * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Course filter(array $filters = [])
+ * @method static Builder<static>|Course newModelQuery()
+ * @method static Builder<static>|Course newQuery()
+ * @method static Builder<static>|Course query()
+ * @method static Builder<static>|Course search(string $search)
+ * @method static Builder<static>|Course whereCourseNumber($value)
+ * @method static Builder<static>|Course whereCreatedAt($value)
+ * @method static Builder<static>|Course whereId($value)
+ * @method static Builder<static>|Course whereName($value)
+ * @method static Builder<static>|Course whereSchoolId($value)
+ * @method static Builder<static>|Course whereSisId($value)
+ * @method static Builder<static>|Course whereSisKey($value)
+ * @method static Builder<static>|Course whereTenantId($value)
+ * @method static Builder<static>|Course whereUpdatedAt($value)
+ *
+ * @mixin \Eloquent
+ */
 class Course extends Model implements ExistsInSis
 {
     use BelongsToTenant;

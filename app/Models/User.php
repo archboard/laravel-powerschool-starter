@@ -28,6 +28,75 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Silber\Bouncer\Database\HasRolesAndAbilities;
 
+/**
+ * @property int $id
+ * @property int $tenant_id
+ * @property int|null $sis_id
+ * @property string|null $first_name
+ * @property string|null $last_name
+ * @property string|null $email
+ * @property string|null $password
+ * @property int|null $school_id
+ * @property string|null $timezone
+ * @property string|null $remember_token
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property string|null $two_factor_secret
+ * @property string|null $two_factor_recovery_codes
+ * @property string $sis_key
+ * @property UserType|null $user_type
+ * @property string $locale
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Silber\Bouncer\Database\Ability> $abilities
+ * @property-read int|null $abilities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\School> $adminSchools
+ * @property-read int|null $admin_schools_count
+ * @property-read mixed $last_first
+ * @property-read mixed $name
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
+ * @property-read mixed $permissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Silber\Bouncer\Database\Role> $roles
+ * @property-read int|null $roles_count
+ * @property-read \App\Models\School|null $school
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\School> $schools
+ * @property-read int|null $schools_count
+ * @property-read \App\Models\SelectedModel|null $selectedModel
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SelectedModel> $selectedModels
+ * @property-read int|null $selected_models_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Student> $students
+ * @property-read int|null $students_count
+ * @property-read \App\Models\Tenant $tenant
+ *
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static Builder<static>|User filter(\Illuminate\Support\Collection|array $data)
+ * @method static Builder<static>|User newModelQuery()
+ * @method static Builder<static>|User newQuery()
+ * @method static Builder<static>|User query()
+ * @method static Builder<static>|User search(string $search)
+ * @method static Builder<static>|User whereCan(string $ability)
+ * @method static Builder<static>|User whereCreatedAt($value)
+ * @method static Builder<static>|User whereEmail($value)
+ * @method static Builder<static>|User whereFirstName($value)
+ * @method static Builder<static>|User whereId($value)
+ * @method static Builder<static>|User whereIs($role)
+ * @method static Builder<static>|User whereIsAll($role)
+ * @method static Builder<static>|User whereIsNot($role)
+ * @method static Builder<static>|User whereLastName($value)
+ * @method static Builder<static>|User whereLocale($value)
+ * @method static Builder<static>|User wherePassword($value)
+ * @method static Builder<static>|User whereRememberToken($value)
+ * @method static Builder<static>|User whereSchoolId($value)
+ * @method static Builder<static>|User whereSisId($value)
+ * @method static Builder<static>|User whereSisKey($value)
+ * @method static Builder<static>|User whereTenantId($value)
+ * @method static Builder<static>|User whereTimezone($value)
+ * @method static Builder<static>|User whereTwoFactorRecoveryCodes($value)
+ * @method static Builder<static>|User whereTwoFactorSecret($value)
+ * @method static Builder<static>|User whereUpdatedAt($value)
+ * @method static Builder<static>|User whereUserType($value)
+ *
+ * @mixin \Eloquent
+ */
 class User extends Authenticatable implements ExistsInSis
 {
     use BelongsToTenant;

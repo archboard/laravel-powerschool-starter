@@ -10,6 +10,47 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $tenant_id
+ * @property int $sis_id
+ * @property int|null $school_number
+ * @property string $name
+ * @property int|null $high_grade
+ * @property int|null $low_grade
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property bool $active
+ * @property string $sis_key
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Course> $courses
+ * @property-read int|null $courses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Section> $sections
+ * @property-read int|null $sections_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Student> $students
+ * @property-read int|null $students_count
+ * @property-read \App\Models\Tenant $tenant
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School active()
+ * @method static \Database\Factories\SchoolFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereHighGrade($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereLowGrade($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereSchoolNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereSisId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereSisKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereTenantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereUpdatedAt($value)
+ *
+ * @mixin \Eloquent
+ */
 class School extends Model implements ExistsInSis
 {
     use BelongsToTenant;
