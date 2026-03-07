@@ -19,3 +19,6 @@ _ide_*
 .phpstorm.meta.php
 .phpactor.json
 .phpunit.cache/test-results
+.mcp.json
+opencode.json
+boost.json
