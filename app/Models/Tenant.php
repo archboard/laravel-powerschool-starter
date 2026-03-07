@@ -72,8 +72,14 @@ class Tenant extends TenantBase
 {
     use HasFactory;
 
+    /**
+     * @var list<string>
+     */
     protected $guarded = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     protected $casts = [
         'sis_provider' => Sis::class,
         'sis_config' => 'encrypted:collection',
@@ -81,18 +87,24 @@ class Tenant extends TenantBase
         'allow_password_auth' => 'boolean',
     ];
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::created(function (Tenant $tenant) {
             //
         });
     }
 
+    /**
+     * @return Attribute<string, never>
+     */
     public function domain(): Attribute
     {
         return Attribute::get(fn ($value) => $value ?? request()->host());
     }
 
+    /**
+     * @return Attribute<Collection, never>
+     */
     public function sisConfig(): Attribute
     {
         return Attribute::get(
@@ -100,6 +112,9 @@ class Tenant extends TenantBase
         );
     }
 
+    /**
+     * @return Attribute<Collection, never>
+     */
     public function smtpConfig(): Attribute
     {
         return Attribute::get(function ($value): Collection {
@@ -117,26 +132,41 @@ class Tenant extends TenantBase
         });
     }
 
+    /**
+     * @return HasMany<School, $this>
+     */
     public function schools(): HasMany
     {
         return $this->hasMany(School::class);
     }
 
+    /**
+     * @return HasMany<User, $this>
+     */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
 
+    /**
+     * @return HasMany<Student, $this>
+     */
     public function students(): HasMany
     {
         return $this->hasMany(Student::class);
     }
 
+    /**
+     * @return HasMany<Course, $this>
+     */
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class);
     }
 
+    /**
+     * @return HasMany<Section, $this>
+     */
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class);

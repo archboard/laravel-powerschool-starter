@@ -12,7 +12,7 @@ class SectionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, School $school)
+    public function index(Request $request, School $school): \Inertia\Response
     {
         $sections = $school->sections()
             ->filter($request->all())
@@ -30,7 +30,7 @@ class SectionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): void
     {
         //
     }
@@ -38,7 +38,7 @@ class SectionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): void
     {
         //
     }
@@ -46,7 +46,7 @@ class SectionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Section $section)
+    public function show(Section $section): void
     {
         //
     }
@@ -54,7 +54,7 @@ class SectionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id): void
     {
         //
     }
@@ -62,7 +62,7 @@ class SectionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id): void
     {
         //
     }
@@ -70,7 +70,7 @@ class SectionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): void
     {
         //
     }

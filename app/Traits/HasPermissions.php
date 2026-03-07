@@ -17,6 +17,9 @@ use Silber\Bouncer\BouncerFacade;
 
 trait HasPermissions
 {
+    /**
+     * @return Attribute<array<string, mixed>, never>
+     */
     public function permissions(): Attribute
     {
         return Attribute::get(
@@ -40,6 +43,9 @@ trait HasPermissions
         return $this;
     }
 
+    /**
+     * @return array<int, class-string<\Illuminate\Database\Eloquent\Model>>
+     */
     public function getPermissionSubjectModels(): array
     {
         return [
@@ -50,6 +56,9 @@ trait HasPermissions
         ];
     }
 
+    /**
+     * @return array{permissions: array<int, array{key: string, granted: bool}>, schools: array<int, array{manages: bool, permissions: array<int, array{key: string, granted: bool}>, models: array<int, array{model: string, label: string, manages: bool, permissions: array<int, array{key: string, granted: bool}>}>}>}
+     */
     public function getPermissionMatrix(?User $authUser = null, ?School $school = null): array
     {
         $schools = $school
@@ -78,6 +87,9 @@ trait HasPermissions
         ];
     }
 
+    /**
+     * @return array{manages: bool, permissions: array<int, array{key: string, granted: bool}>, models: array<int, array{model: string, label: string, manages: bool, permissions: array<int, array{key: string, granted: bool}>}>}
+     */
     public function getScopedPermissionMatrix(School $school): array
     {
         return BouncerFacade::scope()
@@ -147,6 +159,9 @@ trait HasPermissions
         return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function permissionsToFrontend(School $school): array
     {
         $matrix = $this->getPermissionMatrix(school: $school);
@@ -167,7 +182,7 @@ trait HasPermissions
 
     public function hasCachedPermission(string|Permission $model, ?Permission $permission = null): bool
     {
-        $key = ($model?->value ?? $model).($permission ? '.'.$permission->key() : '');
+        $key = ($model instanceof Permission ? $model->value : $model).($permission ? '.'.$permission->key() : '');
 
         return Arr::get($this->permissions, $key, false);
     }

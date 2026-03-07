@@ -81,6 +81,9 @@ class NavigationItem
         return $this;
     }
 
+    /**
+     * @return array{url: string, label: string, method: string, target: string, as: string, component: string, icon: string, current: bool}
+     */
     public function toArray(): array
     {
         return [

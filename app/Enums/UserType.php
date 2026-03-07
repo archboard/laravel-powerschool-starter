@@ -24,6 +24,9 @@ enum UserType: string
         };
     }
 
+    /**
+     * @param  Collection<string, mixed>  $data
+     */
     public static function fromData(Collection $data): UserType
     {
         if ($persona = $data->get('persona', $data->get('usertype'))) {
@@ -37,6 +40,9 @@ enum UserType: string
         throw new UnknownPersonaException("Unknown persona type from data: {$data->toJson()}");
     }
 
+    /**
+     * @param  Collection<string, mixed>  $data
+     */
     public function getSisKeyFromData(Collection $data): string
     {
         $tenant = Tenant::current();

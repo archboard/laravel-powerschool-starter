@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Scope;
 
 class TenantScope implements Scope
 {
-    public function apply(Builder $builder, Model $model)
+    public function apply(Builder $builder, Model $model): void
     {
         $tenant = Tenant::current();
 
@@ -18,12 +18,12 @@ class TenantScope implements Scope
         }
     }
 
-    public function extend(Builder $builder)
+    public function extend(Builder $builder): void
     {
         $this->addWithoutTenant($builder);
     }
 
-    protected function addWithoutTenant(Builder $builder)
+    protected function addWithoutTenant(Builder $builder): void
     {
         $builder->macro('withoutTenant', function (Builder $builder) {
             return $builder->withoutGlobalScope($this);

@@ -15,6 +15,9 @@ enum Sis: string
     case PS = 'ps';
     case CLASS_LINK = 'class link';
 
+    /**
+     * @return array<string, string>
+     */
     public static function options(): array
     {
         return array_reduce(
@@ -28,6 +31,9 @@ enum Sis: string
         );
     }
 
+    /**
+     * @return array<int, array{label: string, value: string}>
+     */
     public static function selectOptions(): array
     {
         return array_map(fn (Sis $sis) => [
@@ -80,6 +86,9 @@ enum Sis: string
         return FormFieldCollection::make(Arr::prependKeysWith($fields, 'sis_config.'));
     }
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public function getRules(): array
     {
         return $this->getConfigFields()

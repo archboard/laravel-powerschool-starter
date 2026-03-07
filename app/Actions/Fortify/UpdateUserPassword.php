@@ -13,10 +13,9 @@ class UpdateUserPassword implements UpdatesUserPasswords
     /**
      * Validate and update the user's password.
      *
-     * @param  mixed  $user
-     * @return void
+     * @param  array<string, mixed>  $input
      */
-    public function update($user, array $input)
+    public function update(\Illuminate\Database\Eloquent\Model $user, array $input): void
     {
         Validator::make($input, [
             'current_password' => [$user->password ? 'required' : 'nullable', 'string'],

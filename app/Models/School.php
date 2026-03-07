@@ -56,8 +56,14 @@ class School extends Model implements ExistsInSis
     use BelongsToTenant;
     use HasFactory;
 
+    /**
+     * @var list<string>
+     */
     protected $guarded = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     protected $casts = [
         'active' => 'boolean',
     ];
@@ -67,22 +73,34 @@ class School extends Model implements ExistsInSis
         $builder->where('active', true);
     }
 
+    /**
+     * @return BelongsToMany<User, $this>
+     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)
             ->withPivot(['staff_id']);
     }
 
+    /**
+     * @return HasMany<Course, $this>
+     */
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class);
     }
 
+    /**
+     * @return HasMany<Section, $this>
+     */
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class);
     }
 
+    /**
+     * @return HasMany<Student, $this>
+     */
     public function students(): HasMany
     {
         return $this->hasMany(Student::class);

@@ -24,20 +24,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\Tenant $tenant
  *
  * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
- * @method static Builder<static>|Course filter(array $filters = [])
- * @method static Builder<static>|Course newModelQuery()
- * @method static Builder<static>|Course newQuery()
- * @method static Builder<static>|Course query()
- * @method static Builder<static>|Course search(string $search)
- * @method static Builder<static>|Course whereCourseNumber($value)
- * @method static Builder<static>|Course whereCreatedAt($value)
- * @method static Builder<static>|Course whereId($value)
- * @method static Builder<static>|Course whereName($value)
- * @method static Builder<static>|Course whereSchoolId($value)
- * @method static Builder<static>|Course whereSisId($value)
- * @method static Builder<static>|Course whereSisKey($value)
- * @method static Builder<static>|Course whereTenantId($value)
- * @method static Builder<static>|Course whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course filter(array $filters = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course search(string $search)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereCourseNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereSchoolId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereSisId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereSisKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereTenantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */
@@ -46,8 +46,14 @@ class Course extends Model implements ExistsInSis
     use BelongsToTenant;
     use HasFactory;
 
+    /**
+     * @var list<string>
+     */
     protected $guarded = [];
 
+    /**
+     * @param  array<string, mixed>  $filters
+     */
     public function scopeFilter(Builder $builder, array $filters = []): void
     {
         $builder->when($filters['search'] ?? null, function (Builder $builder, string $search) {

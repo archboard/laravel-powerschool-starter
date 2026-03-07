@@ -6,16 +6,16 @@ use App\Models\Course;
 use App\Models\School;
 use App\Models\Section;
 use App\Models\Student;
-use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
 interface SisProvider
 {
-    public function __construct(Tenant $tenant);
-
     public function configured(): bool;
 
+    /**
+     * @return Collection<int, School>
+     */
     public function getAllSchools(): Collection;
 
     public function syncSchools(): static;
@@ -36,6 +36,9 @@ interface SisProvider
 
     public function syncUser(User $user): User;
 
+    /**
+     * @return Collection<int, User>
+     */
     public function searchForUser(string $search): Collection;
 
     public function syncSection(Section $section): Section;

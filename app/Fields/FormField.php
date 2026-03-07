@@ -17,8 +17,14 @@ class FormField
 
     protected bool $required = false;
 
+    /**
+     * @var array<int, string>
+     */
     protected array $rules = ['nullable'];
 
+    /**
+     * @var array<array<mixed>|callable|list<mixed>>
+     */
     protected mixed $options = [];
 
     protected bool $disabled = false;
@@ -88,6 +94,9 @@ class FormField
         return $this;
     }
 
+    /**
+     * @param  array<int, string>  $rules
+     */
     public function rules(array $rules): static
     {
         $this->rules = $rules;
@@ -95,11 +104,17 @@ class FormField
         return $this;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getRules(): array
     {
         return $this->rules;
     }
 
+    /**
+     * @param  array<array<mixed>|callable|list<mixed>>  $options
+     */
     public function withOptions(array|callable $options): static
     {
         $this->options = $options;
@@ -147,6 +162,9 @@ class FormField
         return $this;
     }
 
+    /**
+     * @param  array<array<mixed>|callable|list<mixed>>  $options
+     */
     public function combobox(array $options = []): static
     {
         $this->component = FieldType::combobox;
@@ -154,6 +172,9 @@ class FormField
         return $this->withOptions($options);
     }
 
+    /**
+     * @param  array<array<mixed>|callable|list<mixed>>  $options
+     */
     public function select(array $options = []): static
     {
         $this->component = FieldType::select;
@@ -169,6 +190,9 @@ class FormField
         return $attributes;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(bool $loadOptions = false): array
     {
         return [

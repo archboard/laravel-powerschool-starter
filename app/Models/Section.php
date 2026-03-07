@@ -29,23 +29,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read \App\Models\Tenant $tenant
  *
  * @method static \Database\Factories\SectionFactory factory($count = null, $state = [])
- * @method static Builder<static>|Section filter(array $filters = [])
- * @method static Builder<static>|Section newModelQuery()
- * @method static Builder<static>|Section newQuery()
- * @method static Builder<static>|Section query()
- * @method static Builder<static>|Section search(string $search)
- * @method static Builder<static>|Section whereCourseId($value)
- * @method static Builder<static>|Section whereCreatedAt($value)
- * @method static Builder<static>|Section whereExpression($value)
- * @method static Builder<static>|Section whereExternalExpression($value)
- * @method static Builder<static>|Section whereId($value)
- * @method static Builder<static>|Section whereSchoolId($value)
- * @method static Builder<static>|Section whereSectionNumber($value)
- * @method static Builder<static>|Section whereSisId($value)
- * @method static Builder<static>|Section whereSisKey($value)
- * @method static Builder<static>|Section whereTenantId($value)
- * @method static Builder<static>|Section whereUpdatedAt($value)
- * @method static Builder<static>|Section whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section filter(array $filters = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section search(string $search)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereCourseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereExpression($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereExternalExpression($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereSchoolId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereSectionNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereSisId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereSisKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereTenantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereUserId($value)
  *
  * @mixin \Eloquent
  */
@@ -54,8 +54,14 @@ class Section extends Model implements ExistsInSis
     use BelongsToTenant;
     use HasFactory;
 
+    /**
+     * @var list<string>
+     */
     protected $guarded = [];
 
+    /**
+     * @param  array<string, mixed>  $filters
+     */
     public function scopeFilter(Builder $builder, array $filters = []): void
     {
         $builder->select('sections.*')

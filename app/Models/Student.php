@@ -38,27 +38,27 @@ use Illuminate\Support\Facades\DB;
  * @property-read \App\Models\Tenant $tenant
  *
  * @method static \Database\Factories\StudentFactory factory($count = null, $state = [])
- * @method static Builder<static>|Student filter(array $filters = [])
- * @method static Builder<static>|Student newModelQuery()
- * @method static Builder<static>|Student newQuery()
- * @method static Builder<static>|Student onlyTrashed()
- * @method static Builder<static>|Student query()
- * @method static Builder<static>|Student search(string $search)
- * @method static Builder<static>|Student whereCreatedAt($value)
- * @method static Builder<static>|Student whereDeletedAt($value)
- * @method static Builder<static>|Student whereEmail($value)
- * @method static Builder<static>|Student whereFirstName($value)
- * @method static Builder<static>|Student whereGradeLevel($value)
- * @method static Builder<static>|Student whereId($value)
- * @method static Builder<static>|Student whereLastName($value)
- * @method static Builder<static>|Student whereSchoolId($value)
- * @method static Builder<static>|Student whereSisId($value)
- * @method static Builder<static>|Student whereSisKey($value)
- * @method static Builder<static>|Student whereStudentNumber($value)
- * @method static Builder<static>|Student whereTenantId($value)
- * @method static Builder<static>|Student whereUpdatedAt($value)
- * @method static Builder<static>|Student withTrashed(bool $withTrashed = true)
- * @method static Builder<static>|Student withoutTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student filter(array $filters = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student search(string $search)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereFirstName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereGradeLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereLastName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereSchoolId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereSisId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereSisKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereStudentNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereTenantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student withoutTrashed()
  *
  * @mixin \Eloquent
  */
@@ -70,8 +70,14 @@ class Student extends Model implements ExistsInSis
     use HasFirstAndLastName;
     use SoftDeletes;
 
+    /**
+     * @var list<string>
+     */
     protected $guarded = [];
 
+    /**
+     * @param  array<string, mixed>  $filters
+     */
     public function scopeFilter(Builder $builder, array $filters = []): void
     {
         $sort = $filters['sort'] ?? 'last_name';

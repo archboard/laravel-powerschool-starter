@@ -32,6 +32,9 @@ class PowerSchoolProvider implements SisProvider
         }
     }
 
+    /**
+     * @return Collection<int, array{id: int, name: string, school_number: int|string|null, low_grade: int|null, high_grade: int|null}>
+     */
     public function getAllSchools(): Collection
     {
         $response = $this->builder
