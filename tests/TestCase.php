@@ -15,10 +15,6 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 
-    protected bool $signIn = false;
-
-    protected bool $cloud = false;
-
     protected Tenant $tenant;
 
     protected School $school;
@@ -38,15 +34,7 @@ abstract class TestCase extends BaseTestCase
             ->count(2)
             ->create(['tenant_id' => $this->tenant->id]);
 
-        if ($this->signIn) {
-            $this->logIn();
-        }
-
-        if ($this->cloud) {
-            $this->asCloud();
-        } else {
-            $this->asSelfHosted();
-        }
+        $this->asSelfHosted();
 
         BouncerFacade::scope()->remove();
     }
@@ -70,7 +58,6 @@ abstract class TestCase extends BaseTestCase
         /** @var User $user */
         $user = $user ?? $this->seedUser($attributes);
 
-        //        $user->assign($role->value);
         $this->be($user);
         $this->user = $user;
 

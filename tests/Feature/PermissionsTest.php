@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 beforeEach(function () {
     logIn()->setSchool();
 
-    $this->subjectUser = test()->seedUser();
+    $this->subjectUser = seedUser();
 });
 
 it("can't view without permission", function () {

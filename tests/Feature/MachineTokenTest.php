@@ -3,11 +3,11 @@
 use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
-    $this->asCloud();
+    asCloud();
 });
 
 it('self hosted cant generate token', function () {
-    $this->asSelfHosted();
+    asSelfHosted();
 
     $this->assertTrue(
         DB::table('machine_api_tokens')->whereNotNull('api_token')->doesntExist()

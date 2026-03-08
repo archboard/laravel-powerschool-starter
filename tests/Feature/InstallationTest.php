@@ -30,7 +30,7 @@ function getPowerSchoolInstallationRequest(array $attributes = []): array
 }
 
 it('cant access installation on cloud', function () {
-    $this->asCloud()
+    asCloud()
         ->get('/install')
         ->assertNotFound();
 });
@@ -49,7 +49,7 @@ it('cant access installation when user has no permission', function () {
 });
 
 it('redirects to install page when not installed and unauthenticated', function () {
-    $this->asSelfHosted();
+    asSelfHosted();
     $this->tenant->update(['sis_config' => null]);
 
     $this->get('/login')
@@ -57,7 +57,7 @@ it('redirects to install page when not installed and unauthenticated', function 
 });
 
 it('redirects to install page when not installed and authenticated', function () {
-    $this->asSelfHosted();
+    asSelfHosted();
     logIn();
     $this->tenant->update(['sis_config' => null]);
 
@@ -67,7 +67,7 @@ it('redirects to install page when not installed and authenticated', function ()
 
 it('can view installation page unauthenticated', function () {
     $this->tenant->update(['sis_config' => null]);
-    $this->asSelfHosted();
+    asSelfHosted();
 
     $this->get('/install')
         ->assertViewHas('title')
@@ -82,7 +82,7 @@ it('can view installation page unauthenticated', function () {
 
 it('can view installation page authenticated', function () {
     $this->tenant->update(['sis_config' => null]);
-    $this->asSelfHosted();
+    asSelfHosted();
     logIn();
 
     $this->user->allow()->everything();
@@ -108,7 +108,7 @@ it('can successfully install without existing tenant', function () {
 
     fakeLicenseValidation();
 
-    $this->asSelfHosted()
+    asSelfHosted()
         ->post('/install', $data)
         ->assertSessionHas('success')
         ->assertRedirect(route('install.user'));
@@ -128,7 +128,7 @@ it('can successfully install with existing tenant', function () {
     fakeLicenseValidation();
     $this->tenant->update(['sis_config' => null]);
 
-    $this->asSelfHosted()
+    asSelfHosted()
         ->postJson('/install', $data)
         ->assertSessionHas('success')
         ->assertRedirect(route('install.user'));
@@ -143,7 +143,7 @@ it('can successfully install with existing tenant', function () {
 it('cant view user selection when uninstalled', function () {
     $this->tenant->update(['sis_config' => null]);
 
-    $this->asSelfHosted()
+    asSelfHosted()
         ->get(route('install.user'))
         ->assertRedirect(route('install'));
 });
@@ -152,14 +152,14 @@ it('cant view user selection when admin user already exists', function () {
     $admin = seedUser();
     $admin->assignRole(App\Enums\Role::DISTRICT_ADMIN);
 
-    $this->asSelfHosted()
+    asSelfHosted()
         ->get(route('install.user'))
         ->assertSessionHas('error')
         ->assertRedirect();
 });
 
 it('can view user import page', function () {
-    $this->asSelfHosted()
+    asSelfHosted()
         ->get(route('install.user'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 
 beforeEach(function () {
-    $this->asCloud();
+    asCloud();
 
     $this->token = Str::random();
 
@@ -19,7 +19,7 @@ beforeEach(function () {
 });
 
 it('cant access cloud endpoints from self hosted', function () {
-    $this->asSelfHosted()
+    asSelfHosted()
         ->getJson('/api/tenants')
         ->assertNotFound();
 });

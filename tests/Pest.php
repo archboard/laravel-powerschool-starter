@@ -1,5 +1,8 @@
 <?php
 
+use App\Enums\Permission;
+use App\Models\User;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -59,12 +62,12 @@ function fullPermissions()
     return test()->fullPermission();
 }
 
-function seedUser(array $attributes = []): App\Models\User
+function seedUser(array $attributes = []): User
 {
     return test()->seedUser($attributes);
 }
 
-function givePermission(App\Enums\Permission $permission)
+function givePermission(Permission $permission)
 {
     return test()->givePermission($permission);
 }
@@ -72,4 +75,19 @@ function givePermission(App\Enums\Permission $permission)
 function setSchool()
 {
     return test()->setSchool();
+}
+
+function asCloud()
+{
+    return test()->asCloud();
+}
+
+function asSelfHosted()
+{
+    return test()->asSelfHosted();
+}
+
+function tapUser(callable $callback)
+{
+    return test()->tapUser($callback);
 }
