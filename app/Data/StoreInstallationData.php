@@ -25,7 +25,7 @@ class StoreInstallationData extends Data
 
         $rules = [
             'domain' => ['required', Rule::unique('tenants', 'domain')->ignoreModel($tenant)],
-            ...($tenant->sis_provider->getRules()),
+            ...($tenant->sis_provider?->getRules() ?? []),
         ];
 
         if (config('app.cloud')) {

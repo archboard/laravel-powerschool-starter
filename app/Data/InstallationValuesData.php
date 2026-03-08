@@ -20,7 +20,7 @@ class InstallationValuesData extends Data
 
     public static function fromTenant(Tenant $tenant): self
     {
-        $fields = $tenant->sis_provider->getConfigFieldDefinitions();
+        $fields = $tenant->sis_provider?->getConfigFieldDefinitions() ?? [];
 
         $config = array_combine(
             array_column($fields, 'key'),

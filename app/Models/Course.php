@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\Tenant $tenant
  *
  * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course filter(array $filters = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course filter(array<string, mixed> $filters = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course query()
@@ -44,6 +44,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Course extends Model implements ExistsInSis
 {
     use BelongsToTenant;
+
+    /** @use HasFactory<\Database\Factories\CourseFactory> */
     use HasFactory;
 
     /**
@@ -52,15 +54,19 @@ class Course extends Model implements ExistsInSis
     protected $guarded = [];
 
     /**
+     * @param  Builder<Course>  $builder
      * @param  array<string, mixed>  $filters
      */
     public function scopeFilter(Builder $builder, array $filters = []): void
     {
-        $builder->when($filters['search'] ?? null, function (Builder $builder, string $search) {
+        $builder->when($filters['search'] ?? null, function ($builder, string $search) {
             $builder->search($search);
         })->orderBy($filters['sort'] ?? 'name', $filters['dir'] ?? 'asc');
     }
 
+    /**
+     * @param  Builder<Course>  $builder
+     */
     public function scopeSearch(Builder $builder, string $search): void
     {
         $builder->where(function (Builder $builder) use ($search) {
@@ -69,6 +75,9 @@ class Course extends Model implements ExistsInSis
         });
     }
 
+    /**
+     * @return HasMany<Section, $this>
+     */
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class);

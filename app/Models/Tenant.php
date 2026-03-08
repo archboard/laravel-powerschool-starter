@@ -18,7 +18,7 @@ use Spatie\Multitenancy\Models\Tenant as TenantBase;
 /**
  * @property int $id
  * @property string $name
- * @property Collection $sis_config
+ * @property Collection<string, mixed> $sis_config
  * @property string|null $domain
  * @property string|null $custom_domain
  * @property bool $allow_password_auth
@@ -27,8 +27,8 @@ use Spatie\Multitenancy\Models\Tenant as TenantBase;
  * @property string|null $subscription_expires_at
  * @property string|null $license
  * @property string|null $timezone
- * @property Sis $sis_provider
- * @property Collection $smtp_config
+ * @property Sis|null $sis_provider
+ * @property Collection<string, mixed> $smtp_config
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Course> $courses
@@ -68,6 +68,7 @@ use Spatie\Multitenancy\Models\Tenant as TenantBase;
  */
 class Tenant extends TenantBase
 {
+    /** @use HasFactory<\Database\Factories\TenantFactory> */
     use HasFactory;
 
     /**
@@ -76,7 +77,7 @@ class Tenant extends TenantBase
     protected $guarded = [];
 
     /**
-     * @var array<string, mixed>
+     * @var array<string, string>
      */
     protected $casts = [
         'sis_provider' => Sis::class,
@@ -101,21 +102,25 @@ class Tenant extends TenantBase
     }
 
     /**
-     * @return Attribute<Collection, never>
+     * @return Attribute<Collection<string, mixed>, never>
      */
     public function sisConfig(): Attribute
     {
-        return Attribute::get(
+        /** @var Attribute<Collection<string, mixed>, never> $attribute */
+        $attribute = Attribute::get(
             fn ($value): Collection => $value ? $this->castAttribute('sis_config', $value) : collect()
         );
+
+        return $attribute;
     }
 
     /**
-     * @return Attribute<Collection, never>
+     * @return Attribute<Collection<string, mixed>, never>
      */
     public function smtpConfig(): Attribute
     {
-        return Attribute::get(function ($value): Collection {
+        /** @var Attribute<Collection<string, mixed>, never> $attribute */
+        $attribute = Attribute::get(function ($value): Collection {
             return $value
                 ? $this->castAttribute('smtp_config', $value)
                 : collect([
@@ -128,6 +133,8 @@ class Tenant extends TenantBase
                     'encryption' => null,
                 ]);
         });
+
+        return $attribute;
     }
 
     /**
@@ -177,7 +184,7 @@ class Tenant extends TenantBase
 
     public static function fromRequestAndFallback(Request $request): Tenant
     {
-        return static::fromRequest($request) ?? new static([
+        return static::fromRequest($request) ?? new self([
             'domain' => $request->getHost(),
             'sis_provider' => Sis::PS,
         ]);
@@ -204,7 +211,7 @@ class Tenant extends TenantBase
         return $this->sis_provider?->getProvider($this);
     }
 
-    public function getSchoolFromSisId($sisId): School
+    public function getSchoolFromSisId(School|int|string $sisId): School
     {
         if ($sisId instanceof School) {
             return $sisId;
@@ -222,16 +229,17 @@ class Tenant extends TenantBase
     {
         return Arr::get(
             $this->$configKey,
-            Str::replace("{$configKey}.", '', $key),
+            $key !== null ? (string) Str::replace("{$configKey}.", '', $key) : null,
             $defaultValue
         );
     }
 
     public function setConfigKey(string $configKey, ?string $key, mixed $value): static
     {
+        $normalizedKey = (string) Str::replace("{$configKey}.", '', $key ?? '');
         $this->$configKey = [
             ...$this->$configKey,
-            Str::replace("{$configKey}.", '', $key) => $value,
+            $normalizedKey => $value,
         ];
 
         return $this;

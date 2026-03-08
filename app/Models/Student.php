@@ -38,7 +38,7 @@ use Illuminate\Support\Facades\DB;
  * @property-read \App\Models\Tenant $tenant
  *
  * @method static \Database\Factories\StudentFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student filter(array $filters = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student filter(array<string, mixed> $filters = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Student newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Student newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Student onlyTrashed()
@@ -66,7 +66,10 @@ class Student extends Model implements ExistsInSis
 {
     use BelongsToSchool;
     use BelongsToTenant;
+
+    /** @use HasFactory<\Database\Factories\StudentFactory> */
     use HasFactory;
+
     use HasFirstAndLastName;
     use SoftDeletes;
 
@@ -76,6 +79,7 @@ class Student extends Model implements ExistsInSis
     protected $guarded = [];
 
     /**
+     * @param  Builder<Student>  $builder
      * @param  array<string, mixed>  $filters
      */
     public function scopeFilter(Builder $builder, array $filters = []): void
@@ -92,6 +96,9 @@ class Student extends Model implements ExistsInSis
         $builder->orderBy($sort, $dir);
     }
 
+    /**
+     * @param  Builder<Student>  $builder
+     */
     public function scopeSearch(Builder $builder, string $search): void
     {
         $builder->where(function (Builder $builder) use ($search) {
@@ -103,11 +110,17 @@ class Student extends Model implements ExistsInSis
         });
     }
 
+    /**
+     * @return BelongsToMany<Section, $this>
+     */
     public function sections(): BelongsToMany
     {
         return $this->belongsToMany(Section::class);
     }
 
+    /**
+     * @return BelongsToMany<User, $this>
+     */
     public function contacts(): BelongsToMany
     {
         return $this->belongsToMany(User::class)

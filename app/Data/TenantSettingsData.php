@@ -14,7 +14,7 @@ class TenantSettingsData extends Data
         #[Max(255)]
         public string $name,
         public ?string $domain,
-        public Sis $sis_provider,
+        public ?Sis $sis_provider,
         public bool $allow_password_auth = false,
         public bool $allow_oidc_login = false,
     ) {}

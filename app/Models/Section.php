@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read \App\Models\Tenant $tenant
  *
  * @method static \Database\Factories\SectionFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Section filter(array $filters = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section filter(array<string, mixed> $filters = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section query()
@@ -52,6 +52,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Section extends Model implements ExistsInSis
 {
     use BelongsToTenant;
+
+    /** @use HasFactory<\Database\Factories\SectionFactory> */
     use HasFactory;
 
     /**
@@ -60,33 +62,44 @@ class Section extends Model implements ExistsInSis
     protected $guarded = [];
 
     /**
+     * @param  Builder<Section>  $builder
      * @param  array<string, mixed>  $filters
      */
     public function scopeFilter(Builder $builder, array $filters = []): void
     {
         $builder->select('sections.*')
-            ->when($filters['search'] ?? null, function (Builder $builder, string $search) {
+            ->when($filters['search'] ?? null, function ($builder, string $search) {
                 $builder->search($search);
             })
             ->join('courses', 'courses.id', '=', 'sections.course_id')
             ->orderBy('courses.name');
     }
 
+    /**
+     * @param  Builder<Section>  $builder
+     */
     public function scopeSearch(Builder $builder, string $search): void
     {
-        $builder->where(function (Builder $builder) use ($search) {
+        $builder->where(function ($builder) use ($search) {
             $builder->where('section_number', 'ilike', "%{$search}%")
-                ->orWhereHas('course', function (Builder $builder) use ($search) {
-                    $builder->search($search);
+                ->orWhereHas('course', function ($builder) use ($search) {
+                    $builder->where('course_number', 'ilike', "%{$search}%")
+                        ->orWhere('name', 'ilike', "%{$search}%");
                 });
         });
     }
 
+    /**
+     * @return BelongsToMany<Student, $this>
+     */
     public function students(): BelongsToMany
     {
         return $this->belongsToMany(Student::class);
     }
 
+    /**
+     * @return BelongsTo<Course, $this>
+     */
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);

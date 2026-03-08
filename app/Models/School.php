@@ -54,6 +54,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class School extends Model implements ExistsInSis
 {
     use BelongsToTenant;
+
+    /** @use HasFactory<\Database\Factories\SchoolFactory> */
     use HasFactory;
 
     /**
@@ -62,7 +64,7 @@ class School extends Model implements ExistsInSis
     protected $guarded = [];
 
     /**
-     * @var array<string, mixed>
+     * @var array<string, string>
      */
     protected $casts = [
         'active' => 'boolean',

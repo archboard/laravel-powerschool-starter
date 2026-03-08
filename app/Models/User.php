@@ -11,6 +11,7 @@ use App\Traits\HasPermissions;
 use App\Traits\HasTimezone;
 use App\Traits\Selectable;
 use GrantHolle\ModelFilters\Enums\Component;
+use GrantHolle\ModelFilters\Filters\BaseFilter;
 use GrantHolle\ModelFilters\Filters\MultipleSelectFilter;
 use GrantHolle\ModelFilters\Filters\TextFilter;
 use GrantHolle\ModelFilters\Traits\HasFilters;
@@ -68,7 +69,7 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
  * @property-read \App\Models\Tenant $tenant
  *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
- * @method static Builder<static>|User filter(\Illuminate\Support\Collection|array $data)
+ * @method static Builder<static>|User filter(\Illuminate\Support\Collection<string, mixed>|array<string, mixed> $data)
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
  * @method static Builder<static>|User query()
@@ -100,7 +101,10 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
 class User extends Authenticatable implements ExistsInSis
 {
     use BelongsToTenant;
+
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
+
     use HasFilters;
     use HasFirstAndLastName;
     use HasPermissions;
@@ -129,7 +133,7 @@ class User extends Authenticatable implements ExistsInSis
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array<string, mixed>
+     * @var array<string, string>
      */
     protected $casts = [
         'user_type' => UserType::class,
@@ -142,22 +146,28 @@ class User extends Authenticatable implements ExistsInSis
     /**
      * Gets the users who have an ability directly or through a role
      */
+    /**
+     * @param  Builder<User>  $query
+     */
     public function scopeWhereCan(Builder $query, string $ability): void
     {
         $query->where(function ($query) use ($ability) {
             // direct
             $query->whereHas('abilities', function ($query) use ($ability) {
-                $query->byName($ability);
+                $query->whereIn('name', [$ability, '*']);
             });
             // through roles
             $query->orWhereHas('roles', function ($query) use ($ability) {
                 $query->whereHas('abilities', function ($query) use ($ability) {
-                    $query->byName($ability);
+                    $query->whereIn('name', [$ability, '*']);
                 });
             });
         });
     }
 
+    /**
+     * @param  Builder<User>  $builder
+     */
     public function scopeSearch(Builder $builder, string $search): void
     {
         $builder->where(function (Builder $builder) use ($search) {
@@ -253,7 +263,9 @@ class User extends Authenticatable implements ExistsInSis
     public function toggleSelectedModel(string $modelAlias, int $id): static
     {
         if (class_exists($modelAlias)) {
-            $modelAlias = (new $modelAlias)->getMorphClass();
+            /** @var Model $instance */
+            $instance = new $modelAlias;
+            $modelAlias = $instance->getMorphClass();
         }
 
         if ($model = Relation::getMorphedModel($modelAlias)) {
@@ -263,10 +275,15 @@ class User extends Authenticatable implements ExistsInSis
         return $this;
     }
 
+    /**
+     * @param  array<string, mixed>  $filters
+     */
     public function selectAllModel(string $modelAlias, array $filters = []): static
     {
         if (class_exists($modelAlias)) {
-            $modelAlias = (new $modelAlias)->getMorphClass();
+            /** @var Model $instance */
+            $instance = new $modelAlias;
+            $modelAlias = $instance->getMorphClass();
         }
 
         if (Relation::getMorphedModel($modelAlias)) {
@@ -302,11 +319,17 @@ class User extends Authenticatable implements ExistsInSis
         return $this;
     }
 
+    /**
+     * @return Collection<int, mixed>
+     */
     public function getModelSelection(string $model): Collection
     {
-        $modelAlias = class_exists($model)
-            ? (new $model)->getMorphClass()
-            : $model;
+        $modelAlias = $model;
+        if (class_exists($model)) {
+            /** @var Model $instance */
+            $instance = new $model;
+            $modelAlias = $instance->getMorphClass();
+        }
 
         return $this->selectedModels()
             ->where('school_id', $this->school_id)
@@ -315,12 +338,15 @@ class User extends Authenticatable implements ExistsInSis
             ->values();
     }
 
+    /**
+     * @return array<int, BaseFilter>
+     */
     public function filters(): array
     {
         return [
             TextFilter::make('search', __('Search'))
                 ->hide()
-                ->using(fn (Builder $builder, string $search) => $builder->search($search)),
+                ->using(fn ($builder, string $search) => $builder->search($search)),
             TextFilter::make('first_name', __('First name')),
             TextFilter::make('last_name', __('Last name')),
             MultipleSelectFilter::make('user_type', __('Checkbox group'))

@@ -17,7 +17,7 @@ class SisConfigured
     {
         $tenant = $request->tenant();
 
-        if ($tenant->sis_provider->isConfigured($tenant->sis_config)) {
+        if ($tenant->sis_provider?->isConfigured($tenant->sis_config)) {
             return $next($request);
         }
 

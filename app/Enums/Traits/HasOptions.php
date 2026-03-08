@@ -23,11 +23,11 @@ trait HasOptions
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, static>
+     * @return \Illuminate\Support\Collection<int, self>
      */
     public static function collect(): \Illuminate\Support\Collection
     {
-        /** @var \Illuminate\Support\Collection<int, static> */
+        /** @var \Illuminate\Support\Collection<int, self> */
         return collect(static::cases());
     }
 
