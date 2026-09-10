@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 use App\Enums\UserType;
+use App\Models\Course;
 use App\Models\School;
+use App\Models\Section;
+use App\Models\Student;
 use App\Models\Tenant;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -56,13 +59,37 @@ class AppServiceProvider extends ServiceProvider
         Request::macro('tenant', $currentTenant);
         Request::macro('school', $currentSchool);
 
+        Request::macro('currentFilters', function () {
+            /** @var Request $this */
+            return $this->collect('f')
+                ->mapWithKeys(fn (array $filter, $key) => [$key => [
+                    'key' => $filter['key'],
+                    'operator' => $filter['operator'] ?? null,
+                    'value' => $filter['value'] ?? null,
+                ]]);
+        });
+
+        Request::macro('addFilter', function (string|array $key, mixed $value = null) {
+            /** @var Request $this */
+            $data = $this->all();
+            $filters = $data['f'] ?? [];
+            $filters[$key] = [
+                'key' => $key,
+                'value' => $value,
+            ];
+            $data['f'] = $filters;
+            $this->merge($data);
+
+            return $this;
+        });
+
         Relation::morphMap([
-            'user' => \App\Models\User::class,
-            'student' => \App\Models\Student::class,
-            'tenant' => \App\Models\Tenant::class,
-            'school' => \App\Models\School::class,
-            'section' => \App\Models\Section::class,
-            'course' => \App\Models\Course::class,
+            'user' => User::class,
+            'student' => Student::class,
+            'tenant' => Tenant::class,
+            'school' => School::class,
+            'section' => Section::class,
+            'course' => Course::class,
         ]);
 
         // Add the tenant_id to the identifying attributes when looking up a user

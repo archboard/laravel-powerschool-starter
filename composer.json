@@ -8,17 +8,17 @@
   ],
   "license": "MIT",
   "require": {
-    "php": "^8.4",
+    "php": "^8.5",
     "ext-intl": "*",
     "ext-redis": "*",
-    "grantholle/laravel-model-filters": "^1.2",
     "grantholle/laravel-powerschool-auth": "^3.0",
     "grantholle/laravel-timezone": "^1.0",
     "grantholle/powerschool-api": "^4.0",
-    "inertiajs/inertia-laravel": "^2.0",
+    "inertiajs/inertia-laravel": "^3.0",
     "laravel/fortify": "^1.13",
-    "laravel/framework": "^12.0",
-    "laravel/tinker": "^2.5",
+    "laravel/framework": "^13.0",
+    "laravel/tinker": "^3.0",
+    "spatie/laravel-query-builder": "^6.0",
     "silber/bouncer": "^1.0",
     "spatie/laravel-data": "^4.20",
     "spatie/laravel-ignition": "^2.0",
@@ -90,9 +90,10 @@
       "@php artisan ide-helper:models -W",
       "@format"
     ],
-    "analyze": [
+    "analyze": "vendor/bin/phpstan analyze",
+    "lint": [
       "@helpers",
-      "vendor/bin/phpstan analyze"
+      "@analyze"
     ],
     "test": [
       "vendor/bin/pest --parallel"
