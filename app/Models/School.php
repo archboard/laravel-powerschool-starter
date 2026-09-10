@@ -4,7 +4,10 @@ namespace App\Models;
 
 use App\Models\Contracts\ExistsInSis;
 use App\Traits\BelongsToTenant;
+use Carbon\CarbonImmutable;
+use Database\Factories\SchoolFactory;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -18,18 +21,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property int|null $high_grade
  * @property int|null $low_grade
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property bool $active
  * @property string $sis_key
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Course> $courses
+ * @property-read Collection<int, Course> $courses
  * @property-read int|null $courses_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Section> $sections
+ * @property-read Collection<int, Section> $sections
  * @property-read int|null $sections_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Student> $students
+ * @property-read Collection<int, Student> $students
  * @property-read int|null $students_count
- * @property-read \App\Models\Tenant $tenant
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read Tenant $tenant
+ * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|School active()
@@ -55,7 +58,7 @@ class School extends Model implements ExistsInSis
 {
     use BelongsToTenant;
 
-    /** @use HasFactory<\Database\Factories\SchoolFactory> */
+    /** @use HasFactory<SchoolFactory> */
     use HasFactory;
 
     /**

@@ -6,7 +6,10 @@ use App\Models\Contracts\ExistsInSis;
 use App\Traits\BelongsToSchool;
 use App\Traits\BelongsToTenant;
 use App\Traits\HasFirstAndLastName;
+use Carbon\CarbonImmutable;
+use Database\Factories\StudentFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -23,19 +26,19 @@ use Illuminate\Support\Facades\DB;
  * @property string|null $first_name
  * @property string|null $last_name
  * @property string|null $email
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property string $sis_key
- * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property CarbonImmutable|null $deleted_at
  * @property int|null $grade_level
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $contacts
+ * @property-read Collection<int, User> $contacts
  * @property-read int|null $contacts_count
  * @property-read mixed $last_first
  * @property-read mixed $name
- * @property-read \App\Models\School $school
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Section> $sections
+ * @property-read School $school
+ * @property-read Collection<int, Section> $sections
  * @property-read int|null $sections_count
- * @property-read \App\Models\Tenant $tenant
+ * @property-read Tenant $tenant
  *
  * @method static \Database\Factories\StudentFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Student filter(array<string, mixed> $filters = [])
@@ -67,7 +70,7 @@ class Student extends Model implements ExistsInSis
     use BelongsToSchool;
     use BelongsToTenant;
 
-    /** @use HasFactory<\Database\Factories\StudentFactory> */
+    /** @use HasFactory<StudentFactory> */
     use HasFactory;
 
     use HasFirstAndLastName;

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\Sis;
 use App\SisProviders\SisProvider;
+use Carbon\CarbonImmutable;
+use Database\Factories\TenantFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,17 +31,17 @@ use Spatie\Multitenancy\Models\Tenant as TenantBase;
  * @property string|null $timezone
  * @property Sis|null $sis_provider
  * @property Collection<string, mixed> $smtp_config
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Course> $courses
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Course> $courses
  * @property-read int|null $courses_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\School> $schools
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, School> $schools
  * @property-read int|null $schools_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Section> $sections
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Section> $sections
  * @property-read int|null $sections_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Student> $students
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Student> $students
  * @property-read int|null $students_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, User> $users
  * @property-read int|null $users_count
  *
  * @method static \Spatie\Multitenancy\TenantCollection<int, static> all($columns = ['*'])
@@ -68,7 +70,7 @@ use Spatie\Multitenancy\Models\Tenant as TenantBase;
  */
 class Tenant extends TenantBase
 {
-    /** @use HasFactory<\Database\Factories\TenantFactory> */
+    /** @use HasFactory<TenantFactory> */
     use HasFactory;
 
     /**
