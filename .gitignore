@@ -25,3 +25,4 @@ _ide_*
 opencode.json
 boost.json
 .claude/settings.local.json
+.phpunit.cache
