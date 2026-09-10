@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Scope;
 
 /**
  * @template TModel of Model
+ *
+ * @implements Scope<TModel>
  */
 class TenantScope implements Scope
 {
@@ -35,7 +37,7 @@ class TenantScope implements Scope
     protected function addWithoutTenant(Builder $builder): void
     {
         $builder->macro('withoutTenant', function (Builder $builder) {
-            /** @var Scope $scope */
+            /** @var Scope<TModel> $scope */
             $scope = $this;
 
             return $builder->withoutGlobalScope($scope);
