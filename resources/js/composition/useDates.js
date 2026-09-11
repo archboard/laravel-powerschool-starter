@@ -24,7 +24,7 @@ export default () => {
     try {
       const { data } = await $http.get('/timezones')
       return data
-    } catch (e) {
+    } catch {
       return {}
     }
   }

@@ -47,7 +47,7 @@ import TimezoneModal from '@/components/modals/TimezoneModal.vue'
 import { useLocalStorage } from '@vueuse/core'
 
 const { timezone, dayjs } = useDates()
-const emit = defineEmits(['launch'])
+defineEmits(['launch'])
 const manualShow = ref(true)
 const ignore = useLocalStorage('ignore-timezone-prompt', false)
 const dateString = '1988-12-08 14:00:00'

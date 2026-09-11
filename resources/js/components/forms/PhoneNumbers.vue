@@ -32,8 +32,6 @@ import AppLabel from '@/components/forms/AppLabel.vue'
 import { nanoid } from 'nanoid'
 import AppButton from '@/components/AppButton.vue'
 import PhoneNumber from '@/components/forms/PhoneNumber.vue'
-import FormField from '@/components/forms/FormField.vue'
-import AppSelect from '@/components/forms/AppSelect.vue'
 import FadeInGroup from '@/components/transitions/FadeInGroup.vue'
 import FieldError from '@/components/forms/FieldError.vue'
 import RemoveButton from '@/components/forms/buttons/RemoveButton.vue'
@@ -43,8 +41,6 @@ export default defineComponent({
     RemoveButton,
     FieldError,
     FadeInGroup,
-    AppSelect,
-    FormField,
     PhoneNumber,
     AppButton,
     AppLabel,

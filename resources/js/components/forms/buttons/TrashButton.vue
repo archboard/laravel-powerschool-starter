@@ -19,7 +19,7 @@ export default defineComponent({
     },
   },
 
-  setup (props, context) {
+  setup (props) {
     const sizes = {
       sm: 'w-4 h-4',
     }

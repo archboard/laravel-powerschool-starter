@@ -13,7 +13,7 @@ import PersonalDetails from '@/components/forms/form-sets/PersonalDetails.vue'
 import SecuritySettings from '@/components/forms/form-sets/SecuritySettings.vue'
 import Spacer from '@/components/Spacer.vue'
 
-const props = defineProps({
+defineProps({
   user: Object,
   tenant: Object,
   hasPassword: Boolean,

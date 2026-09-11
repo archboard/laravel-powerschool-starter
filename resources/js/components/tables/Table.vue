@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   hideShadow: {
     type: Boolean,
     default: () => false,

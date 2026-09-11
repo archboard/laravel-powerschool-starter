@@ -72,11 +72,11 @@ import Filters from '@/components/tables/Filters.vue'
 import useFilters from '@/composition/useFilters.js'
 import AppLink from '@/components/AppLink.vue'
 
-const props = defineProps({
+defineProps({
   users: Object,
   availableFilters: Array,
   currentFilters: [Array, Object],
 })
-const { selection, selectedAll, toggleSelection, selectNone } = useModelSelection('user')
+const { selection, selectedAll, toggleSelection } = useModelSelection('user')
 const { filters, search, updateResults, updatingResults } = useFilters()
 </script>

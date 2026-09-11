@@ -73,7 +73,7 @@ export default defineComponent({
   props: {
     extensions: {
       type: Array,
-      default: [],
+      default: () => [],
     },
     errors: {
       type: Object,

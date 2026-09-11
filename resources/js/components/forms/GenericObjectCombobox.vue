@@ -46,12 +46,12 @@ const localValue = computed({
 const query = ref()
 const filteredOptions = computed(() => {
   if (!query.value || typeof query.value !== 'string') {
-    return props.options.splice(0, 10)
+    return props.options.slice(0, 10)
   }
 
   const q = query.value.toLowerCase()
 
   return props.options.filter(o => o[props.searchAttribute]?.toLowerCase()?.includes(q))
-    .splice(0, 10)
+    .slice(0, 10)
 })
 </script>

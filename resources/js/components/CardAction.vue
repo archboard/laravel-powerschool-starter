@@ -18,7 +18,7 @@
 <script setup>
 import CardPadding from '@/components/CardPadding.vue'
 import AppButton from '@/components/AppButton.vue'
-const props = defineProps({
+defineProps({
   negativeMargin: {
     type: Boolean,
     default: false

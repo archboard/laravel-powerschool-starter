@@ -176,7 +176,7 @@ const select = all => {
 }
 const saveSchools = () => {
   if (props.editable) {
-    schoolForm.put(`/settings/tenant/schools`, {
+    schoolForm.put('/settings/tenant/schools', {
       preserveScroll: true,
     })
   }

@@ -22,11 +22,11 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   show: {
     type: Boolean,
     required: true,
   },
 })
-const emit = defineEmits(['close'])
+defineEmits(['close'])
 </script>

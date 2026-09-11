@@ -22,7 +22,6 @@ import AppButton from '@/components/AppButton.vue'
 import ConfirmationModal from '@/components/modals/ConfirmationModal.vue'
 
 const emit = defineEmits(['confirmed'])
-const modal = ref()
 const show = ref(false)
 
 const confirmed = (close) => {

@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-0.5">
-    <div v-for="(label, value) in options">
+    <div v-for="(label, value) in options" :key="value">
       <AppCheckbox v-model="localValue" :value="value">
         {{ label }}
       </AppCheckbox>
@@ -9,7 +9,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useVModel } from '@vueuse/core'
 import AppCheckbox from '@/components/forms/AppCheckbox.vue'
 

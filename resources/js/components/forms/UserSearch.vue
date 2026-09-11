@@ -42,11 +42,11 @@ export default defineComponent({
       }
 
       try {
-        const { data } = await $http.get(`/search/users`, {
+        const { data } = await $http.get('/search/users', {
           params: { s, limit: 10 }
         })
         users.value = data
-      } catch (e) { }
+      } catch { }
     }, 500, { leading: false })
 
     watch(query, search)

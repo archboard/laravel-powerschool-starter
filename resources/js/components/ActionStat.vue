@@ -23,14 +23,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import Spinner from '@/components/Spinner.vue'
 
-const props = defineProps({
+defineProps({
   icon: [Object, Function],
   value: [String, Number],
   actionText: String,
   loading: Boolean,
 })
-const emit = defineEmits(['action'])
+defineEmits(['action'])
 </script>

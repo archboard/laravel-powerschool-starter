@@ -10,5 +10,5 @@
 <script setup>
 import AppButton from '@/components/AppButton.vue'
 
-const emit = defineEmits(['removed'])
+defineEmits(['removed'])
 </script>

@@ -23,7 +23,6 @@ import FormField from '@/components/forms/FormField.vue'
 import { useVModel } from '@vueuse/core'
 import { inject, ref, computed } from 'vue'
 import usesApplicant from '@/composition/usesApplicant.js'
-import usesUser from '@/composition/usesUser.js'
 import useProp from '@/composition/useProp.js'
 import FileUpload from '@/components/forms/FileUpload.vue'
 
@@ -34,7 +33,7 @@ const emit = defineEmits([
   ...fieldEmits,
 ])
 const localValue = useVModel(props, 'modelValue', emit)
-const getFileName = path => (path || 'file').replace(/^.*[\\\/]/, '')
+const getFileName = path => (path || 'file').replace(/^.*[\\/]/, '')
 const applicantForm = useProp('applicantForm')
 const url = computed(() => {
   return applicant.value
@@ -43,7 +42,6 @@ const url = computed(() => {
 })
 const max = ref(props.field.options?.max || Infinity)
 const applicant = usesApplicant()
-const user = usesUser()
 const $error = inject('$error')
 const $success = inject('$success')
 const $http = inject('$http')

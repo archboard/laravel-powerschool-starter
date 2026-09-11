@@ -30,7 +30,7 @@ const localValue = useVModel(props, 'modelValue', emit)
 const localObject = ref({})
 
 if (props.modelValue) {
-  $http.get(`/search/users`, {
+  $http.get('/search/users', {
     params: { id: props.modelValue }
   }).then(({ data }) => {
     localObject.value = data[0] || {}

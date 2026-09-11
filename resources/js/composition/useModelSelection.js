@@ -1,4 +1,4 @@
-import { inject, ref, watch, toValue } from 'vue'
+import { inject, ref, watch } from 'vue'
 import NProgress from 'nprogress'
 
 export default function useModelSelection (model) {
@@ -8,7 +8,7 @@ export default function useModelSelection (model) {
   const toggleSelection = async (id) => {
     try {
       await $http.post(`/selection/${model}`, { selectable_id: id, silent: true })
-    } catch (e) { }
+    } catch { }
   }
   const selectAll = async (ids = []) => {
     NProgress.start()
@@ -16,7 +16,7 @@ export default function useModelSelection (model) {
     try {
       await $http.post(`/selection/${model}`, { ids })
       await fetchSelection()
-    } catch (e) { }
+    } catch { }
 
     NProgress.done()
   }
@@ -26,13 +26,13 @@ export default function useModelSelection (model) {
 
     try {
       await $http.delete(`/selection/${model}`)
-    } catch (e) { }
+    } catch { }
   }
   const fetchSelection = async () => {
     try {
       const { data } = await $http.get(`/selection/${model}`)
       selection.value = data
-    } catch (e) { }
+    } catch { }
   }
 
   watch(selectedAll, value => {

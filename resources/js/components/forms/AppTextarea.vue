@@ -32,9 +32,9 @@ export default defineComponent({
   setup (props) {
     const textarea = ref(null)
     const baseHeight = 66
-    const height = ref(`auto`)
+    const height = ref('auto')
     const resize = () => {
-      height.value = `auto`
+      height.value = 'auto'
 
       nextTick(() => {
         const scrollHeight = textarea.value.scrollHeight

@@ -75,14 +75,13 @@ const props = defineProps({
   subject: Object,
   userPermissions: Object,
 })
-const emit = defineEmits([])
 const localPermissions = ref(clone(props.userPermissions))
 const $http = inject('$http')
 const updatePermission = async (permission, granted, school = null, model = null, reload = false) => {
   NProgress.start()
 
   try {
-    const { data } = await $http.put(`/users/${props.subject.id}/permissions`, {
+    await $http.put(`/users/${props.subject.id}/permissions`, {
       permission,
       granted,
       school,

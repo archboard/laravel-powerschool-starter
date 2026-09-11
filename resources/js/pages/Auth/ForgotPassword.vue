@@ -24,7 +24,7 @@ import Layout from '@/layouts/Guest.vue'
 import FormField from '@/components/forms/FormField.vue'
 import { useForm } from '@inertiajs/vue3'
 
-const props = defineProps({
+defineProps({
   status: String
 })
 const form = useForm({

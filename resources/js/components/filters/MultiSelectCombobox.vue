@@ -4,7 +4,7 @@
       v-model="localItem"
       v-model:query="query"
       :options="filteredOptions"
-      :display-value="item => item?.label"
+      :display-value="displayOption"
     />
     <div class="mt-2" v-if="selectedOptions.length > 0">
       <div class="-m-1 flex flex-wrap items-center">

@@ -9,7 +9,7 @@ export default () => {
   const interval = setInterval(async () => {
     try {
       await $http.get('/ping')
-    } catch (err) {
+    } catch {
       clearInterval(interval)
       router.visit('/login')
     }

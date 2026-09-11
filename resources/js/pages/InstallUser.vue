@@ -52,7 +52,7 @@ import { inject, ref } from 'vue'
 import AppCombobox from '@/components/forms/AppCombobox.vue'
 import AppFieldset from '@/components/forms/AppFieldset.vue'
 
-const props = defineProps({
+defineProps({
   endpoint: String,
 })
 const inertiaForm = useForm({
@@ -94,7 +94,7 @@ watchDebounced(query, async (value) => {
     })
 
     options.value = data
-  } catch (err) {}
+  } catch {}
 
   loading.value = false
 }, { debounce: 500 })

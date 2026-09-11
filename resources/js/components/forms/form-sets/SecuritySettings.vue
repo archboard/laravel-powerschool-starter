@@ -26,7 +26,7 @@ import Headline3 from '@/components/Headline3.vue'
 import HelpText from '@/components/forms/HelpText.vue'
 import FormField from '@/components/forms/FormField.vue'
 
-const props = defineProps({
+defineProps({
   hasPassword: Boolean,
 })
 const form = useForm({

@@ -66,7 +66,7 @@ import BorderSeparator from '@/components/BorderSeparator.vue'
 import AppLink from '@/components/AppLink.vue'
 import AppInput from '@/components/forms/AppInput.vue'
 
-const props = defineProps({
+defineProps({
   status: String,
   tenant: Object,
 })

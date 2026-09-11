@@ -23,11 +23,9 @@
 <script setup>
 import CardWrapper from '@/components/CardWrapper.vue'
 import CardPadding from '@/components/CardPadding.vue'
-import FormActions from '@/components/forms/FormActions.vue'
-import AppButton from '@/components/AppButton.vue'
 import CardAction from '@/components/CardAction.vue'
 
-const props = defineProps({
+defineProps({
   cancel: String,
   loading: Boolean,
   hideActions: {

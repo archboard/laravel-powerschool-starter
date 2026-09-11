@@ -41,15 +41,15 @@ export default defineComponent({
 
   setup ({ notification }) {
     const colors = {
-      success: `text-green-400`,
-      error: `text-red-400`,
-      warning: `text-yellow-400`,
-      neutral: `text-gray-400`,
+      success: 'text-green-400',
+      error: 'text-red-400',
+      warning: 'text-yellow-400',
+      neutral: 'text-gray-400',
     }
     const titles = {
-      success: `Success!`,
-      error: `Error!`,
-      warning: `Warning!`,
+      success: 'Success!',
+      error: 'Error!',
+      warning: 'Warning!',
       neutral: 'Hey!',
     }
     const icons = {

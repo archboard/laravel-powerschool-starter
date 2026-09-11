@@ -15,6 +15,7 @@
           <div class="p-1">
             <AppMenuItem
               v-for="item in menuItems"
+              :key="item.route"
               is="InertiaLink"
               :href="item.route"
             >

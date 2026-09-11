@@ -30,14 +30,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import Authenticated from '@/layouts/Authenticated.vue'
 import { ActionColumn, Table, Tbody, Th, Thead } from '@/components/tables/index.js'
 import Td from '@/components/tables/Td.vue'
 import Pagination from '@/components/tables/Pagination.vue'
 import AppLink from '@/components/AppLink.vue'
 
-const props = defineProps({
+defineProps({
   sections: Object,
 })
 </script>

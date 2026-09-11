@@ -3,7 +3,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "lint": "eslint resources/js"
   },
   "dependencies": {
     "@headlessui-float/vue": "^0.15.1",
@@ -36,5 +37,11 @@
     "v-calendar": "^3.0.1",
     "vite": "^8.2.2",
     "vue": "^3.5.42"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.10.0",
+    "eslint-plugin-vue": "^10.11.0",
+    "globals": "^17.12.0"
   }
 }

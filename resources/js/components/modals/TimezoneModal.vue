@@ -28,18 +28,14 @@
 import Modal from '@/components/modals/Modal.vue'
 import FormField from '@/components/forms/FormField.vue'
 import useDates from '@/composition/useDates.js'
-import AppCombobox from '@/components/forms/AppCombobox.vue'
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
-import AppButton from '@/components/AppButton.vue'
 import AppLink from '@/components/AppLink.vue'
 import TimezoneCombobox from '@/components/forms/TimezoneCombobox.vue'
 
-const props = defineProps({})
-const emit = defineEmits(['close'])
+defineEmits(['close'])
 
 const { dayjs } = useDates()
-const timezones = ref([])
 const form = useForm({
   timezone: dayjs.tz.guess(),
 })
@@ -56,9 +52,5 @@ watch(showForm, value => {
   form.timezone = value
     ? null
     : dayjs.tz.guess()
-
-  if (form.timezone) {
-    selectedTimezone.value = timezones.value.find(z => z.value === form.timezone) || null
-  }
 })
 </script>

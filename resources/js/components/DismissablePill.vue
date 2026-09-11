@@ -11,11 +11,11 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   bgColor: {
     type: String,
-    default: `bg-gray-100 dark:bg-gray-900`
+    default: 'bg-gray-100 dark:bg-gray-900'
   }
 })
-const emit = defineEmits(['removed'])
+defineEmits(['removed'])
 </script>

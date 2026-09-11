@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   background: {
     type: String,
     default: 'bg-white dark:bg-black',
