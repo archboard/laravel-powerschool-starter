@@ -18,13 +18,14 @@
     "inertiajs/inertia-laravel": "^3.0",
     "laravel/fortify": "^1.13",
     "laravel/framework": "^13.0",
+    "laravel/octane": "^2.19",
     "laravel/tinker": "^3.0",
-    "spatie/laravel-query-builder": "^6.0",
     "silber/bouncer": "^1.0",
     "spatie/laravel-data": "^4.20",
     "spatie/laravel-ignition": "^2.0",
     "spatie/laravel-model-flags": "^1.2",
-    "spatie/laravel-multitenancy": "^4.0"
+    "spatie/laravel-multitenancy": "^4.0",
+    "spatie/laravel-query-builder": "^6.0"
   },
   "require-dev": {
     "barryvdh/laravel-ide-helper": "^3.6",
