@@ -17,6 +17,9 @@
     <env name="CACHE_DRIVER" value="array"/>
     <env name="DB_DATABASE" value="saas_test"/>
     <env name="MAIL_MAILER" value="array"/>
+    <env name="POWERSCHOOL_ADDRESS" value="https://powerschool.test"/>
+    <env name="POWERSCHOOL_CLIENT_ID" value="00000000-0000-0000-0000-000000000001"/>
+    <env name="POWERSCHOOL_CLIENT_SECRET" value="00000000-0000-0000-0000-000000000002"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
     <env name="SESSION_DRIVER" value="array"/>
     <env name="TELESCOPE_ENABLED" value="false"/>
