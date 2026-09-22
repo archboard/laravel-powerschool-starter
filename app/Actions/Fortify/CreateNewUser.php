@@ -17,7 +17,7 @@ class CreateNewUser implements CreatesNewUsers
      *
      * @param  array<string, mixed>  $input
      */
-    public function create(array $input): \App\Models\User
+    public function create(array $input): User
     {
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],

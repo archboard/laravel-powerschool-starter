@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Navigation\NavigationItem;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -25,7 +26,7 @@ class Controller extends BaseController
      * @param  string|\BackedEnum|null  $ability
      * @param  array<mixed>  $arguments
      */
-    public function authorize($ability, $arguments = []): \Illuminate\Auth\Access\Response
+    public function authorize($ability, $arguments = []): Response
     {
         $abilityValue = $ability instanceof \BackedEnum ? $ability->value : $ability;
         [$ability, $arguments] = $this->parseAbilityAndArguments($abilityValue, $arguments);

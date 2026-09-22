@@ -1,6 +1,32 @@
 <?php
 
 use App\Enums\Permission;
+use App\Http\Controllers\Auth\PowerSchoolOidcLoginController;
+use App\Http\Controllers\Auth\PowerSchoolOpenIdLoginController;
+use App\Http\Controllers\CheckAuthStatusController;
+use App\Http\Controllers\ClassLinkOAuthController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\GetSelectionController;
+use App\Http\Controllers\InstallationController;
+use App\Http\Controllers\InstallFirstUserController;
+use App\Http\Controllers\RefreshCsrfTokenController;
+use App\Http\Controllers\SchoolSelectionController;
+use App\Http\Controllers\Search\SisUserController;
+use App\Http\Controllers\SectionController;
+use App\Http\Controllers\SendSmtpTestController;
+use App\Http\Controllers\Settings\PersonalSettingsController;
+use App\Http\Controllers\Settings\SchoolSettingsController;
+use App\Http\Controllers\Settings\SyncModelController;
+use App\Http\Controllers\Settings\SyncSchoolItemController;
+use App\Http\Controllers\Settings\TenantSettingsController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ToggleSelectionController;
+use App\Http\Controllers\UpdateCurrentSchoolController;
+use App\Http\Controllers\UpdateSmtpSettingsController;
+use App\Http\Controllers\UpdateTenantSchoolsController;
+use App\Http\Controllers\UpdateTimezoneController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserPermissionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,17 +51,17 @@ Route::middleware(['self_hosted'])
     ->group(function () {
         Route::middleware('uninstalled')
             ->group(function () {
-                Route::get('/install', [\App\Http\Controllers\InstallationController::class, 'index']);
-                Route::post('/install', [\App\Http\Controllers\InstallationController::class, 'store'])
+                Route::get('/install', [InstallationController::class, 'index']);
+                Route::post('/install', [InstallationController::class, 'store'])
                     ->name('install');
             });
 
         Route::middleware(['tenant', 'installed', 'no_admin'])
             ->group(function () {
-                Route::get('/install/user', [\App\Http\Controllers\InstallFirstUserController::class, 'index'])
+                Route::get('/install/user', [InstallFirstUserController::class, 'index'])
                     ->name('install.user');
-                Route::post('/install/user', [\App\Http\Controllers\InstallFirstUserController::class, 'store']);
-                Route::post('/search/sis/user', \App\Http\Controllers\Search\SisUserController::class);
+                Route::post('/install/user', [InstallFirstUserController::class, 'store']);
+                Route::post('/search/sis/user', SisUserController::class);
             });
     });
 
@@ -44,26 +70,26 @@ Route::middleware('tenant')->group(function () {
     Route::middleware(['sis_configured'])
         ->prefix('/auth/powerschool')
         ->group(function () {
-            Route::get('/openid', [\App\Http\Controllers\Auth\PowerSchoolOpenIdLoginController::class, 'authenticate']);
-            Route::get('/openid/verify', [\App\Http\Controllers\Auth\PowerSchoolOpenIdLoginController::class, 'login'])
+            Route::get('/openid', [PowerSchoolOpenIdLoginController::class, 'authenticate']);
+            Route::get('/openid/verify', [PowerSchoolOpenIdLoginController::class, 'login'])
                 ->name('openid.verify');
-            Route::get('/oidc/authenticate', [\App\Http\Controllers\Auth\PowerSchoolOidcLoginController::class, 'authenticate']);
-            Route::get('/oidc', [\App\Http\Controllers\Auth\PowerSchoolOidcLoginController::class, 'login']);
+            Route::get('/oidc/authenticate', [PowerSchoolOidcLoginController::class, 'authenticate']);
+            Route::get('/oidc', [PowerSchoolOidcLoginController::class, 'login']);
         });
 
     // TODO: ClassLink auth
     Route::prefix('/auth/classlink')
         ->group(function () {
-            Route::get('/oauth', [\App\Http\Controllers\ClassLinkOAuthController::class, 'authenticate'])
+            Route::get('/oauth', [ClassLinkOAuthController::class, 'authenticate'])
                 ->name('classlink.authenticate');
-            Route::get('/redirect', [\App\Http\Controllers\ClassLinkOAuthController::class, 'login']);
+            Route::get('/redirect', [ClassLinkOAuthController::class, 'login']);
         });
 
     Route::middleware('auth')->group(function () {
-        Route::get('/ping', \App\Http\Controllers\CheckAuthStatusController::class)
+        Route::get('/ping', CheckAuthStatusController::class)
             ->name('auth.status');
 
-        Route::get('/csrf-token', \App\Http\Controllers\RefreshCsrfTokenController::class)
+        Route::get('/csrf-token', RefreshCsrfTokenController::class)
             ->name('csrf-token');
 
         Route::get('/timezones', fn () => timezones());
@@ -72,36 +98,36 @@ Route::middleware('tenant')->group(function () {
             return inertia('Index');
         })->name('home');
 
-        Route::get('/select-school', [\App\Http\Controllers\SchoolSelectionController::class, 'index'])
+        Route::get('/select-school', [SchoolSelectionController::class, 'index'])
             ->name('select-school');
-        Route::post('/select-school', [\App\Http\Controllers\SchoolSelectionController::class, 'update']);
-        Route::post('/sync/{model}/{id}', \App\Http\Controllers\Settings\SyncModelController::class)
+        Route::post('/select-school', [SchoolSelectionController::class, 'update']);
+        Route::post('/sync/{model}/{id}', SyncModelController::class)
             ->name('model.sync');
 
-        Route::match(['post', 'delete'], '/selection/{model}', \App\Http\Controllers\ToggleSelectionController::class)
+        Route::match(['post', 'delete'], '/selection/{model}', ToggleSelectionController::class)
             ->name('selection.toggle');
-        Route::get('/selection/{model}', \App\Http\Controllers\GetSelectionController::class)
+        Route::get('/selection/{model}', GetSelectionController::class)
             ->name('selection.get');
 
         Route::middleware(['has_school', 'scoped_permissions'])
             ->group(function () {
-                Route::resource('/students', \App\Http\Controllers\StudentController::class)
+                Route::resource('/students', StudentController::class)
                     ->only('index', 'show');
 
-                Route::resource('/sections', \App\Http\Controllers\SectionController::class)
+                Route::resource('/sections', SectionController::class)
                     ->only('index', 'show');
 
-                Route::resource('/courses', \App\Http\Controllers\CourseController::class)
+                Route::resource('/courses', CourseController::class)
                     ->only('index', 'show');
 
-                Route::resource('/users', \App\Http\Controllers\UserController::class)
+                Route::resource('/users', UserController::class)
                     ->only('index', 'show');
 
                 Route::middleware(Permission::editPermissions->toMiddleware())
                     ->group(function () {
-                        Route::get('/users/{user}/permissions', [\App\Http\Controllers\UserPermissionController::class, 'index'])
+                        Route::get('/users/{user}/permissions', [UserPermissionController::class, 'index'])
                             ->name('users.permissions.index');
-                        Route::put('/users/{user}/permissions', [\App\Http\Controllers\UserPermissionController::class, 'update'])
+                        Route::put('/users/{user}/permissions', [UserPermissionController::class, 'update'])
                             ->name('users.permissions.update');
                     });
             });
@@ -109,34 +135,34 @@ Route::middleware('tenant')->group(function () {
         Route::prefix('/settings')
             ->name('settings.')
             ->group(function () {
-                Route::singleton('/personal', \App\Http\Controllers\Settings\PersonalSettingsController::class)
+                Route::singleton('/personal', PersonalSettingsController::class)
                     ->only('edit', 'update');
 
-                Route::put('/timezone', \App\Http\Controllers\UpdateTimezoneController::class)
+                Route::put('/timezone', UpdateTimezoneController::class)
                     ->name('timezone.update');
 
-                Route::put('/current-school', \App\Http\Controllers\UpdateCurrentSchoolController::class)
+                Route::put('/current-school', UpdateCurrentSchoolController::class)
                     ->name('current-school.update');
 
                 Route::middleware('can:edit tenant settings')->group(function () {
-                    Route::singleton('/tenant', \App\Http\Controllers\Settings\TenantSettingsController::class)
+                    Route::singleton('/tenant', TenantSettingsController::class)
                         ->only('edit', 'update');
 
-                    Route::put('/tenant/smtp', \App\Http\Controllers\UpdateSmtpSettingsController::class)
+                    Route::put('/tenant/smtp', UpdateSmtpSettingsController::class)
                         ->name('tenant.smtp');
 
-                    Route::post('/tenant/smtp/test', \App\Http\Controllers\SendSmtpTestController::class)
+                    Route::post('/tenant/smtp/test', SendSmtpTestController::class)
                         ->name('tenant.smtp.test');
 
-                    Route::put('/tenant/schools', \App\Http\Controllers\UpdateTenantSchoolsController::class)
+                    Route::put('/tenant/schools', UpdateTenantSchoolsController::class)
                         ->name('tenant.schools');
                 });
 
                 Route::middleware(['has_school', 'scoped_permissions', 'can:edit school settings'])->group(function () {
-                    Route::singleton('/school', \App\Http\Controllers\Settings\SchoolSettingsController::class)
+                    Route::singleton('/school', SchoolSettingsController::class)
                         ->only('edit', 'update');
 
-                    Route::post('/school/sync/{item}', \App\Http\Controllers\Settings\SyncSchoolItemController::class)
+                    Route::post('/school/sync/{item}', SyncSchoolItemController::class)
                         ->name('school.item-sync');
                 });
             });

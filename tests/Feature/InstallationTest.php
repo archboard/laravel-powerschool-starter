@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use App\Jobs\SyncSchools;
 use App\Models\Tenant;
 use Illuminate\Support\Arr;
@@ -150,7 +151,7 @@ it('cant view user selection when uninstalled', function () {
 
 it('cant view user selection when admin user already exists', function () {
     $admin = seedUser();
-    $admin->assignRole(App\Enums\Role::DISTRICT_ADMIN);
+    $admin->assignRole(Role::DISTRICT_ADMIN);
 
     asSelfHosted()
         ->get(route('install.user'))

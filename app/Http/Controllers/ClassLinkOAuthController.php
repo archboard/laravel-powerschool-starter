@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ClassLinkOAuthController extends Controller
 {
@@ -11,7 +13,7 @@ class ClassLinkOAuthController extends Controller
         //
     }
 
-    public function login(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+    public function login(Request $request): Response|JsonResponse
     {
         dump($request->all());
 

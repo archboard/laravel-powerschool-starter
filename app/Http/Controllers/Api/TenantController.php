@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\TenantApiResource;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 
 class TenantController extends Controller
@@ -13,7 +15,7 @@ class TenantController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(): AnonymousResourceCollection
     {
         $tenants = Tenant::query()
             ->orderBy('created_at')
@@ -48,7 +50,7 @@ class TenantController extends Controller
      *
      * @param  int  $id
      */
-    public function show($id): \Illuminate\Http\Response
+    public function show($id): Response
     {
         return response()->noContent();
     }
@@ -58,7 +60,7 @@ class TenantController extends Controller
      *
      * @param  int  $id
      */
-    public function update(Request $request, $id): \Illuminate\Http\Response
+    public function update(Request $request, $id): Response
     {
         return response()->noContent();
     }
@@ -68,7 +70,7 @@ class TenantController extends Controller
      *
      * @param  int  $id
      */
-    public function destroy($id): \Illuminate\Http\Response
+    public function destroy($id): Response
     {
         return response()->noContent();
     }

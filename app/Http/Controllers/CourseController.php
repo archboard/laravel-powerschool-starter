@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CourseResource;
 use App\Models\School;
 use Illuminate\Http\Request;
+use Inertia\Response;
 
 class CourseController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, School $school): \Inertia\Response
+    public function index(Request $request, School $school): Response
     {
         $title = __('Courses');
         $courses = $school->courses()

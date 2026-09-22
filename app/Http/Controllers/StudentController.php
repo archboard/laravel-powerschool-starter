@@ -7,13 +7,14 @@ use App\Models\School;
 use App\Models\Student;
 use App\Navigation\NavigationItem;
 use Illuminate\Http\Request;
+use Inertia\Response;
 
 class StudentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, School $school): \Inertia\Response
+    public function index(Request $request, School $school): Response
     {
         $title = __('Students');
         $students = $school->students()
@@ -35,7 +36,7 @@ class StudentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Student $student): \Inertia\Response
+    public function show(Student $student): Response
     {
         $title = $student->name;
         $student->load('school', 'sections', 'sections.course');

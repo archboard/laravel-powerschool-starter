@@ -8,14 +8,16 @@ use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Navigation\NavigationItem;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Inertia\Response;
 
 class UserPermissionController extends Controller
 {
-    public function index(Request $request, User $user): \Inertia\Response
+    public function index(Request $request, User $user): Response
     {
         $title = __('Permissions for :name', ['name' => $user->name]);
         $authUser = $request->user();
@@ -39,7 +41,7 @@ class UserPermissionController extends Controller
         ])->withViewData(compact('title'));
     }
 
-    public function update(Request $request, Tenant $tenant, User $user): \Illuminate\Http\JsonResponse
+    public function update(Request $request, Tenant $tenant, User $user): JsonResponse
     {
         $validModels = array_reduce($user->getPermissionSubjectModels(), function (array $carry, string $model) {
             $carry[] = (new $model)->getMorphClass();
@@ -65,7 +67,7 @@ class UserPermissionController extends Controller
         })->validateWithBag('default');
 
         $permission = Permission::from($data['permission']);
-        /** @var \App\Models\School|null */
+        /** @var School|null */
         $school = School::find($data['school']);
 
         $user->updateAppPermission($permission, $data['granted'], $school, $data['model']);

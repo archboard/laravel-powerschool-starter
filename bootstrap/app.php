@@ -18,6 +18,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Spatie\Multitenancy\Exceptions\NoCurrentTenant;
 use Spatie\Multitenancy\Http\Middleware\EnsureValidTenantSession;
 use Spatie\Multitenancy\Http\Middleware\NeedsTenant;
@@ -70,6 +71,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 (! $request->wantsJson() || $request->inertia())
             ) {
                 $title = __('Error');
+
+                Inertia::setRootView('layouts.app');
 
                 return inertia('Error', [
                     'status' => $response->getStatusCode(),

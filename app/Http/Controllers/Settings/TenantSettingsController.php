@@ -9,13 +9,15 @@ use App\Http\Controllers\Controller;
 use App\Models\School;
 use App\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Response;
+use Inertia\ResponseFactory;
 
 class TenantSettingsController extends Controller
 {
     /**
      * Shows the tenant settings form
      *
-     * @return \Inertia\Response|\Inertia\ResponseFactory
+     * @return Response|ResponseFactory
      */
     public function edit(Tenant $tenant)
     {

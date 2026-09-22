@@ -1,5 +1,7 @@
 <?php
 
+use Inertia\Testing\AssertableInertia;
+
 beforeEach(function () {
     logIn();
 });
@@ -7,7 +9,7 @@ beforeEach(function () {
 it('has a personal settings page', function () {
     $this->get(route('settings.personal.edit'))
         ->assertOk()
-        ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+        ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('settings/Personal')
             ->has('hasPassword')
         );

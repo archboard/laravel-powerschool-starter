@@ -2,6 +2,8 @@
 
 use App\Enums\Permission;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,8 +16,8 @@ use App\Models\User;
 |
 */
 
-uses(Tests\TestCase::class)->in('Feature');
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)->in('Feature');
+uses(TestCase::class)->in('Feature');
+uses(RefreshDatabase::class)->in('Feature');
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +30,7 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)->in('Feature');
 | that do not require database setup.
 |
 */
-pest()->extend(Tests\TestCase::class)->group('browser')->in('Browser');
+pest()->extend(TestCase::class)->group('browser')->in('Browser');
 
 /*
 |--------------------------------------------------------------------------

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -10,7 +11,7 @@ class UpdateCurrentSchoolController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request): \Illuminate\Http\RedirectResponse
+    public function __invoke(Request $request): RedirectResponse
     {
         $user = $request->user();
         if (! $user) {

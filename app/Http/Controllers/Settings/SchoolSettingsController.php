@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Settings;
 use App\Enums\UserType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Inertia\Response;
 
 class SchoolSettingsController extends Controller
 {
-    public function edit(Request $request): \Inertia\Response
+    public function edit(Request $request): Response
     {
         $school = $request->school();
 

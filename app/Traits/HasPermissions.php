@@ -5,7 +5,10 @@ namespace App\Traits;
 use App\Enums\Permission;
 use App\Exceptions\InvalidPermissionException;
 use App\Models\Contracts\ExistsInSis;
+use App\Models\Course;
 use App\Models\School;
+use App\Models\Section;
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -44,15 +47,15 @@ trait HasPermissions
     }
 
     /**
-     * @return array<int, class-string<\Illuminate\Database\Eloquent\Model>>
+     * @return array<int, class-string<Model>>
      */
     public function getPermissionSubjectModels(): array
     {
         return [
-            \App\Models\User::class,
-            \App\Models\Course::class,
-            \App\Models\Section::class,
-            \App\Models\Student::class,
+            User::class,
+            Course::class,
+            Section::class,
+            Student::class,
         ];
     }
 

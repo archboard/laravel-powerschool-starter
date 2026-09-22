@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\FlashesAndRedirects;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Response;
 
 class PersonalSettingsController extends Controller
 {
@@ -13,7 +15,7 @@ class PersonalSettingsController extends Controller
     /**
      * Show the settings page
      */
-    public function edit(Request $request): \Inertia\Response
+    public function edit(Request $request): Response
     {
         $title = __('Personal settings');
         $user = $request->user();
@@ -27,7 +29,7 @@ class PersonalSettingsController extends Controller
     /**
      * Updates a users name, email, and password
      */
-    public function update(Request $request): \Illuminate\Http\RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
         $data = $request->validate([
             'first_name' => ['required'],

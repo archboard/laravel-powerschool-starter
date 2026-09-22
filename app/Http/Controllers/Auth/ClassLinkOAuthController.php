@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ClassLinkOAuthController extends Controller
 {
@@ -12,7 +13,7 @@ class ClassLinkOAuthController extends Controller
         //
     }
 
-    public function login(Request $request): \Illuminate\Http\Response
+    public function login(Request $request): Response
     {
         dump($request->all());
 

@@ -1,7 +1,10 @@
 <?php
 
+use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Ramsey\Uuid\Uuid;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +22,7 @@ Route::prefix('_testing')->group(function () {
         'ps_url' => env('POWERSCHOOL_ADDRESS'),
         'ps_client_id' => env('POWERSCHOOL_CLIENT_ID'),
         'ps_secret' => env('POWERSCHOOL_CLIENT_SECRET'),
-        'license' => \Ramsey\Uuid\Uuid::uuid4(),
+        'license' => Uuid::uuid4(),
         'allow_password_auth' => false,
         'subscription_started_at' => now(),
     ];
@@ -28,12 +31,12 @@ Route::prefix('_testing')->group(function () {
      * Creates a user session for the given tenant
      */
     Route::get('/session/new', function (Request $request) use ($email, $tenantAttributes) {
-        $tenant = \App\Models\Tenant::updateOrCreate(['domain' => $request->getHost()], $tenantAttributes);
+        $tenant = Tenant::updateOrCreate(['domain' => $request->getHost()], $tenantAttributes);
 
-        \App\Models\User::where('email', $email)->delete();
+        User::where('email', $email)->delete();
 
-        /** @var \App\Models\User $user */
-        $user = $tenant->users()->save(\App\Models\User::factory()->make(['email' => $email]));
+        /** @var User $user */
+        $user = $tenant->users()->save(User::factory()->make(['email' => $email]));
 
         auth()->login($user);
 
@@ -52,14 +55,14 @@ Route::prefix('_testing')->group(function () {
             $user->delete();
         }
 
-        \App\Models\User::where('email', $email)->delete();
-        \App\Models\Tenant::current()->update($tenantAttributes);
+        User::where('email', $email)->delete();
+        Tenant::current()->update($tenantAttributes);
 
         return response()->json();
     });
 
     Route::post('/permissions', function (Request $request) {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $request->user();
 
         $user->allow($request->input('permissions'));

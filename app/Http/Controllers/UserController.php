@@ -6,13 +6,14 @@ use App\Http\Resources\UserResource;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Response;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, School $school): \Inertia\Response
+    public function index(Request $request, School $school): Response
     {
         $title = __('Users');
         $filters = $request->currentFilters();

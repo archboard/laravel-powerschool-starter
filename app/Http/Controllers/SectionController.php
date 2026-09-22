@@ -6,13 +6,14 @@ use App\Http\Resources\SectionResource;
 use App\Models\School;
 use App\Models\Section;
 use Illuminate\Http\Request;
+use Inertia\Response;
 
 class SectionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, School $school): \Inertia\Response
+    public function index(Request $request, School $school): Response
     {
         $sections = $school->sections()
             ->filter($request->all())

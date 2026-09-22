@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\School;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ToggleSelectionController extends Controller
 {
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request, School $school, string $model): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+    public function __invoke(Request $request, School $school, string $model): Response|RedirectResponse|JsonResponse
     {
         $user = $request->user();
 

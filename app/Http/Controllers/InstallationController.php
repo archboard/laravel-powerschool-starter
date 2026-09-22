@@ -8,10 +8,11 @@ use App\Jobs\SyncSchools;
 use App\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Response;
 
 class InstallationController extends Controller
 {
-    public function index(Request $request): \Inertia\Response
+    public function index(Request $request): Response
     {
         $title = __('Installation');
         $tenant = Tenant::fromRequestAndFallback($request);

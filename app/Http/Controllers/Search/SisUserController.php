@@ -5,15 +5,16 @@ namespace App\Http\Controllers\Search;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class SisUserController extends Controller
 {
     /**
      * Handle the incoming request.
      *
-     * @return \Illuminate\Support\Collection<int, mixed>
+     * @return Collection<int, mixed>
      */
-    public function __invoke(Request $request, Tenant $tenant): \Illuminate\Support\Collection
+    public function __invoke(Request $request, Tenant $tenant): Collection
     {
         $data = $request->validate([
             'search' => ['required', 'string', 'min:3'],
