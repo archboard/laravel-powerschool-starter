@@ -8,6 +8,10 @@
           </CardHeader>
         </CardPadding>
         <CardPadding>
+          <SimpleAlert level="info" class="mb-5">
+            {{ __('Install the PowerSchool plugin first to get a client ID and secret.') }}
+            <AppLink is="a" href="/install/plugin">{{ __('Download plugin') }}</AppLink>
+          </SimpleAlert>
           <div class="grid grid-cols-1 md:grid-cols-6 gap-5">
             <div class="md:col-span-6">
               <InputField v-model="inertiaForm.name" :error="inertiaForm.errors.name" :label="__('Tenant name')" required />
@@ -50,6 +54,8 @@ import CardAction from '@/components/CardAction.vue'
 import CheckboxField from '@/components/forms/fields/CheckboxField.vue'
 import InputField from '@/components/forms/fields/InputField.vue'
 import Installation from '@/layouts/Installation.vue'
+import SimpleAlert from '@/components/alerts/SimpleAlert.vue'
+import AppLink from '@/components/AppLink.vue'
 
 const fieldComponents = {
   text: InputField,
