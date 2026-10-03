@@ -21,8 +21,9 @@ class Uninstalled
             }
         }
 
+        // PowerSchool's plugin registration configures the SIS before the wizard finishes, so it stays open until a user exists
         $tenant = $request->tenant();
-        if ($tenant->installed()) {
+        if ($tenant->installed() && $tenant->users()->exists()) {
             abort(404);
         }
 

@@ -37,8 +37,15 @@ it('cant access installation on cloud', function () {
 });
 
 it('cant access installation when already installed', function () {
+    $this->seedUser();
+
     $this->get('/install')
         ->assertNotFound();
+});
+
+it('can access installation when installed without users', function () {
+    $this->get('/install')
+        ->assertOk();
 });
 
 it('cant access installation when user has no permission', function () {
