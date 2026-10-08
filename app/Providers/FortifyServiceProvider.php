@@ -6,14 +6,21 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Enums\UserType;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rule;
 use Laravel\Fortify\Fortify;
+use Laravel\Fortify\Http\Controllers\NewPasswordController as FortifyNewPasswordController;
+use Laravel\Fortify\Http\Controllers\PasswordResetLinkController as FortifyPasswordResetLinkController;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -24,7 +31,8 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(FortifyPasswordResetLinkController::class, PasswordResetLinkController::class);
+        $this->app->bind(FortifyNewPasswordController::class, NewPasswordController::class);
     }
 
     /**
@@ -39,6 +47,12 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
+        ResetPassword::createUrlUsing(fn (User $user, string $token) => route('password.reset', [
+            'token' => $token,
+            'email' => $user->getEmailForPasswordReset(),
+            'user_type' => $user->user_type?->value,
+        ]));
+
         RateLimiter::for('login', function (Request $request) {
             $email = (string) $request->email;
 
@@ -50,7 +64,10 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         Fortify::authenticateUsing(function (Request $request) {
+            $request->validate(['user_type' => ['required', Rule::enum(UserType::class)]]);
+
             $user = User::where(DB::raw('lower(email)'), strtolower($request->input('email', '')))
+                ->where('user_type', $request->input('user_type'))
                 ->first();
 
             if ($user && $user->password && Hash::check($request->input('password'), $user->password)) {
@@ -64,6 +81,7 @@ class FortifyServiceProvider extends ServiceProvider
             return inertia('Auth/Login', [
                 'title' => $title,
                 'status' => session('status'),
+                'userTypes' => UserType::selectOptions(),
             ])->withViewData(compact('title'));
         });
 
@@ -73,6 +91,7 @@ class FortifyServiceProvider extends ServiceProvider
             return inertia('Auth/ForgotPassword', [
                 'title' => $title,
                 'status' => session('status'),
+                'userTypes' => UserType::selectOptions(),
             ])->withViewData(compact('title'));
         });
 
@@ -82,6 +101,7 @@ class FortifyServiceProvider extends ServiceProvider
             return inertia('Auth/ResetPassword', [
                 'title' => $title,
                 'email' => $request->email,
+                'userType' => $request->user_type,
                 'token' => $request->route('token'),
             ])->withViewData(compact('title'));
         });

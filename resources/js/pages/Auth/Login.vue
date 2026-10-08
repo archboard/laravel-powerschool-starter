@@ -15,6 +15,13 @@
 
     <form v-if="tenant.allow_password_auth" @submit.prevent="submit">
       <AppFieldset>
+        <FormField :error="form.errors.user_type">
+          {{ __('Log in as') }}
+          <template #component>
+            <RadioGroup v-model="form.user_type" :options="userTypes" />
+          </template>
+        </FormField>
+
         <FormField :error="form.errors.email">
           {{ __('Email') }}
           <template #component="{ hasError }">
@@ -65,12 +72,15 @@ import AppButton from '@/components/AppButton.vue'
 import BorderSeparator from '@/components/BorderSeparator.vue'
 import AppLink from '@/components/AppLink.vue'
 import AppInput from '@/components/forms/AppInput.vue'
+import RadioGroup from '@/components/forms/RadioGroup.vue'
 
 defineProps({
   status: String,
   tenant: Object,
+  userTypes: Array,
 })
 const form = useForm({
+  user_type: 'staff',
   email: '',
   password: '',
   remember: false
