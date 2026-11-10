@@ -1,42 +1,5 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Broadcast;
-use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-
 return [
 
     /*
@@ -50,11 +13,14 @@ return [
     |
     */
 
-    'name' => env('VITE_APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Laravel'),
 
     'cloud' => env('IS_CLOUD', false),
 
     'self_hosted' => ! env('IS_CLOUD', false),
+
+    // Public demo: one-click logins, read-only settings, and data reset by DemoSeeder on a schedule
+    'demo' => (bool) env('DEMO_MODE', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -95,7 +61,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'asset_url' => env('ASSET_URL', null),
+    'asset_url' => env('ASSET_URL'),
 
     /*
     |--------------------------------------------------------------------------
@@ -162,71 +128,30 @@ return [
 
     'key' => env('APP_KEY'),
 
+    'previous_keys' => [
+        ...array_filter(
+            explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
+        ),
+    ],
+
     'cipher' => 'AES-256-CBC',
 
     /*
     |--------------------------------------------------------------------------
-    | Autoloaded Service Providers
+    | Maintenance Mode Driver
     |--------------------------------------------------------------------------
     |
-    | The service providers listed here will be automatically loaded on the
-    | request to your application. Feel free to add your own services to
-    | this array to grant expanded functionality to your applications.
+    | These configuration options determine the driver used to determine and
+    | manage Laravel's "maintenance mode" status. The "cache" driver will
+    | allow maintenance mode to be controlled across multiple machines.
+    |
+    | Supported drivers: "file", "cache"
     |
     */
 
-    'providers' => ServiceProvider::defaultProviders()->toArray(),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Class Aliases
-    |--------------------------------------------------------------------------
-    |
-    | This array of class aliases will be registered when this application
-    | is started. However, feel free to register as many as you wish as
-    | the aliases are "lazy" loaded so they don't hinder performance.
-    |
-    */
-
-    'aliases' => [
-
-        'App' => App::class,
-        'Arr' => Arr::class,
-        'Artisan' => Artisan::class,
-        'Auth' => Auth::class,
-        'Blade' => Blade::class,
-        'Broadcast' => Broadcast::class,
-        'Bus' => Bus::class,
-        'Cache' => Cache::class,
-        'Config' => Config::class,
-        'Cookie' => Cookie::class,
-        'Crypt' => Crypt::class,
-        'DB' => DB::class,
-        'Eloquent' => Model::class,
-        'Event' => Event::class,
-        'File' => File::class,
-        'Gate' => Gate::class,
-        'Hash' => Hash::class,
-        'Http' => Http::class,
-        'Lang' => Lang::class,
-        'Log' => Log::class,
-        'Mail' => Mail::class,
-        'Notification' => Notification::class,
-        'Password' => Password::class,
-        'Queue' => Queue::class,
-        'Redirect' => Redirect::class,
-        // 'Redis' => Illuminate\Support\Facades\Redis::class,
-        'Request' => Request::class,
-        'Response' => Response::class,
-        'Route' => Route::class,
-        'Schema' => Schema::class,
-        'Session' => Session::class,
-        'Storage' => Storage::class,
-        'Str' => Str::class,
-        'URL' => URL::class,
-        'Validator' => Validator::class,
-        'View' => View::class,
-
+    'maintenance' => [
+        'driver' => env('APP_MAINTENANCE_DRIVER', 'cache'),
+        'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
 ];

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Traits\FlashesAndRedirects;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
 class UpdateTimezoneController extends Controller
@@ -14,17 +14,28 @@ class UpdateTimezoneController extends Controller
 
     /**
      * Handle the incoming request.
+     *
+     * @return RedirectResponse
      */
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(Request $request)
     {
-        /** @var Collection<string, string> $timezones */
         $timezones = timezones();
+
+        if (is_string($timezones)) {
+            abort(500);
+        }
 
         $data = $request->validate([
             'timezone' => ['required', Rule::in($timezones->keys())],
         ]);
 
-        $request->user()?->update($data);
+        /** @var User $user */
+        $user = $request->user();
+        $user->update($data);
+
+        if ($user->school && blank($user->school->timezone)) {
+            $user->school->update($data);
+        }
 
         return $this->flashAndBack();
     }

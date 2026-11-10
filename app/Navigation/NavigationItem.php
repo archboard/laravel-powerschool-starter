@@ -2,7 +2,7 @@
 
 namespace App\Navigation;
 
-class NavigationItem
+final class NavigationItem
 {
     public string $component = 'InertiaLink';
 
@@ -20,70 +20,68 @@ class NavigationItem
 
     public bool $current = false;
 
-    public static function make(): self
+    public static function make(): static
     {
         return new self;
     }
 
-    public function useComponent(string $component): self
+    public function useComponent(string $component): static
     {
         $this->component = $component;
 
         return $this;
     }
 
-    public function inNewTab(): self
+    public function inNewTab(): static
     {
         $this->target = '_blank';
 
         return $this;
     }
 
-    public function method(string $method): self
+    public function method(string $method): static
     {
         $this->method = $method;
 
         return $this;
     }
 
-    public function labeled(string $label): self
+    public function labeled(string $label): static
     {
         $this->label = $label;
 
         return $this;
     }
 
-    public function to(string $url): self
+    public function to(string $url): static
     {
         $this->endpoint = $url;
 
         return $this;
     }
 
-    public function asButton(): self
+    public function asButton(): static
     {
         $this->as = 'button';
 
         return $this;
     }
 
-    public function withIcon(string $icon): self
+    public function withIcon(string $icon): static
     {
         $this->icon = $icon;
 
         return $this;
     }
 
-    public function isCurrent(bool $current = true): self
+    public function isCurrent(bool $current = true): static
     {
         $this->current = $current;
 
         return $this;
     }
 
-    /**
-     * @return array{url: string, label: string, method: string, target: string, as: string, component: string, icon: string, current: bool}
-     */
+    /** @return array<string, mixed> */
     public function toArray(): array
     {
         return [

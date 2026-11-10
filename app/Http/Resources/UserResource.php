@@ -11,11 +11,9 @@ class UserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  Request  $request
-     * @return array<string, mixed>
      */
-    public function toArray($request): array
+    /** @return array<string, mixed> */
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->resource->id,
@@ -26,18 +24,15 @@ class UserResource extends JsonResource
             'email' => $this->resource->email,
             'timezone' => $this->resource->timezone,
             'school_id' => $this->resource->school_id,
+            'is_24h' => $this->resource->is_24h,
+            'locale' => $this->resource->locale,
+            'sections_count' => $this->resource->sections_count,
             'user_type' => $this->resource->user_type?->value,
             'user_type_display' => $this->resource->user_type?->label(),
             'schools' => SchoolResource::collection($this->whenLoaded('schools')),
-            'school' => new SchoolResource($this->whenLoaded('schoool')),
-            'permissions' => $this->whenLoaded('school', function (): array {
-                /** @var array<int, array{permission: string, selected: bool}> $schoolPermissions */
-                $schoolPermissions = $this->resource->getAttribute('school_permissions') ?? [];
-
-                return collect($schoolPermissions)
-                    ->mapWithKeys(fn (array $perm) => [$perm['permission'] => $perm['selected']])
-                    ->toArray();
-            }, []),
+            'school' => new SchoolResource($this->whenLoaded('school')),
+            'model_alias' => $this->resource->getMorphClass(),
+            'students' => StudentResource::collection($this->whenLoaded('students')),
         ];
     }
 }

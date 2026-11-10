@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\Role;
 use App\Models\Tenant;
 use Closure;
 use Illuminate\Http\Request;
@@ -17,13 +16,15 @@ class NoDistrictAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+        /** @var Tenant $tenant */
         $tenant = Tenant::current();
-        if (! $tenant || $tenant->users()->whereIs(Role::DISTRICT_ADMIN->value)->exists()) {
-            session()->flash('error', __('A district admin already exists.'));
 
-            return back();
+        if (! $tenant->hasDistrictAdmin()) {
+            return $next($request);
         }
 
-        return $next($request);
+        session()->flash('error', __('A district admin already exists.'));
+
+        return back();
     }
 }

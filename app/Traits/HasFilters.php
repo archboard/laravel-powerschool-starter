@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use App\Services\Filters\BaseFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -12,30 +11,31 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 trait HasFilters
 {
-    /**
-     * @param  Builder<Model>  $builder
-     * @param  Collection<string, mixed>|array<string, mixed>  $data
-     * @return Builder<Model>
-     */
+    /** @param Collection<array-key, mixed>|array<array-key, mixed> $data */
     public function scopeFilter(Builder $builder, Collection|array $data): Builder
     {
         $activeFilters = $this->getActiveFilters($data);
-        $request = Request::create('/', 'GET', [
-            'filter' => collect($activeFilters)->mapWithKeys(fn (BaseFilter $filter) => [$filter->key => $filter->currentValue])->toArray(),
-        ]);
+
+        if (empty($activeFilters)) {
+            return $builder;
+        }
 
         $allowedFilters = collect($activeFilters)
             ->map(fn (BaseFilter $filter) => AllowedFilter::custom($filter->key, $filter))
-            ->values()
-            ->toArray();
+            ->all();
 
-        QueryBuilder::for($builder, $request)->allowedFilters($allowedFilters);
+        $values = collect($activeFilters)
+            ->mapWithKeys(fn (BaseFilter $filter) => [$filter->key => $filter->currentValue])
+            ->all();
+
+        QueryBuilder::for($builder, Request::create('', 'GET', ['filter' => $values]))
+            ->allowedFilters(...$allowedFilters);
 
         return $builder;
     }
 
     /**
-     * @param  Collection<string, mixed>|array<string, mixed>  $data
+     * @param  Collection<array-key, mixed>|array<array-key, mixed>  $data
      * @return array<int, BaseFilter>
      */
     public function getActiveFilters(Collection|array $data): array
@@ -72,17 +72,13 @@ trait HasFilters
             ->toArray();
     }
 
-    /**
-     * @return array<int, BaseFilter>
-     */
+    /** @return array<int, BaseFilter> */
     public function filters(): array
     {
         return [];
     }
 
-    /**
-     * @param  Collection<string, mixed>|array<string, mixed>  $data
-     */
+    /** @param Collection<array-key, mixed>|array<array-key, mixed> $data */
     public function activeFiltersToArray(Collection|array $data): object
     {
         return (object) collect($this->getActiveFilters($data))
@@ -91,9 +87,7 @@ trait HasFilters
             ->toArray();
     }
 
-    /**
-     * @return array<int, mixed>
-     */
+    /** @return array<int, array<string, mixed>> */
     public function availableFiltersToArray(): array
     {
         return collect($this->filters())
@@ -103,9 +97,7 @@ trait HasFilters
             ->toArray();
     }
 
-    /**
-     * @return Collection<string, BaseFilter>
-     */
+    /** @return Collection<string, BaseFilter> */
     public function filtersByKey(): Collection
     {
         return collect($this->filters())

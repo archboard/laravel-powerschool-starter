@@ -3,17 +3,19 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
 
 class Uninstalled
 {
     /**
      * Handle an incoming request.
      *
-     * @param  Closure(Request): Response  $next
+     * @param  Closure(Request): (Response|RedirectResponse)  $next
+     * @return Response|RedirectResponse
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
         if ($user = $request->user()) {
             if ($user->cant('install')) {
@@ -21,8 +23,8 @@ class Uninstalled
             }
         }
 
-        // PowerSchool's plugin registration configures the SIS before the wizard finishes, so it stays open until a user exists
         $tenant = $request->tenant();
+
         if ($tenant->installed() && $tenant->users()->exists()) {
             abort(404);
         }

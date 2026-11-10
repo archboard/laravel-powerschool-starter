@@ -1,5 +1,5 @@
 <template>
-  <component :is="is" :class="`font-medium font-sans cursor-pointer focus:outline-none transition duration-100 ease-in-out ${colorClass}`">
+  <component :is="is" :class="`font-medium font-sans cursor-pointer focus:outline-hidden transition duration-100 ease-in-out ${colorClass}`">
     <slot />
   </component>
 </template>
@@ -22,6 +22,7 @@ export default defineComponent({
   setup (props) {
     const colorClasses = {
       primary: 'text-primary-500 dark:text-primary-300 hover:underline',
+      red: 'text-red-600 dark:text-red-400 hover:underline',
     }
 
     return {

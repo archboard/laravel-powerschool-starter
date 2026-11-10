@@ -12,7 +12,6 @@ use App\Models\Tenant;
 use App\Models\User;
 use GrantHolle\PowerSchool\Api\RequestBuilder;
 use GrantHolle\PowerSchool\Api\Response;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -32,30 +31,20 @@ class PowerSchoolProvider implements SisProvider
         }
     }
 
-    /**
-     * @return Collection<int, array<string, mixed>>
-     */
+    /** @return Collection<array-key, mixed> */
     public function getAllSchools(): Collection
     {
-        $response = $this->builder
+        return $this->builder
             ->to('/ws/v1/district/school')
-            ->get();
-
-        // Only get the schools that exist already
-        if (config('app.cloud')) {
-            $schools = $this->tenant->schools()->pluck('sis_id');
-
-            return $response->collect()
-                ->filter(fn (array $school) => $schools->contains($school['id']));
-        }
-
-        return $response->collect();
+            ->get()
+            ->collect();
     }
 
     public function syncSchools(): static
     {
         $now = now()->toDateTimeString();
         $data = $this->getAllSchools()
+            ->sortBy('school_number')
             ->map(fn ($school) => [
                 'tenant_id' => $this->tenant->id,
                 'sis_id' => $school['id'],
@@ -66,10 +55,11 @@ class PowerSchoolProvider implements SisProvider
                 'created_at' => $now,
                 'updated_at' => $now,
                 'sis_key' => $this->makeSisKey($school),
-            ]);
+            ])
+            ->values();
 
         School::upsert(
-            $data->toArray(),
+            $this->limitNewActiveSchools($data->all()),
             ['sis_key'],
             ['name', 'school_number', 'low_grade', 'high_grade', 'updated_at']
         );
@@ -78,8 +68,33 @@ class PowerSchoolProvider implements SisProvider
     }
 
     /**
-     * @return array<string, mixed>
+     * In the cloud only `school_limit` schools may be active. New schools fill the open
+     * slots in school number order and the rest come in inactive. The upsert never
+     * updates `active`, so existing schools keep what the district chose.
+     *
+     * @param  array<int, array<string, mixed>>  $rows
+     * @return array<int, array<string, mixed>>
      */
+    protected function limitNewActiveSchools(array $rows): array
+    {
+        $limit = $this->tenant->school_limit;
+
+        if (! config('app.cloud') || $limit === null) {
+            return $rows;
+        }
+
+        $existing = $this->tenant->schools()->pluck('sis_id');
+        $openSlots = max(0, $limit - $this->tenant->schools()->where('active', true)->count());
+
+        return array_map(function (array $row) use ($existing, &$openSlots) {
+            $isNew = ! $existing->contains($row['sis_id']);
+            $row['active'] = ! $isNew || $openSlots-- > 0;
+
+            return $row;
+        }, $rows);
+    }
+
+    /** @return array<array-key, mixed> */
     public function getSchool(School $school): array
     {
         $results = $this->builder
@@ -125,7 +140,7 @@ class PowerSchoolProvider implements SisProvider
 
         while ($results = $builder->paginate()) {
             $filteredStaff = $results->collect()
-                ->filter(fn (array $user) => isset($user['users_dcid']));
+                ->whereNotNull('users_dcid');
 
             $entries = $filteredStaff->map(fn (array $user) => [
                 'tenant_id' => $this->tenant->id,
@@ -210,6 +225,10 @@ class PowerSchoolProvider implements SisProvider
         //        while ($results = $builder->paginate()) {
         //            $entries = $results->collect()
         //                ->map(fn (array $student) => $this->makeSisKey($student));
+        //
+        //            ray(Student::query()
+        //                ->whereIn('sis_key', $entries)
+        //                ->delete());
         //        }
 
         return $this;
@@ -386,6 +405,7 @@ class PowerSchoolProvider implements SisProvider
         return $user;
     }
 
+    /** @return Collection<int, User> */
     public function searchForUser(string $search): Collection
     {
         return $this->builder
@@ -400,13 +420,17 @@ class PowerSchoolProvider implements SisProvider
                 'first_name' => $user['first_name'] ?? null,
                 'last_name' => $user['last_name'] ?? null,
                 'email' => $user['email'] ?? null,
-                'sis_key' => UserType::staff->getSisKeyFromSisId((int) $user['dcid']),
+                'sis_key' => UserType::staff->getSisKeyFromSisId($user['dcid']),
                 'user_type' => UserType::staff,
             ]));
     }
 
     protected function syncStaff(User $user): void
     {
+        if ($user->sis_id === null) {
+            return;
+        }
+
         // Fetch from custom PQ
         /** @var Response $data */
         $data = $this->builder
@@ -420,7 +444,7 @@ class PowerSchoolProvider implements SisProvider
                 'last_name' => $data[0]['last_name'] ?? null,
                 'email' => $data[0]['email'] ? strtolower($data[0]['email']) : null,
                 'user_type' => UserType::staff,
-                'sis_key' => UserType::staff->getSisKeyFromSisId((int) $user->sis_id),
+                'sis_key' => UserType::staff->getSisKeyFromSisId($user->sis_id),
             ]);
             $user->save();
         }
@@ -443,8 +467,8 @@ class PowerSchoolProvider implements SisProvider
         $data = $this->builder
             ->get("/ws/contacts/contact/{$contactId}");
 
-        /** @var array<int, array<string, mixed>> $emails */
-        $emails = $data['emails'] ?? [];
+        $emails = is_array($data['emails']) ? $data['emails'] : [];
+
         $user->update([
             'first_name' => $data['firstName'] ?? $user->first_name,
             'last_name' => $data['lastName'] ?? $user->last_name,
@@ -452,9 +476,9 @@ class PowerSchoolProvider implements SisProvider
                 ->firstWhere('primary', true)['address'] ?? $user->email,
         ]);
 
+        $contactStudents = is_array($data['contactStudents']) ? $data['contactStudents'] : [];
+
         // Sync the student relationships
-        /** @var array<int, array<string, mixed>> $contactStudents */
-        $contactStudents = $data['contactStudents'] ?? [];
         $students = collect($contactStudents)
             ->filter(fn (array $student) => $student['deleted'] === false &&
                 $student['canAccessData'] === true &&
@@ -466,9 +490,10 @@ class PowerSchoolProvider implements SisProvider
             ->students()
             ->whereIn('sis_id', $students->keys())
             ->pluck('id', 'sis_id');
+
         $sync = $studentIds->mapWithKeys(fn ($id, $dcid) => [
             $id => [
-                'relationship' => Arr::get($students->get($dcid) ?? [], 'studentDetails.0.relationship'),
+                'relationship' => Arr::get($students->get($dcid), 'studentDetails.0.relationship'),
             ],
         ]);
 
@@ -529,16 +554,16 @@ class PowerSchoolProvider implements SisProvider
     }
 
     /**
-     * @param  array<string, mixed>|Model|string  $subject
+     * @param  array<string, mixed>|Course|School|Section|Student|string  $subject
      */
-    protected function makeSisKey(array|Model|string $subject): string
+    protected function makeSisKey(array|Course|School|Section|Student|string $subject): string
     {
         if (is_array($subject)) {
-            return $this->tenant->id.'|'.(string) $subject['id'];
+            return $this->tenant->id.'|'.$subject['id'];
         }
 
-        if ($subject instanceof Model) {
-            return $this->tenant->id.'|'.(string) $subject->getAttribute('sis_id');
+        if ($subject instanceof Course || $subject instanceof School || $subject instanceof Section || $subject instanceof Student) {
+            return $this->tenant->id.'|'.$subject->sis_id;
         }
 
         return $this->tenant->id.'|'.$subject;

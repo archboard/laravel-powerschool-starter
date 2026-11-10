@@ -6,40 +6,36 @@ use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Spatie\Multitenancy\Exceptions\NoCurrentTenant;
 
-/**
- * @template TModel of Model
- *
- * @implements Scope<TModel>
- */
+/** @implements Scope<Model> */
 class TenantScope implements Scope
 {
+    /**
+     * Fails closed: a query without a current tenant would return every district's rows,
+     * so it throws unless the caller opts out with `withoutTenant()`.
+     *
+     * @throws NoCurrentTenant
+     */
     public function apply(Builder $builder, Model $model): void
     {
-        $tenant = Tenant::current();
+        $tenant = Tenant::current() ?? throw NoCurrentTenant::make();
 
-        if ($tenant) {
-            $builder->where($model->getTable().'.tenant_id', $tenant->id);
-        }
+        $builder->where($model->getTable().'.tenant_id', $tenant->id);
     }
 
-    /**
-     * @param  Builder<TModel>  $builder
-     */
+    /** @param Builder<Model> $builder */
     public function extend(Builder $builder): void
     {
         $this->addWithoutTenant($builder);
     }
 
-    /**
-     * @param  Builder<TModel>  $builder
-     */
+    /** @param Builder<Model> $builder */
     protected function addWithoutTenant(Builder $builder): void
     {
-        $builder->macro('withoutTenant', function (Builder $builder) {
-            /** @var Scope<TModel> $scope */
-            $scope = $this;
+        $scope = $this;
 
+        $builder->macro('withoutTenant', function (Builder $builder) use ($scope) {
             return $builder->withoutGlobalScope($scope);
         });
     }

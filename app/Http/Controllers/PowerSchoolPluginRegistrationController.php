@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PowerSchoolPluginRegistered;
 use App\Models\Tenant;
+use App\Scopes\TenantScope;
 use App\Services\PowerSchoolPluginService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\HttpClientException;
@@ -13,7 +15,7 @@ use Illuminate\Support\Uri;
 
 /**
  * PowerSchool posts the plugin's OAuth credentials here when the plugin is enabled.
- * Self-hosted installs may not have a tenant yet, so one is started and the install form loads its values.
+ * Self-hosted installs may not have a tenant yet, so one is started and its install form is filled.
  * PowerSchool expects a 200 every time; failures are reported in callback_result.
  */
 class PowerSchoolPluginRegistrationController extends Controller
@@ -50,13 +52,22 @@ class PowerSchoolPluginRegistrationController extends Controller
             return $this->result(false, $e->getMessage());
         }
 
-        $tenant->name ??= $request->host();
-        $tenant->sis_config = $tenant->sis_config->merge([
+        $sisConfig = [
             'url' => $url,
             'client_id' => $data['credentials']['client_id'],
             'client_secret' => $data['credentials']['client_secret'],
-        ]);
+        ];
+
+        $tenant->name ??= $request->host();
+        $tenant->sis_config = $tenant->sis_config->merge($sisConfig);
         $tenant->save();
+
+        // Only an open install form is listening, and it's open until the first user exists.
+        // The credentials are saved and the form loads them on reload, so a Reverb failure can't fail registration.
+        // A first install has no current tenant for TenantScope; the relation already limits this to the tenant.
+        if (! $tenant->users()->withoutGlobalScope(TenantScope::class)->exists()) {
+            rescue(fn () => PowerSchoolPluginRegistered::dispatch($request->host(), $sisConfig));
+        }
 
         return $this->result(true, 'SUCCESS');
     }

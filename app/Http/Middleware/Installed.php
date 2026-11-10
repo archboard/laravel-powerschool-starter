@@ -15,8 +15,21 @@ class Installed
      */
     public function handle(Request $request, Closure $next)
     {
-        if (config('app.cloud') || Tenant::current()?->installed()) {
+        if (Tenant::current()?->installed()) {
             return $next($request);
+        }
+
+        // Cloud districts install through their signed setup link, see Tenant::setupLinks()
+        if (config('app.cloud')) {
+            // The root domain, or a host no district owns
+            if (! Tenant::current()) {
+                return to_route('district.create');
+            }
+
+            return inertia('Error', [
+                'status' => 503,
+                'message' => __('This district is still being set up. Please contact your administrator.'),
+            ])->toResponse($request)->setStatusCode(503);
         }
 
         // Redirect to installation

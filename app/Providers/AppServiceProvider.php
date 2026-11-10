@@ -3,20 +3,28 @@
 namespace App\Providers;
 
 use App\Enums\UserType;
+use App\Models\Activity;
 use App\Models\Course;
 use App\Models\School;
 use App\Models\Section;
+use App\Models\SelectedModel;
 use App\Models\Student;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\ModelClassService;
 use Carbon\CarbonImmutable;
 use GrantHolle\PowerSchool\Auth\UserFactory;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Spatie\Activitylog\Support\CauserResolver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,14 +47,60 @@ class AppServiceProvider extends ServiceProvider
     {
         JsonResource::withoutWrapping();
         Date::use(CarbonImmutable::class);
+        // TLS terminates at the proxy, so a worker only sees http unless X-Forwarded-Proto arrives; never emit http links in production
+        URL::forceHttps($this->app->isProduction());
 
+        // The machine-token API guard authenticates a GenericUser, which the activity log can't reference. The resolver
+        // is scoped, so Octane builds a fresh one each request: set the override whenever it's resolved, not once at boot
+        $this->app->resolving(CauserResolver::class, fn (CauserResolver $resolver) => $resolver->resolveUsing(
+            fn () => auth()->user() instanceof User ? auth()->user() : null,
+        ));
+
+        $this->addRequestMarcos()
+            ->addStringMacros();
+
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));
+        // Codes are only four characters, so throttle guessing them on the district lookup
+        RateLimiter::for('district-lookup', fn (Request $request) => Limit::perMinute(10)
+            ->by($request->ip())
+            ->response(fn () => back()->withErrors(['code' => __('Too many attempts. Please try again in a minute.')])));
+
+        Relation::morphMap([
+            'user' => User::class,
+            'student' => Student::class,
+            'tenant' => Tenant::class,
+            'school' => School::class,
+            'section' => Section::class,
+            'course' => Course::class,
+            'selected_model' => SelectedModel::class,
+            'activity' => Activity::class,
+        ]);
+
+        // Add the tenant_id to the identifying attributes when looking up a user
+        UserFactory::findUserUsing(function (Collection $data, string $model, array $attributes) {
+            /** @var Tenant $tenant */
+            $tenant = Tenant::current();
+            $userType = UserType::fromData($data);
+
+            $user = $model::firstOrNew([
+                ...$attributes,
+                'tenant_id' => $tenant->id,
+                'sis_key' => $userType->getSisKeyFromData($data),
+            ]);
+            $user->user_type = $userType;
+
+            return $user;
+        });
+    }
+
+    protected function addRequestMarcos(): static
+    {
         $currentTenant = fn (): Tenant => Tenant::current() ?? new Tenant;
 
         $currentSchool = function (): School {
-            /** @var User|null $user */
             $user = auth()->user();
 
-            if ($user !== null && $school = $user->school) {
+            if ($user instanceof User && ($school = $user->school)?->active) {
                 return $school;
             }
 
@@ -69,43 +123,27 @@ class AppServiceProvider extends ServiceProvider
                 ]]);
         });
 
-        Request::macro('addFilter', function (string|array $key, mixed $value = null) {
+        Request::macro('addFilter', function (string $key, mixed $value = null) {
             /** @var Request $this */
             $data = $this->all();
-            $filters = $data['f'] ?? [];
-            $filters[$key] = [
+            $data['f'][$key] = [
                 'key' => $key,
                 'value' => $value,
             ];
-            $data['f'] = $filters;
             $this->merge($data);
 
             return $this;
         });
 
-        Relation::morphMap([
-            'user' => User::class,
-            'student' => Student::class,
-            'tenant' => Tenant::class,
-            'school' => School::class,
-            'section' => Section::class,
-            'course' => Course::class,
-        ]);
+        return $this;
+    }
 
-        // Add the tenant_id to the identifying attributes when looking up a user
-        UserFactory::findUserUsing(function (Collection $data, string $model, array $attributes) {
-            /** @var Tenant $tenant */
-            $tenant = Tenant::current();
-            $userType = UserType::fromData($data);
+    protected function addStringMacros(): static
+    {
+        Str::macro('toModelAlias', fn (string $string): string => ModelClassService::toAlias($string));
+        Str::macro('toModelClass', fn (string $string): string => ModelClassService::toClassName($string));
+        Str::macro('toApiResourceClass', fn (string $string): string => ModelClassService::toApiResourceClass($string));
 
-            $user = $model::firstOrNew([
-                ...$attributes,
-                'tenant_id' => $tenant->id,
-                'sis_key' => $userType->getSisKeyFromData($data),
-            ]);
-            $user->user_type = $userType;
-
-            return $user;
-        });
+        return $this;
     }
 }

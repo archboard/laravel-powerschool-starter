@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permission;
 use App\Http\Resources\CourseResource;
+use App\Models\Course;
 use App\Models\School;
+use App\Navigation\NavigationItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Response;
 
 class CourseController extends Controller
@@ -14,63 +18,54 @@ class CourseController extends Controller
      */
     public function index(Request $request, School $school): Response
     {
+        $this->authorize(Permission::viewAny, Course::class);
+
         $title = __('Courses');
         $courses = $school->courses()
-            ->filter($request->all())
+            ->filter($request->currentFilters())
             ->withCount('sections')
+            ->orderBy('name')
             ->paginate(25);
 
         return inertia('courses/Index', [
             'title' => $title,
             'courses' => CourseResource::collection($courses),
+            'model_alias' => Str::toModelAlias(Course::class),
+            'breadcrumbs' => $this->withBreadcrumbs(
+                NavigationItem::make()
+                    ->labeled(__('Courses'))
+                    ->to(route('courses.index'))
+                    ->isCurrent()
+            ),
         ])->withViewData(compact('title'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): void
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): void
-    {
-        //
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id): void
+    public function show(Course $course): Response
     {
-        //
-    }
+        $this->authorize(Permission::view, $course);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id): void
-    {
-        //
-    }
+        $course->load([
+            'sections',
+            'sections.students',
+            'sections.teacher',
+        ]);
+        $title = $course->name;
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id): void
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id): void
-    {
-        //
+        return inertia('courses/Show', [
+            'title' => $title,
+            'course' => new CourseResource($course),
+            'breadcrumbs' => $this->withBreadcrumbs(
+                NavigationItem::make()
+                    ->labeled(__('Courses'))
+                    ->to(route('courses.index')),
+                NavigationItem::make()
+                    ->labeled($course->name)
+                    ->to(route('courses.show', $course))
+                    ->isCurrent(),
+            ),
+        ])->withViewData(compact('title'));
     }
 }

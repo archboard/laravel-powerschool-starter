@@ -1,19 +1,16 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\PurgeExpiredTenants;
+use Database\Seeders\DemoSeeder;
+use Illuminate\Database\Console\Migrations\FreshCommand;
+use Illuminate\Support\Facades\Schedule;
+use Spatie\Activitylog\Commands\CleanActivitylogCommand;
 
-/*
-|--------------------------------------------------------------------------
-| Console Routes
-|--------------------------------------------------------------------------
-|
-| This file is where you may define all of your Closure based console
-| commands. Each Closure is bound to a command instance allowing a
-| simple approach to interacting with each command's IO methods.
-|
-*/
-
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+Schedule::command(CleanActivitylogCommand::class)->daily();
+Schedule::command(PurgeExpiredTenants::class)
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->when(fn () => config('app.cloud'));
+Schedule::command(FreshCommand::class, ['--force', '--seed', '--seeder' => DemoSeeder::class])
+    ->hourly()
+    ->when(fn () => config('app.demo'));

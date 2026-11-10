@@ -1,5 +1,5 @@
 <?php
 
-it('passes a basic truth assertion', function () {
+it('basic test', function () {
     expect(true)->toBeTrue();
 });

@@ -1,24 +1,27 @@
 <?php
 
+use App\Http\Controllers\Api\TenantController;
 use App\Http\Middleware\AllowsPasswordLogins;
-use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\Cloud;
-use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\HasSchoolSet;
 use App\Http\Middleware\Installed;
 use App\Http\Middleware\NoDistrictAdmin;
+use App\Http\Middleware\PreventInDemo;
 use App\Http\Middleware\ScopeBouncerToSchool;
 use App\Http\Middleware\SelfHosted;
+use App\Http\Middleware\SelfHostedOrSetup;
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\SetupLinkIsOpen;
 use App\Http\Middleware\SisConfigured;
 use App\Http\Middleware\Uninstalled;
+use App\Http\Middleware\WithinSchoolLimit;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use Spatie\LaravelFlare\Facades\Flare;
 use Spatie\Multitenancy\Exceptions\NoCurrentTenant;
 use Spatie\Multitenancy\Http\Middleware\EnsureValidTenantSession;
 use Spatie\Multitenancy\Http\Middleware\NeedsTenant;
@@ -30,16 +33,31 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            Route::middleware(['cloud', 'api', 'auth:machine'])
+                ->prefix('api')
+                ->group(function () {
+                    Route::get('/tenants', [TenantController::class, 'index']);
+                    Route::put('/tenants/{license}', [TenantController::class, 'update'])
+                        ->whereUuid('license');
+                });
+        },
     )
-    ->withMiddleware(function (Middleware $middleware) {
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+    // Channel auth needs the tenant session resolved before `auth` runs
+    ->withBroadcasting(
+        __DIR__.'/../routes/channels.php',
+        ['middleware' => ['web', 'tenant', 'auth']],
+    )
+    ->withMiddleware(function (Middleware $middleware): void {
+        // Only set TRUSTED_PROXIES=* when the app port is reachable solely through the proxy
+        $middleware->trustProxies(at: env('TRUSTED_PROXIES'), headers: Request::HEADER_X_FORWARDED_FOR
+            | Request::HEADER_X_FORWARDED_HOST
+            | Request::HEADER_X_FORWARDED_PORT
+            | Request::HEADER_X_FORWARDED_PROTO
+            | Request::HEADER_X_FORWARDED_AWS_ELB);
 
-        $middleware->web(append: [
-            SetLocale::class,
-            HandleAppearance::class,
-            HandleInertiaRequests::class,
-            AddLinkHeadersForPreloadedAssets::class,
-        ]);
+        // Inertia must run last so every earlier middleware can still share props
+        $middleware->web(append: [SetLocale::class, PreventInDemo::class, HandleInertiaRequests::class]);
 
         $middleware->group('tenant', [
             Installed::class,
@@ -48,8 +66,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'auth' => Authenticate::class,
             'self_hosted' => SelfHosted::class,
+            'self_hosted_or_setup' => SelfHostedOrSetup::class,
+            'setup_link_open' => SetupLinkIsOpen::class,
+            'within_school_limit' => WithinSchoolLimit::class,
             'cloud' => Cloud::class,
             'allows_pw_auth' => AllowsPasswordLogins::class,
             'sis_configured' => SisConfigured::class,
@@ -59,21 +79,22 @@ return Application::configure(basePath: dirname(__DIR__))
             'scoped_permissions' => ScopeBouncerToSchool::class,
             'no_admin' => NoDistrictAdmin::class,
         ]);
+
+        $middleware->redirectGuestsTo(fn () => route('login'));
+        $middleware->redirectUsersTo('/');
     })
-    ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->renderable(function (NoCurrentTenant $e) {
-            abort(404);
-        });
+    ->withExceptions(function (Exceptions $exceptions): void {
+        Flare::handles($exceptions);
+
+        $exceptions->render(fn (NoCurrentTenant $e) => abort(404));
 
         $exceptions->respond(function (Response $response, Throwable $e, Request $request) {
             if (
-                app()->environment('production') &&
-                in_array($response->getStatusCode(), [500, 503, 404, 403]) &&
-                (! $request->wantsJson() || $request->inertia())
+                ! config('app.debug')
+                && in_array($response->getStatusCode(), [500, 503, 404, 403])
+                && (! $request->wantsJson() || $request->inertia())
             ) {
                 $title = __('Error');
-
-                Inertia::setRootView('layouts.app');
 
                 return inertia('Error', [
                     'status' => $response->getStatusCode(),
@@ -86,4 +107,5 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return $response;
         });
-    })->create();
+    })
+    ->create();

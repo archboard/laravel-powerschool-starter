@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permission;
 use App\Http\Resources\UserResource;
 use App\Models\School;
 use App\Models\User;
+use App\Navigation\NavigationItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Response;
 
 class UserController extends Controller
@@ -15,6 +18,8 @@ class UserController extends Controller
      */
     public function index(Request $request, School $school): Response
     {
+        $this->authorize(Permission::viewAny, User::class);
+
         $title = __('Users');
         $filters = $request->currentFilters();
         $users = $school->users()
@@ -26,54 +31,30 @@ class UserController extends Controller
             'users' => UserResource::collection($users),
             'availableFilters' => (new User)->availableFiltersToArray(),
             'currentFilters' => (object) $filters,
+            'model_alias' => Str::toModelAlias(User::class),
+            'breadcrumbs' => $this->withBreadcrumbs(
+                NavigationItem::make()
+                    ->labeled(__('Users'))
+                    ->to(route('users.index'))
+                    ->isCurrent()
+            ),
         ])->withViewData(compact('title'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): void
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): void
-    {
-        //
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id): void
+    public function show(User $user): Response
     {
-        //
-    }
+        $this->authorize(Permission::view, $user);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id): void
-    {
-        //
-    }
+        $title = $user->name;
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id): void
-    {
-        //
-    }
+        $user->load('students');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id): void
-    {
-        //
+        return inertia('users/Show', [
+            'title' => $title,
+            'subjectUser' => new UserResource($user),
+        ])->withViewData(compact('title'));
     }
 }

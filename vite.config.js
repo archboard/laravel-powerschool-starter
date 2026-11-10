@@ -1,16 +1,19 @@
 import { defineConfig, loadEnv } from 'vite'
 import laravel from 'laravel-vite-plugin'
 import vue from '@vitejs/plugin-vue'
-import tailwindcss from '@tailwindcss/vite'
+import tailwind from '@tailwindcss/vite'
 
 export default ({ mode }) => {
+  // process.env = {
+  //   ...process.env,
+  //   ...loadEnv(mode, process.cwd(), 'APP_'),
+  // }
+
   return defineConfig({
     plugins: [
-      tailwindcss(),
+      tailwind(),
       laravel({
-        input: [
-          'resources/js/app.js',
-        ],
+        input: ['resources/js/app.js'],
         refresh: true,
       }),
       vue({

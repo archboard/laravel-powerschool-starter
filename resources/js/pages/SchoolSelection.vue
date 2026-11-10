@@ -1,12 +1,48 @@
 <template>
   <div class="flex justify-center py-12">
     <div class="max-w-md w-full mx-auto">
-      <form @submit.prevent="form.post(endpoint)">
+      <CardWrapper v-if="schools.length === 0">
+        <CardPadding class="text-center">
+          <UserGroupIcon class="mx-auto h-12 w-12 text-gray-400" />
+          <h2 class="mt-3 text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {{ __('No students found') }}
+          </h2>
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            {{ __("There are no students linked to your account, so there are no schools to choose from. If you believe this is a mistake, please contact your student's school to check your contact information.") }}
+          </p>
+        </CardPadding>
+        <CardAction>
+          <AppButton color="white" @click="router.post('/logout')">
+            {{ __('Log out') }}
+          </AppButton>
+        </CardAction>
+      </CardWrapper>
+
+      <form v-else @submit.prevent="form.post(endpoint)">
         <CardWrapper>
           <CardPadding>
             <CardHeader>{{ title }}</CardHeader>
           </CardPadding>
-          <CardPadding>
+          <CardPadding v-if="schoolLimit !== null">
+            <FormField :error="form.errors.schools" required>
+              {{ __('Choose the schools your district will use') }}
+              <template #component>
+                <HelpText>
+                  {{ __(':active of :limit licensed schools selected', { active: form.schools.length, limit: schoolLimit }) }}
+                </HelpText>
+                <div v-for="school in schools" :key="school.id">
+                  <AppCheckbox
+                    v-model="form.schools"
+                    :value="school.id"
+                    :disabled="form.schools.length >= schoolLimit && !form.schools.includes(school.id)"
+                  >
+                    {{ school.name }}
+                  </AppCheckbox>
+                </div>
+              </template>
+            </FormField>
+          </CardPadding>
+          <CardPadding v-if="schoolOptions.length">
               <FormField :error="form.errors.school_id" required>
                 {{ __('Choose your current school') }}
                 <template #component>
@@ -30,7 +66,8 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useForm } from '@inertiajs/vue3'
+import { router, useForm } from '@inertiajs/vue3'
+import { UserGroupIcon } from '@heroicons/vue/24/outline/index.js'
 import CardWrapper from '@/components/CardWrapper.vue'
 import CardPadding from '@/components/CardPadding.vue'
 import CardHeader from '@/components/CardHeader.vue'
@@ -39,23 +76,27 @@ import RadioGroup from '@/components/forms/RadioGroup.vue'
 import FormField from '@/components/forms/FormField.vue'
 import CardAction from '@/components/CardAction.vue'
 import AppButton from '@/components/AppButton.vue'
+import AppCheckbox from '@/components/forms/AppCheckbox.vue'
+import HelpText from '@/components/forms/HelpText.vue'
 
 const props = defineProps({
   schools: Array,
   user: Object,
   title: String,
   endpoint: String,
+  schoolLimit: { type: Number, default: null },
 })
 usePageTitle()
 const form = useForm({
   school_id: props.user.school_id,
+  ...(props.schoolLimit !== null ? { schools: [] } : {}),
 })
 const schoolOptions = computed(() => {
-  return props.schools.map((school) => {
-    return {
+  return props.schools
+    .filter(school => props.schoolLimit === null || form.schools.includes(school.id))
+    .map(school => ({
       label: school.name,
       value: school.id,
-    }
-  })
+    }))
 })
 </script>

@@ -1,6 +1,6 @@
 <?php
 
-use App\User;
+use App\Models\User;
 use GrantHolle\PowerSchool\Auth\Transformers\Lowercase;
 
 return [
@@ -46,7 +46,7 @@ return [
 
     'staff' => [
         'allowed' => true,
-        'model' => App\Models\User::class,
+        'model' => User::class,
         'attributes' => [
             'firstName' => 'first_name',
             'given_name' => 'first_name',
@@ -65,7 +65,7 @@ return [
 
     'guardian' => [
         'allowed' => true,
-        'model' => App\Models\User::class,
+        'model' => User::class,
         'attributes' => [
             'firstName' => 'first_name',
             'lastName' => 'last_name',

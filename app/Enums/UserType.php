@@ -2,13 +2,17 @@
 
 namespace App\Enums;
 
+use App\Enums\Traits\Collectable;
 use App\Enums\Traits\HasOptions;
 use App\Exceptions\UnknownPersonaException;
 use App\Models\Tenant;
 use Illuminate\Support\Collection;
+use Intrfce\LaravelFrontendEnums\Attributes\PublishEnum;
 
+#[PublishEnum]
 enum UserType: string
 {
+    use Collectable;
     use HasOptions;
 
     case staff = 'staff';
@@ -25,39 +29,47 @@ enum UserType: string
     }
 
     /**
-     * @param  Collection<string, mixed>  $data
+     * User types that can log in with a password. Students only sign in through the SIS.
+     *
+     * @return array<int, array{label: string, value: string}>
      */
-    public static function fromData(Collection $data): UserType
+    public static function passwordSelectOptions(): array
     {
-        if ($persona = $data->get('persona', $data->get('usertype'))) {
-            return match ($persona) {
-                'student' => self::student,
-                'staff', 'teacher' => self::staff,
-                'guardian', 'parent' => self::guardian,
-                default => throw new UnknownPersonaException("Unknown persona type: {$persona}"),
-            };
-        }
-
-        throw new UnknownPersonaException("Unknown persona type from data: {$data->toJson()}");
+        return array_values(array_filter(
+            self::selectOptions(),
+            fn (array $option) => $option['value'] !== self::student->value,
+        ));
     }
 
-    /**
-     * @param  Collection<string, mixed>  $data
-     */
+    /** @param Collection<array-key, mixed> $data */
+    public static function fromData(Collection $data): UserType
+    {
+        /** @var string|null $persona */
+        $persona = $data->get('persona', $data->get('usertype'));
+
+        return match ($persona) {
+            'student' => self::student,
+            'staff', 'teacher' => self::staff,
+            'guardian', 'parent' => self::guardian,
+            default => throw new UnknownPersonaException,
+        };
+    }
+
+    /** @param Collection<array-key, mixed> $data */
     public function getSisKeyFromData(Collection $data): string
     {
-        $tenant = Tenant::current();
+        $tenant = Tenant::current() ?? new Tenant;
         $id = $data->get('usersDCID') ??
             $data->get('ps_dcid') ??
             $data->get('dcid');
 
-        return "{$tenant?->id}|{$this->value}|{$id}";
+        return "{$tenant->id}|{$this->value}|{$id}";
     }
 
     public function getSisKeyFromSisId(string|int $sisId): string
     {
-        $tenant = Tenant::current();
+        $tenant = Tenant::current() ?? new Tenant;
 
-        return "{$tenant?->id}|{$this->value}|{$sisId}";
+        return "{$tenant->id}|{$this->value}|{$sisId}";
     }
 }

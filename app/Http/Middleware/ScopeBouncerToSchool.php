@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Silber\Bouncer\BouncerFacade;
@@ -16,8 +17,10 @@ class ScopeBouncerToSchool
      */
     public function handle(Request $request, Closure $next): Response
     {
+        /** @var User|null $user */
         $user = $request->user();
-        if ($user && ($school = $user->school_id)) {
+
+        if ($school = $user?->school_id) {
             BouncerFacade::scope()->to($school);
 
             return $next($request);

@@ -3,25 +3,16 @@
 namespace App\Http\Middleware;
 
 use App\Enums\Permission;
-use App\Enums\Role;
 use App\Http\Resources\SchoolResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Navigation\NavigationItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
-     *
-     * @var string
-     */
-    protected $rootView = 'layouts.app';
-
     /**
      * Determines the current asset version.
      *
@@ -38,8 +29,6 @@ class HandleInertiaRequests extends Middleware
      * Defines the props that are shared by default.
      *
      * @see https://inertiajs.com/shared-data
-     *
-     * @return array<string, mixed>
      */
     public function share(Request $request): array
     {
@@ -50,32 +39,20 @@ class HandleInertiaRequests extends Middleware
 
         return array_merge(parent::share($request), [
             'user' => function () use ($user) {
-                if ($user) {
-                    return new UserResource($user);
+                if (! $user) {
+                    return new \stdClass;
                 }
 
-                return new \stdClass;
+                return new UserResource($user);
             },
             'permissions' => fn () => $user
                 ? $user->permissions
                 : new \stdClass,
             'school' => fn () => new SchoolResource($school),
             'breadcrumbs' => [],
-            'adminSchools' => function () use ($user, $tenant) {
-                if (! $user) {
-                    return [];
-                }
-
-                $schools = $user->isA(Role::DISTRICT_ADMIN->value)
-                    ? $tenant->schools()
-                        ->active()
-                        ->orderBy('name')
-                        ->get()
-                    : $user->adminSchools()
-                        ->get();
-
-                return SchoolResource::collection($schools);
-            },
+            'adminSchools' => fn () => $user
+                ? SchoolResource::collection($user->adminSchools()->get())
+                : [],
             'flash' => [
                 'success' => session('success'),
                 'error' => session('error'),
@@ -115,6 +92,14 @@ class HandleInertiaRequests extends Middleware
                         ->to('/courses')
                         ->isCurrent($request->routeIs('courses.*'))
                         ->withIcon('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" /></svg>');
+                }
+
+                if ($user->can('edit school settings')) {
+                    $nav[] = NavigationItem::make()
+                        ->labeled(__('Activity'))
+                        ->to(route('activity.index'))
+                        ->isCurrent($request->routeIs('activity.*'))
+                        ->withIcon('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>');
                 }
 
                 if ($user->hasCachedPermission('user', Permission::viewAny)) {
@@ -162,6 +147,13 @@ class HandleInertiaRequests extends Middleware
                 return array_map(fn (NavigationItem $item) => $item->toArray(), $nav);
             },
             'filterKey' => fn () => 'f',
+            'demo' => (bool) config('app.demo'),
+            'demoReadOnly' => fn () => PreventInDemo::locks($request),
+            // Echo's connection settings, so the JS bundle isn't tied to one environment
+            'reverb' => fn () => [
+                'key' => config('broadcasting.connections.reverb.key'),
+                ...Arr::only(config('broadcasting.connections.reverb.options'), ['host', 'port', 'scheme']),
+            ],
         ]);
     }
 }

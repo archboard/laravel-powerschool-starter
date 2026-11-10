@@ -1,7 +1,12 @@
 <?php
 
+use App\Events\PowerSchoolPluginRegistered;
 use App\Models\Tenant;
 use App\Services\PowerSchoolPluginService;
+use Illuminate\Broadcasting\BroadcastException;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Http;
 
 function registrationPayload(string $host, array $overrides = []): array
@@ -26,7 +31,9 @@ function fakePowerSchool(): void
 }
 
 it('stores verified credentials on the existing tenant', function () {
+    Event::fake([PowerSchoolPluginRegistered::class]);
     fakePowerSchool();
+    $this->seedUser();
     $this->freezeTime();
 
     $this->postJson(route('powerschool.registration'), registrationPayload($this->tenant->domain))
@@ -43,9 +50,11 @@ it('stores verified credentials on the existing tenant', function () {
         'client_secret' => 'new-client-secret',
     ])->and(Tenant::count())->toBe(1);
 
+    Event::assertNotDispatched(PowerSchoolPluginRegistered::class);
 });
 
-it('starts a self-hosted tenant before installation', function () {
+it('starts a self-hosted tenant and fills its install form', function () {
+    Event::fake([PowerSchoolPluginRegistered::class]);
     fakePowerSchool();
 
     $this->postJson('https://new.example.com/api/powerschool/registration', registrationPayload('new.example.com'))
@@ -56,19 +65,72 @@ it('starts a self-hosted tenant before installation', function () {
 
     expect($tenant->name)->toBe('new.example.com')
         ->and($tenant->sis_config->get('client_id'))->toBe('new-client-id');
+
+    Event::assertDispatched(PowerSchoolPluginRegistered::class, fn ($event) => $event->sisConfig === [
+        'url' => 'https://ps.example.com',
+        'client_id' => 'new-client-id',
+        'client_secret' => 'new-client-secret',
+    ]);
 });
 
-it('fills the install form for a registered tenant', function () {
+it("fills an existing tenant's install form until it has a user", function () {
+    Event::fake([PowerSchoolPluginRegistered::class]);
+    fakePowerSchool();
+
+    $this->postJson(route('powerschool.registration'), registrationPayload($this->tenant->domain))
+        ->assertOk();
+
+    Event::assertDispatched(PowerSchoolPluginRegistered::class, fn ($event) => $event->broadcastOn()->name === PowerSchoolPluginRegistered::channelName($this->tenant->domain)
+        && $event->broadcastWith() === ['sisConfig' => [
+            'url' => 'https://ps.example.com',
+            'client_id' => 'new-client-id',
+            'client_secret' => 'new-client-secret',
+        ]]);
+});
+
+it('reports success on a first install with no current tenant', function () {
+    Event::fake([PowerSchoolPluginRegistered::class]);
+    fakePowerSchool();
+    Tenant::forgetCurrent();
+
+    $this->post('https://new.example.com/api/powerschool/registration', registrationPayload('new.example.com'))
+        ->assertOk()
+        ->assertJson(['callback_result' => '200', 'message' => 'SUCCESS']);
+
+    Event::assertDispatched(PowerSchoolPluginRegistered::class);
+});
+
+it('still reports success when the install form broadcast fails', function () {
+    Exceptions::fake();
+    fakePowerSchool();
+    Broadcast::shouldReceive('queue')->once()->andThrow(new BroadcastException('Reverb is unreachable'));
+
+    $this->post('https://new.example.com/api/powerschool/registration', registrationPayload('new.example.com'))
+        ->assertOk()
+        ->assertJson(['callback_result' => '200', 'message' => 'SUCCESS']);
+
+    expect(Tenant::getByHost('new.example.com')->sis_config->get('client_id'))->toBe('new-client-id');
+    Exceptions::assertReported(BroadcastException::class);
+});
+
+it('broadcasts on a channel only its host knows', function () {
+    expect(PowerSchoolPluginRegistered::channelName('a.example.com'))
+        ->not->toBe(PowerSchoolPluginRegistered::channelName('b.example.com'))
+        ->not->toBe('install');
+});
+
+it('fills the install form on reload without websockets', function () {
+    Event::fake([PowerSchoolPluginRegistered::class]);
     fakePowerSchool();
 
     $this->postJson('https://new.example.com/api/powerschool/registration', registrationPayload('new.example.com'));
 
     $this->get('https://new.example.com/install')
-        ->assertInertia(fn ($page) => $page->where('installationValues.sis_config', [
+        ->assertInertia(fn ($page) => $page->where('sisConfig', [
             'url' => 'https://ps.example.com',
             'client_id' => 'new-client-id',
             'client_secret' => 'new-client-secret',
-        ]));
+        ])->where('channel', PowerSchoolPluginRegistered::channelName('new.example.com')));
 });
 
 it("doesn't create a tenant in the cloud", function () {

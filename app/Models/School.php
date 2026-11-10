@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\ActivityEvent;
 use App\Models\Contracts\ExistsInSis;
 use App\Traits\BelongsToTenant;
+use App\Traits\HasTimezone;
 use Carbon\CarbonImmutable;
 use Database\Factories\SchoolFactory;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -12,6 +14,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 /**
  * @property int $id
@@ -25,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $updated_at
  * @property bool $active
  * @property string $sis_key
+ * @property string|null $timezone
  * @property-read Collection<int, Course> $courses
  * @property-read int|null $courses_count
  * @property-read Collection<int, Section> $sections
@@ -50,7 +55,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereSisId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereSisKey($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereTenantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereTimezone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|School whereUpdatedAt($value)
+ *
+ * @property-read Collection<int, Activity> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
  *
  * @mixin \Eloquent
  */
@@ -61,14 +70,21 @@ class School extends Model implements ExistsInSis
     /** @use HasFactory<SchoolFactory> */
     use HasFactory;
 
-    /**
-     * @var list<string>
-     */
+    use HasTimezone;
+    use LogsActivity;
+
     protected $guarded = [];
 
-    /**
-     * @var array<string, string>
-     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logExcept(['updated_at'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges()
+            ->setDescriptionForEvent(fn (string $event) => ActivityEvent::from($event)->description());
+    }
+
     protected $casts = [
         'active' => 'boolean',
     ];
@@ -78,34 +94,26 @@ class School extends Model implements ExistsInSis
         $builder->where('active', true);
     }
 
-    /**
-     * @return BelongsToMany<User, $this>
-     */
+    /** @return BelongsToMany<User, $this> */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)
             ->withPivot(['staff_id']);
     }
 
-    /**
-     * @return HasMany<Course, $this>
-     */
+    /** @return HasMany<Course, $this> */
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class);
     }
 
-    /**
-     * @return HasMany<Section, $this>
-     */
+    /** @return HasMany<Section, $this> */
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class);
     }
 
-    /**
-     * @return HasMany<Student, $this>
-     */
+    /** @return HasMany<Student, $this> */
     public function students(): HasMany
     {
         return $this->hasMany(Student::class);
@@ -113,41 +121,47 @@ class School extends Model implements ExistsInSis
 
     public function syncFromSis(): static
     {
-        $provider = $this->tenant->getSisProvider();
-        $provider?->syncSchool($this);
+        $this->tenant->getSisProvider()?->syncSchool($this);
 
         return $this;
     }
 
     public function syncStaff(): static
     {
-        $provider = $this->tenant->getSisProvider();
-        $provider?->syncSchoolStaff($this);
+        $this->tenant->getSisProvider()?->syncSchoolStaff($this);
 
         return $this;
     }
 
     public function syncStudents(): static
     {
-        $provider = $this->tenant->getSisProvider();
-        $provider?->syncSchoolStudents($this);
+        $this->tenant->getSisProvider()?->syncSchoolStudents($this);
 
         return $this;
     }
 
     public function syncCourses(): static
     {
-        $provider = $this->tenant->getSisProvider();
-        $provider?->syncSchoolCourses($this);
+        $this->tenant->getSisProvider()?->syncSchoolCourses($this);
 
         return $this;
     }
 
     public function syncSections(): static
     {
-        $provider = $this->tenant->getSisProvider();
-        $provider?->syncSchoolSections($this);
+        $this->tenant->getSisProvider()?->syncSchoolSections($this);
 
         return $this;
+    }
+
+    public static function current(): self
+    {
+        return request()->school();
+    }
+
+    /** @return array<int, int> */
+    public function gradeSelectOptions(): array
+    {
+        return range((int) $this->low_grade, (int) $this->high_grade);
     }
 }

@@ -3,7 +3,7 @@
 use Spatie\Multitenancy\Exceptions\NoCurrentTenant;
 
 test('production error responses render the inertia error page', function () {
-    app()->detectEnvironment(fn () => 'production');
+    config(['app.debug' => false]);
 
     $this->get('/this-route-does-not-exist')
         ->assertNotFound()

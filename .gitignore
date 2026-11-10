@@ -2,8 +2,8 @@
 /public/hot
 /public/css
 /public/js
-/public/build
 /public/storage
+/public/build
 /public/mix-manifest.json
 /storage/*.key
 /vendor
@@ -21,10 +21,12 @@ _ide_*
 .phpstorm.meta.php
 .phpactor.json
 .phpunit.cache/test-results
-.mcp.json
 opencode.json
+.mcp.json
 boost.json
 .claude/settings.local.json
+.ai/
+/tests/Browser/Screenshots
 .phpunit.cache
 
 **/caddy

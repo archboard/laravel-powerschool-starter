@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\Role;
 use App\Enums\UserType;
 use App\Models\User;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
@@ -30,10 +31,18 @@ class InstallFirstUserController extends Controller
             'tenant_id' => $request->tenant()->id,
             'user_type' => UserType::staff,
         ]);
-        $user->syncFromSis();
+
+        try {
+            $user->syncFromSis();
+        } catch (GuzzleException) {
+            return back()->with('error', $request->tenant()->sis_provider?->connectionErrorMessage());
+        }
+
         BouncerFacade::allow(Role::DISTRICT_ADMIN->value)->everything();
         $user->assignRole(Role::DISTRICT_ADMIN);
         auth()->login($user);
+        $request->session()->forget('setup_tenant_id');
+        $request->session()->put('first_sync', true);
 
         return to_route('select-school');
     }

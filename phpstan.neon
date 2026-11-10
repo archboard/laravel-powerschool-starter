@@ -1,15 +1,10 @@
 includes:
     - vendor/larastan/larastan/extension.neon
-    - vendor/nesbot/carbon/extension.neon
 
 parameters:
-
     paths:
-        - app/
+        - app
 
-    # Level 10 is the highest level
     level: 8
 
-    reportUnmatchedIgnoredErrors: true
-
-    # ignoreErrors:
+    ignoreErrors:

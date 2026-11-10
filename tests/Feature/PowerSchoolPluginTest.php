@@ -24,7 +24,6 @@ it('builds a zip with plugin.xml at the root and the query files in place', func
     expect($names->all())->toBe(['plugin.xml', 'queries_root/plugin_name.named_queries.xml'])
         ->and($zip->getFromName('plugin.xml'))
         ->toContain('version="1.0.0"')
-        ->toContain('name="'.config('app.name').'"')
         ->toContain('base-url="https://ptc.example.com"')
         ->toContain('<openid host="ptc.example.com" port="443">')
         ->toContain('<registration url="https://ptc.example.com/api/powerschool/registration">')

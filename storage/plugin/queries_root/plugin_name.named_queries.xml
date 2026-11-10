@@ -1,5 +1,5 @@
 <queries>
-  <query name="com.archboard.plugin_name.students.enrollment" flattened="true">
+  <query name="com.archboard.starter_sample.students.enrollment" flattened="true">
     <description>Gets students' current enrollment.</description>
     <args>
       <arg name="dcid" type="array" required="true" />
@@ -28,7 +28,7 @@ order by s.dcid
       ]]>
     </sql>
   </query>
-  <query name="com.archboard.plugin_name.guardian.contactid" flattened="true">
+  <query name="com.archboard.starter_sample.guardian.contactid" flattened="true">
     <description>Gets the contact id of the guardian</description>
     <args>
       <arg name="guardianid" required="true" />
@@ -46,7 +46,7 @@ where
       ]]>
     </sql>
   </query>
-  <query name="com.archboard.plugin_name.user.get" flattened="true">
+  <query name="com.archboard.starter_sample.user.get" flattened="true">
     <description>Gets the data for a user/staff.</description>
     <args>
       <arg name="dcid" required="true" />
@@ -70,7 +70,7 @@ where
       ]]>
     </sql>
   </query>
-  <query name="com.archboard.plugin_name.user.search" flattened="true">
+  <query name="com.archboard.starter_sample.user.search" flattened="true">
     <description>Searches for a user by name or email.</description>
     <args>
       <arg name="search" required="true" />

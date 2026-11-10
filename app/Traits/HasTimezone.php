@@ -7,9 +7,7 @@ use Carbon\FactoryImmutable as Factory;
 
 trait HasTimezone
 {
-    /**
-     * @return array{locale: string, timezone: string}
-     */
+    /** @return array<string, mixed> */
     public function getCarbonSettings(): array
     {
         return [

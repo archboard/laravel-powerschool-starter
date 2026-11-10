@@ -8,6 +8,7 @@ use App\Models\School;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Navigation\NavigationItem;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -20,12 +21,13 @@ class UserPermissionController extends Controller
     public function index(Request $request, User $user): Response
     {
         $title = __('Permissions for :name', ['name' => $user->name]);
+        /** @var User $authUser */
         $authUser = $request->user();
 
         return inertia('users/Permissions', [
             'title' => $title,
             'subject' => new UserResource($user),
-            'userPermissions' => $user->getPermissionMatrix($authUser, $authUser?->school),
+            'userPermissions' => $user->getPermissionMatrix($authUser, $authUser->school),
             'breadcrumbs' => $this->withBreadcrumbs(
                 NavigationItem::make()
                     ->labeled(__('Users'))
@@ -43,11 +45,16 @@ class UserPermissionController extends Controller
 
     public function update(Request $request, Tenant $tenant, User $user): JsonResponse
     {
-        $validModels = array_reduce($user->getPermissionSubjectModels(), function (array $carry, string $model) {
-            $carry[] = (new $model)->getMorphClass();
+        $validModels = array_reduce(
+            $user->getPermissionSubjectModels(),
+            /** @param class-string<Model> $model */
+            function (array $carry, string $model) {
+                $carry[] = (new $model)->getMorphClass();
 
-            return $carry;
-        }, ['*']);
+                return $carry;
+            },
+            ['*']
+        );
 
         $data = Validator::make($request->all(), [
             'permission' => ['required', new Enum(Permission::class)],
@@ -56,19 +63,19 @@ class UserPermissionController extends Controller
             'model' => ['nullable', Rule::in($validModels)],
         ])->after(function (\Illuminate\Validation\Validator $validator) use ($request) {
             $permission = Permission::from($request->input('permission'));
+            /** @var User $authUser */
             $authUser = $request->user();
             $noSchool = ! $request->input('school');
 
             if ($permission->shouldBeScoped() && $noSchool) {
                 $validator->errors()->add('school', __('This permission requires a school to be selected.'));
-            } elseif ($noSchool && $authUser && $authUser->cant(Permission::editTenantSettings->value)) {
+            } elseif ($noSchool && $authUser->cant(Permission::editTenantSettings->value)) {
                 $validator->errors()->add('permission', __('You are not allowed to grant this permission.'));
             }
         })->validateWithBag('default');
 
         $permission = Permission::from($data['permission']);
-        /** @var School|null */
-        $school = School::find($data['school']);
+        $school = $data['school'] ? School::query()->findOrFail((int) $data['school']) : null;
 
         $user->updateAppPermission($permission, $data['granted'], $school, $data['model']);
 

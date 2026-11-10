@@ -38,16 +38,11 @@ class SelectedModel extends Model
     use BelongsToTenant;
     use BelongsToUser;
 
-    /**
-     * @var list<string>
-     */
     protected $guarded = [];
 
     public $timestamps = false;
 
-    /**
-     * @return MorphTo<Model, $this>
-     */
+    /** @return MorphTo<Model, $this> */
     public function selectable(): MorphTo
     {
         return $this->morphTo();

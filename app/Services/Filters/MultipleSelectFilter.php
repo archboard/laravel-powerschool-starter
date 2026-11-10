@@ -14,9 +14,7 @@ class MultipleSelectFilter extends BaseFilter
 
     public Component $component = Component::checkbox_group;
 
-    /**
-     * @return array<int, mixed>
-     */
+    /** @return array<int, mixed> */
     public function defaultValue(): array
     {
         return [];

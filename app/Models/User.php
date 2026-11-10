@@ -5,8 +5,8 @@ namespace App\Models;
 use App\Enums\Role;
 use App\Enums\UserType;
 use App\Models\Contracts\ExistsInSis;
+use App\Models\Contracts\Filterable;
 use App\Services\Filters\BaseFilter;
-use App\Services\Filters\Enums\Component;
 use App\Services\Filters\MultipleSelectFilter;
 use App\Services\Filters\TextFilter;
 use App\Traits\BelongsToTenant;
@@ -16,7 +16,9 @@ use App\Traits\HasPermissions;
 use App\Traits\HasTimezone;
 use App\Traits\Selectable;
 use Carbon\CarbonImmutable;
+use Closure;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -52,6 +54,7 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
  * @property string $sis_key
  * @property UserType|null $user_type
  * @property string $locale
+ * @property bool $is_24h
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Ability> $abilities
  * @property-read int|null $abilities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, School> $adminSchools
@@ -66,6 +69,8 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
  * @property-read School|null $school
  * @property-read \Illuminate\Database\Eloquent\Collection<int, School> $schools
  * @property-read int|null $schools_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Section> $sections
+ * @property-read int|null $sections_count
  * @property-read SelectedModel|null $selectedModel
  * @property-read \Illuminate\Database\Eloquent\Collection<int, SelectedModel> $selectedModels
  * @property-read int|null $selected_models_count
@@ -74,21 +79,25 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
  * @property-read Tenant $tenant
  *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
- * @method static Builder<static>|User filter(\Illuminate\Support\Collection<string, mixed>|array<string, mixed> $data)
+ * @method static Builder<static>|User filter(\Illuminate\Support\Collection<array-key, mixed>|array<array-key, mixed> $data)
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
  * @method static Builder<static>|User query()
- * @method static Builder<static>|User search(string $search)
+ * @method static Builder<static>|User search(string|int $search)
  * @method static Builder<static>|User whereCan(string $ability)
+ * @method static Builder<static>|User whereCanBook($value)
  * @method static Builder<static>|User whereCreatedAt($value)
  * @method static Builder<static>|User whereEmail($value)
  * @method static Builder<static>|User whereFirstName($value)
  * @method static Builder<static>|User whereId($value)
  * @method static Builder<static>|User whereIs($role)
+ * @method static Builder<static>|User whereIs24h($value)
  * @method static Builder<static>|User whereIsAll($role)
  * @method static Builder<static>|User whereIsNot($role)
  * @method static Builder<static>|User whereLastName($value)
  * @method static Builder<static>|User whereLocale($value)
+ * @method static Builder<static>|User whereMeetingUrl($value)
+ * @method static Builder<static>|User whereNotificationConfig($value)
  * @method static Builder<static>|User wherePassword($value)
  * @method static Builder<static>|User whereRememberToken($value)
  * @method static Builder<static>|User whereSchoolId($value)
@@ -100,10 +109,11 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
  * @method static Builder<static>|User whereTwoFactorSecret($value)
  * @method static Builder<static>|User whereUpdatedAt($value)
  * @method static Builder<static>|User whereUserType($value)
+ * @method static Builder<static>|User whereRoom($value)
  *
  * @mixin \Eloquent
  */
-class User extends Authenticatable implements ExistsInSis
+class User extends Authenticatable implements ExistsInSis, Filterable, HasLocalePreference
 {
     use BelongsToTenant;
 
@@ -121,7 +131,7 @@ class User extends Authenticatable implements ExistsInSis
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected $guarded = [];
 
@@ -142,6 +152,7 @@ class User extends Authenticatable implements ExistsInSis
      */
     protected $casts = [
         'user_type' => UserType::class,
+        'is_24h' => 'boolean',
     ];
 
     // -------------------------------------------------------------------------
@@ -150,9 +161,8 @@ class User extends Authenticatable implements ExistsInSis
 
     /**
      * Gets the users who have an ability directly or through a role
-     */
-    /**
-     * @param  Builder<User>  $query
+     *
+     * @param  Builder<static>  $query
      */
     public function scopeWhereCan(Builder $query, string $ability): void
     {
@@ -170,14 +180,16 @@ class User extends Authenticatable implements ExistsInSis
         });
     }
 
-    /**
-     * @param  Builder<User>  $builder
-     */
-    public function scopeSearch(Builder $builder, string $search): void
+    /** @param Builder<static> $builder */
+    public function scopeSearch(Builder $builder, string|int $search): void
     {
-        $builder->where(function (Builder $builder) use ($search) {
-            $builder->where(DB::raw("(first_name || ' ' || last_name)"), 'ilike', "%{$search}%")
-                ->orWhere('email', 'ilike', "%{$search}%");
+        $builder->when(is_numeric($search), function (Builder $builder) use ($search) {
+            $builder->where('id', $search);
+        })->unless(is_numeric($search), function (Builder $builder) use ($search) {
+            $builder->where(function (Builder $builder) use ($search) {
+                $builder->where(DB::raw("(first_name || ' ' || last_name)"), 'ilike', "%{$search}%")
+                    ->orWhere('email', 'ilike', "%{$search}%");
+            });
         });
     }
 
@@ -185,17 +197,13 @@ class User extends Authenticatable implements ExistsInSis
     // Relationships
     // -------------------------------------------------------------------------
 
-    /**
-     * @return BelongsToMany<School, $this>
-     */
+    /** @return BelongsToMany<School, $this> */
     public function schools(): BelongsToMany
     {
         return $this->belongsToMany(School::class);
     }
 
-    /**
-     * @return BelongsToMany<Student, $this>
-     */
+    /** @return BelongsToMany<Student, $this> */
     public function students(): BelongsToMany
     {
         return $this->belongsToMany(Student::class)
@@ -203,30 +211,47 @@ class User extends Authenticatable implements ExistsInSis
     }
 
     /**
-     * @return BelongsToMany<School, $this>
+     * District admins can access every active school in the tenant, guardians the schools
+     * of their linked students, and everyone else only their assigned schools.
+     *
+     * @return Builder<School>
      */
-    public function adminSchools(): BelongsToMany
+    public function adminSchools(): Builder
     {
-        return $this->schools()
+        $query = match (true) {
+            $this->isA(Role::DISTRICT_ADMIN->value) => $this->tenant->schools()->getQuery(),
+            $this->user_type === UserType::guardian => $this->tenant->schools()
+                ->getQuery()
+                ->whereIn('id', $this->students()->select('students.school_id')),
+            default => $this->schools()->getQuery(),
+        };
+
+        return $query
             ->active()
             ->orderBy('name');
     }
 
-    /**
-     * @return BelongsTo<School, $this>
-     */
+    /** @return BelongsTo<School, $this> */
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class);
     }
 
-    /**
-     * @return HasMany<SelectedModel, $this>
-     */
+    /** @return HasMany<SelectedModel, $this> */
     public function selectedModels(): HasMany
     {
         return $this->hasMany(SelectedModel::class);
     }
+
+    /** @return HasMany<Section, $this> */
+    public function sections(): HasMany
+    {
+        return $this->hasMany(Section::class);
+    }
+
+    // -------------------------------------------------------------------------
+    // Custom accessors and mutators
+    // -------------------------------------------------------------------------
 
     // -------------------------------------------------------------------------
     // Instance functions
@@ -268,31 +293,25 @@ class User extends Authenticatable implements ExistsInSis
     public function toggleSelectedModel(string $modelAlias, int $id): static
     {
         if (class_exists($modelAlias)) {
-            /** @var Model $instance */
             $instance = new $modelAlias;
+            assert($instance instanceof Model);
             $modelAlias = $instance->getMorphClass();
         }
 
         if ($model = Relation::getMorphedModel($modelAlias)) {
-            return $this->toggleSelectedModelInstance(new $model(['id' => $id]));
+            $instance = new $model(['id' => $id]);
+
+            return $this->toggleSelectedModelInstance($instance);
         }
 
         return $this;
     }
 
-    /**
-     * @param  array<string, mixed>  $filters
-     */
-    public function selectAllModel(string $modelAlias, array $filters = []): static
+    /** @param array<array-key, mixed>|Collection<array-key, mixed> $filters */
+    public function selectAllModel(string $modelAlias, array|Collection $filters = []): static
     {
-        if (class_exists($modelAlias)) {
-            /** @var Model $instance */
-            $instance = new $modelAlias;
-            $modelAlias = $instance->getMorphClass();
-        }
-
-        if (Relation::getMorphedModel($modelAlias)) {
-            $relationship = Str::plural($modelAlias);
+        if ($alias = Str::toModelAlias($modelAlias)) {
+            $relationship = Str::plural($alias);
 
             $data = $this->school
                 ->$relationship()
@@ -302,11 +321,11 @@ class User extends Authenticatable implements ExistsInSis
                     'tenant_id' => $this->tenant_id,
                     'school_id' => $this->school_id,
                     'user_id' => $this->id,
-                    'selectable_type' => $modelAlias,
+                    'selectable_type' => $alias,
                     'selectable_id' => $id,
                 ]);
 
-            $this->deselectAllModel($modelAlias)
+            $this->deselectAllModel($alias)
                 ->selectedModels()
                 ->insert($data->toArray());
         }
@@ -317,51 +336,50 @@ class User extends Authenticatable implements ExistsInSis
     public function deselectAllModel(string $modelAlias): static
     {
         $this->selectedModels()
-            ->where('selectable_type', $modelAlias)
+            ->where('selectable_type', Str::toModelAlias($modelAlias))
             ->where('school_id', $this->school_id)
             ->delete();
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, mixed>
-     */
-    public function getModelSelection(string $model): Collection
+    /** @return Collection<int, int> */
+    public function getModelSelection(string $model, ?Closure $where = null): Collection
     {
-        $modelAlias = $model;
-        if (class_exists($model)) {
-            /** @var Model $instance */
-            $instance = new $model;
-            $modelAlias = $instance->getMorphClass();
-        }
-
         return $this->selectedModels()
             ->where('school_id', $this->school_id)
-            ->where('selectable_type', $modelAlias)
+            ->where('selectable_type', Str::toModelAlias($model))
+            ->when($where, $where)
             ->pluck('selectable_id')
             ->values();
     }
 
-    /**
-     * @return array<int, BaseFilter>
-     */
+    /** @param Builder<User> $builder */
+    protected function applySearchFilter(Builder $builder, string|int $search): void
+    {
+        $builder->search($search);
+    }
+
+    /** @return array<int, BaseFilter> */
     public function filters(): array
     {
         return [
             TextFilter::make('search', __('Search'))
                 ->hide()
-                ->using(fn ($builder, string $search) => $builder->search($search)),
+                ->using($this->applySearchFilter(...)),
             TextFilter::make('first_name', __('First name')),
             TextFilter::make('last_name', __('Last name')),
-            MultipleSelectFilter::make('user_type', __('Checkbox group'))
+            MultipleSelectFilter::make('user_type', __('User type'))
                 ->options(UserType::options()),
-            MultipleSelectFilter::make('user_type', __('Combobox'))
-                ->withComponent(Component::combobox)
-                ->options(UserType::options()),
-            MultipleSelectFilter::make('user_type', __('Select'))
-                ->withComponent(Component::combobox)
-                ->options(UserType::options()),
+            MultipleSelectFilter::make('teacher', __('Teachers'))
+                ->hide()
+                ->using(fn (Builder $builder) => $builder
+                    ->whereHas('sections')),
         ];
+    }
+
+    public function preferredLocale(): ?string
+    {
+        return $this->locale;
     }
 }

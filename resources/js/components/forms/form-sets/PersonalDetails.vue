@@ -3,22 +3,50 @@
     <SplitForm cancel="/settings/personal" :loading="form.processing">
       <template #headline>
         <Headline3>{{ __('Personal details') }}</Headline3>
-        <HelpText>{{ __(`These items are synchronized from your SIS, so they may be overwritten on the next sync or log in.`) }}</HelpText>
+        <HelpText>{{ __(`Some items are synchronized from :sis, so they may be overwritten on the next sync or the next time you log in.`, { sis: tenant.sis }) }}</HelpText>
       </template>
 
-      <FormField v-model="form.first_name" :error="form.errors.first_name" class="col-span-6 sm:col-span-3">
+      <FormField v-model="form.first_name" :error="form.errors.first_name" :help="__('Syncs from :sis.', { sis: tenant.sis })" class="col-span-6 sm:col-span-3">
         {{ __('First name') }}
       </FormField>
-      <FormField v-model="form.last_name" :error="form.errors.last_name" class="col-span-6 sm:col-span-3">
+
+      <FormField v-model="form.last_name" :error="form.errors.last_name" :help="__('Syncs from :sis.', { sis: tenant.sis })" class="col-span-6 sm:col-span-3">
         {{ __('Last name') }}
       </FormField>
-      <FormField v-model="form.email" :error="form.errors.email" type="email" class="col-span-6 sm:col-span-3">
+
+      <FormField v-model="form.email" :error="form.errors.email" :help="__('Syncs from :sis.', { sis: tenant.sis })" type="email" class="col-span-6 sm:col-span-3">
         {{ __('Email') }}
       </FormField>
-      <FormField :error="form.errors.timezone" class="col-span-6 sm:col-span-3">
+
+      <FormField :error="form.errors.timezone" class="col-span-6 sm:col-span-3 sm:col-start-1" required>
         {{ __('Timezone') }}
         <template #component="{ id, hasError }">
           <TimezoneCombobox v-model="form.timezone" :id="id" :has-error="hasError" />
+        </template>
+      </FormField>
+
+      <FormField :error="form.errors.locale" class="col-span-6 sm:col-span-3" required>
+        {{ __('Language') }}
+        <template #component>
+          <AppSelect v-model="form.locale" hide-null>
+            <option v-for="language in languages" :key="language.value" :value="language.value">{{ language.native_name }}</option>
+          </AppSelect>
+        </template>
+      </FormField>
+
+      <FormField :error="form.errors.is_24h" :help="__('When enabled, you will see time formatted using 24 hours instead of 12. For example, 13:00 instead of 1:00pm.')" class="col-span-6">
+        <template #component>
+          <AppCheckbox v-model="form.is_24h">
+            {{ __('Format time using 24 hours') }}
+          </AppCheckbox>
+        </template>
+      </FormField>
+
+      <FormField :help="__('Saved in this browser only.')" class="col-span-6">
+        <template #component>
+          <AppCheckbox v-model="isDark">
+            {{ __('Use dark theme') }}
+          </AppCheckbox>
         </template>
       </FormField>
 
@@ -41,6 +69,10 @@ import TimezoneCombobox from '@/components/forms/TimezoneCombobox.vue'
 import AppButton from '@/components/AppButton.vue'
 import { watch } from 'vue'
 import useSisObjectSync from '@/composition/useSisObjectSync.js'
+import AppCheckbox from '@/components/forms/AppCheckbox.vue'
+import AppSelect from '@/components/forms/AppSelect.vue'
+import useLanguages from '@/composition/useLanguages.js'
+import useColorTheme from '@/composition/useColorTheme.js'
 
 const user = useProp('user')
 const tenant = useProp('tenant')
@@ -49,7 +81,11 @@ const form = useForm({
   last_name: user.value.last_name,
   email: user.value.email,
   timezone: user.value.timezone,
+  is_24h: user.value.is_24h,
+  locale: user.value.locale ?? 'en',
 })
+const languages = useLanguages()
+const { isDark } = useColorTheme()
 const { syncing, sync } = useSisObjectSync('user', user)
 const submit = () => {
   form.put('/settings/personal', {

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\School;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,11 +15,8 @@ class UpdateCurrentSchoolController extends Controller
      */
     public function __invoke(Request $request): RedirectResponse
     {
+        /** @var User $user */
         $user = $request->user();
-        if (! $user) {
-            return back();
-        }
-
         $data = $request->validate([
             'school_id' => [
                 'required',
@@ -30,9 +29,9 @@ class UpdateCurrentSchoolController extends Controller
         $user->update($data);
 
         session()->flash('success', __('School changed to :school.', [
-            'school' => $user->school?->name,
+            'school' => School::findOrFail((int) $data['school_id'])->name,
         ]));
 
-        return back();
+        return to_route('home');
     }
 }

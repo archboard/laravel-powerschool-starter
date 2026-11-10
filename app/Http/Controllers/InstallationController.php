@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\InstallationValuesData;
-use App\Data\StoreInstallationData;
+use App\Events\PowerSchoolPluginRegistered;
 use App\Jobs\SyncSchools;
 use App\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 use Inertia\Response;
 
 class InstallationController extends Controller
@@ -15,20 +16,35 @@ class InstallationController extends Controller
     public function index(Request $request): Response
     {
         $title = __('Installation');
-        $tenant = Tenant::fromRequestAndFallback($request);
+        $tenant = $this->tenant($request);
 
         return inertia('Install', [
             'title' => $title,
-            'installationValues' => InstallationValuesData::fromTenant($tenant),
-            'isCloud' => (bool) config('app.cloud'),
+            'name' => $tenant->name,
+            'domain' => $tenant->domain,
+            'sisConfig' => $tenant->sis_config->toArray(),
+            'isCloud' => config('app.cloud'),
+            'channel' => PowerSchoolPluginRegistered::channelName($request->host()),
         ])->withViewData(compact('title'));
     }
 
-    public function store(StoreInstallationData $data): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        $tenant = Tenant::fromRequestAndFallback(request());
+        $tenant = $this->tenant($request);
 
-        $tenant->fill($data->toArray())->save();
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            // Cloud domains are set at provisioning
+            ...(config('app.cloud') ? [] : [
+                'domain' => ['required', Rule::unique('tenants', 'domain')->ignoreModel($tenant)],
+            ]),
+            'sis_config.url' => ['required', 'url'],
+            'sis_config.client_id' => ['required', 'uuid'],
+            'sis_config.client_secret' => ['required', 'uuid'],
+        ]);
+
+        $tenant->fill(Arr::undot($data))
+            ->save();
         $tenant->makeCurrent();
 
         // Kick off job to sync schools
@@ -37,5 +53,15 @@ class InstallationController extends Controller
         session()->flash('success', __('Installation complete. Sync has been started.'));
 
         return to_route('install.user');
+    }
+
+    /**
+     * A cloud setup session always has a current tenant; only self-hosted installs create one.
+     */
+    protected function tenant(Request $request): Tenant
+    {
+        return config('app.cloud')
+            ? Tenant::current() ?? abort(404)
+            : Tenant::fromRequestAndFallback($request);
     }
 }

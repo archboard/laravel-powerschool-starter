@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
-use App\Models\User;
 use GrantHolle\PowerSchool\Auth\Traits\AuthenticatesUsingPowerSchoolWithOidc;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
@@ -35,15 +34,13 @@ class PowerSchoolOidcLoginController extends Controller
     }
 
     /**
-     * @param  Collection<int|string, mixed>  $data
+     * @param  Collection<array-key, mixed>  $data
+     * @return void
      */
-    protected function authenticated(Request $request, Authenticatable $user, Collection $data): void
+    protected function authenticated(Request $request, Authenticatable $user, Collection $data)
     {
-        if ($user instanceof User) {
-            // @phpstan-ignore-next-line method_exists.alreadyNarrowedType
-            if (method_exists($user, 'syncFromSis')) {
-                $user->syncFromSis();
-            }
+        if (method_exists($user, 'syncFromSis')) {
+            $user->syncFromSis();
         }
     }
 }

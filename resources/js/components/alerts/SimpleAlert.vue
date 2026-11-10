@@ -1,8 +1,8 @@
 <template>
   <FadeIn>
-    <div v-if="show" class="rounded-lg shadow p-4" :class="bgColor">
+    <div v-if="show" class="rounded-lg shadow-sm p-4" :class="bgColor">
       <div class="flex">
-        <div class="flex flex-shrink-0">
+        <div class="flex shrink-0">
           <component :is="icon" class="h-5 w-5" :class="iconColor" aria-hidden="true" />
         </div>
         <div class="ml-3">
@@ -12,8 +12,8 @@
         </div>
         <div class="ml-auto pl-3">
           <div class="-mx-1.5 -my-1.5">
-            <button @click.prevent="show = false" type="button" class="inline-flex rounded-lg p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2" :class="dismissColor">
-              <span class="sr-only">Dismiss</span>
+            <button @click.prevent="show = false" type="button" class="inline-flex rounded-lg p-1.5 focus:outline-hidden focus:ring-2 focus:ring-offset-2" :class="dismissColor">
+              <span class="sr-only">{{ __('Dismiss') }}</span>
               <XMarkIcon class="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, toRef } from 'vue'
 import FadeIn from '@/components/transitions/FadeIn.vue'
 import alertColors from '@/composition/alertColors.js'
 import AlertComponent from '@/mixins/AlertComponent.js'
@@ -38,7 +38,7 @@ export default {
   },
 
   setup (props) {
-    const colors = alertColors(props.level)
+    const colors = alertColors(toRef(props, 'level'))
     const show = ref(true)
 
     return {

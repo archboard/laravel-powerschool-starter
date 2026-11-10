@@ -14,22 +14,44 @@
           </SimpleAlert>
           <div class="grid grid-cols-1 md:grid-cols-6 gap-5">
             <div class="md:col-span-6">
-              <InputField v-model="inertiaForm.name" :error="inertiaForm.errors.name" :label="__('Tenant name')" required />
+              <InputField
+                v-model="inertiaForm.name"
+                :error="inertiaForm.errors.name"
+                :label="__('Tenant name')"
+                required
+              />
+            </div>
+            <div v-if="!isCloud" class="md:col-span-6">
+              <InputField
+                v-model="inertiaForm.domain"
+                :error="inertiaForm.errors.domain"
+                :label="__('Domain')"
+                required
+              />
             </div>
             <div class="md:col-span-6">
-              <InputField v-model="inertiaForm.domain" :error="inertiaForm.errors.domain" :label="__('Domain')" :disabled="!isCloud" required />
+              <InputField
+                v-model="inertiaForm.sis_config.url"
+                :error="inertiaForm.errors['sis_config.url']"
+                :label="__('PowerSchool URL')"
+                type="url"
+                required
+              />
             </div>
-            <div v-if="isCloud" class="md:col-span-6">
-              <InputField v-model="inertiaForm.custom_domain" :error="inertiaForm.errors.custom_domain" :label="__('Custom domain')" />
+            <div class="md:col-span-6">
+              <InputField
+                v-model="inertiaForm.sis_config.client_id"
+                :error="inertiaForm.errors['sis_config.client_id']"
+                :label="__('PowerSchool Client ID')"
+                required
+              />
             </div>
-            <div v-for="field in installationValues.sis_config_fields" :key="field.key" class="md:col-span-6">
-              <component
-                :is="fieldComponents[field.type]"
-                v-model="inertiaForm.sis_config[field.key]"
-                :error="inertiaForm.errors['sis_config.' + field.key]"
-                :label="__(field.label)"
-                :type="field.type"
-                :required="field.required"
+            <div class="md:col-span-6">
+              <InputField
+                v-model="inertiaForm.sis_config.client_secret"
+                :error="inertiaForm.errors['sis_config.client_secret']"
+                :label="__('PowerSchool Client Secret')"
+                required
               />
             </div>
           </div>
@@ -45,32 +67,40 @@
 </template>
 
 <script setup>
+import { onMounted, onUnmounted } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import CardWrapper from '@/components/CardWrapper.vue'
 import CardPadding from '@/components/CardPadding.vue'
 import CardHeader from '@/components/CardHeader.vue'
 import AppButton from '@/components/AppButton.vue'
 import CardAction from '@/components/CardAction.vue'
-import CheckboxField from '@/components/forms/fields/CheckboxField.vue'
 import InputField from '@/components/forms/fields/InputField.vue'
 import Installation from '@/layouts/Installation.vue'
 import SimpleAlert from '@/components/alerts/SimpleAlert.vue'
 import AppLink from '@/components/AppLink.vue'
 
-const fieldComponents = {
-  text: InputField,
-  url: InputField,
-  checkbox: CheckboxField,
-}
-
 const props = defineProps({
-  installationValues: Object,
+  name: String,
+  domain: String,
+  sisConfig: Object,
   isCloud: Boolean,
+  channel: String,
 })
+
 const inertiaForm = useForm({
-  name: props.installationValues.name,
-  domain: props.installationValues.domain,
-  custom_domain: props.installationValues.custom_domain,
-  sis_config: { ...props.installationValues.sis_config },
+  name: props.name ?? '',
+  domain: props.domain ?? '',
+  sis_config: {
+    url: props.sisConfig?.url ?? '',
+    client_id: props.sisConfig?.client_id ?? '',
+    client_secret: props.sisConfig?.client_secret ?? '',
+  },
 })
+
+// PowerSchool registers the plugin as it's enabled, which fills in its connection details
+onMounted(() => {
+  window.Echo?.channel(props.channel)
+    .listen('PowerSchoolPluginRegistered', ({ sisConfig }) => Object.assign(inertiaForm.sis_config, sisConfig))
+})
+onUnmounted(() => window.Echo?.leave(props.channel))
 </script>

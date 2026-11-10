@@ -14,8 +14,11 @@ class GetTimezonesController extends Controller
      */
     public function __invoke(Request $request): Collection
     {
-        /** @var Collection<string, string> $timezones */
         $timezones = timezones();
+
+        if (is_string($timezones)) {
+            abort(500);
+        }
 
         return $timezones
             ->map(fn (string $label, string $key) => [
