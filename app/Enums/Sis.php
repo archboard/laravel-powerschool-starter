@@ -2,7 +2,6 @@
 
 namespace App\Enums;
 
-use App\Data\SisConfigFieldData;
 use App\Models\Tenant;
 use App\SisProviders\PowerSchoolProvider;
 use App\SisProviders\SisProvider;
@@ -13,9 +12,7 @@ enum Sis: string
     case PS = 'ps';
     case CLASS_LINK = 'class link';
 
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     public static function options(): array
     {
         return array_reduce(
@@ -30,6 +27,8 @@ enum Sis: string
     }
 
     /**
+     * Providers that can be chosen. ClassLink is not implemented yet.
+     *
      * @return array<int, array{label: string, value: string}>
      */
     public static function selectOptions(): array
@@ -37,7 +36,7 @@ enum Sis: string
         return array_map(fn (Sis $sis) => [
             'label' => $sis->label(),
             'value' => $sis->value,
-        ], Sis::cases());
+        ], [self::PS]);
     }
 
     public function label(): string
@@ -48,17 +47,29 @@ enum Sis: string
         };
     }
 
+    /**
+     * Shown when an SIS API call fails during installation, usually because the plugin isn't enabled.
+     */
+    public function connectionErrorMessage(): string
+    {
+        return match ($this) {
+            self::PS => __('Could not connect to PowerSchool. Make sure the plugin is installed and enabled, then try again.'),
+            self::CLASS_LINK => __('Could not connect to the SIS. Check the configuration and try again.'),
+        };
+    }
+
     public function getProvider(Tenant $tenant): SisProvider
     {
         return match ($this) {
-            self::PS => new PowerSchoolProvider($tenant),
+            // Prefer a container-bound instance so tests can swap in a mock
+            self::PS => app()->bound(PowerSchoolProvider::class)
+                ? app(PowerSchoolProvider::class)
+                : new PowerSchoolProvider($tenant),
             self::CLASS_LINK => throw new \Exception('To be implemented'),
         };
     }
 
-    /**
-     * @param  Collection<string, mixed>  $config
-     */
+    /** @param Collection<array-key, mixed> $config */
     public function isConfigured(Collection $config): bool
     {
         return match ($this) {
@@ -66,36 +77,6 @@ enum Sis: string
                 $config->get('client_id') &&
                 $config->get('client_secret'),
             self::CLASS_LINK => false,
-        };
-    }
-
-    /**
-     * @return SisConfigFieldData[]
-     */
-    public function getConfigFieldDefinitions(): array
-    {
-        return match ($this) {
-            self::PS => [
-                new SisConfigFieldData(key: 'url', label: __('PowerSchool URL'), type: SisConfigFieldType::URL, required: true),
-                new SisConfigFieldData(key: 'client_id', label: __('PowerSchool Client ID'), type: SisConfigFieldType::TEXT, required: true),
-                new SisConfigFieldData(key: 'client_secret', label: __('PowerSchool Client Secret'), type: SisConfigFieldType::TEXT, required: true),
-            ],
-            self::CLASS_LINK => [],
-        };
-    }
-
-    /**
-     * @return array<string, array<int, string>>
-     */
-    public function getRules(): array
-    {
-        return match ($this) {
-            self::PS => [
-                'sis_config.url' => ['required', 'url'],
-                'sis_config.client_id' => ['required', 'uuid'],
-                'sis_config.client_secret' => ['required', 'uuid'],
-            ],
-            self::CLASS_LINK => [],
         };
     }
 }

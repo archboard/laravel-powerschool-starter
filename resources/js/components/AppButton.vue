@@ -1,7 +1,7 @@
 <template>
   <component
     :is="component"
-    class="border border-transparent overflow-hidden font-medium shadow hover:shadow-none focus:outline-none transition ease-in-out duration-150 relative text-center justify-center items-center disabled:cursor-not-allowed focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-700"
+    class="cursor-pointer border border-transparent overflow-hidden font-medium shadow-sm hover:shadow-none focus:outline-hidden transition ease-in-out duration-150 relative z-0 text-center justify-center items-center disabled:cursor-not-allowed focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-700"
     :class="[
       buttonSize,
       buttonColor,
@@ -83,7 +83,7 @@ export default {
   data () {
     return {
       sizes: {
-        xs: 'px-2.5 py-1.5 text-xs leading-4 rounded-md',
+        xs: 'px-2.5 py-1 text-xs leading-4 rounded-md',
         sm: 'px-3 py-1.5 text-sm leading-4 rounded-md',
         base: 'px-4 py-2 text-sm leading-5 rounded-lg',
         lg: 'px-4 py-2 sm:py-3 leading-6 rounded-xl',

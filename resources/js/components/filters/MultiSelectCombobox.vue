@@ -4,7 +4,7 @@
       v-model="localItem"
       v-model:query="query"
       :options="filteredOptions"
-      :display-value="displayOption"
+      :display-value="item => item?.label"
     />
     <div class="mt-2" v-if="selectedOptions.length > 0">
       <div class="-m-1 flex flex-wrap items-center">
@@ -46,13 +46,6 @@ const localValue = computed({
     emit('update:modelValue', value)
   }
 })
-const displayOption = item => {
-  if (typeof props.displayUsing === 'string') {
-    return item?.[props.displayUsing]
-  }
-
-  return props.displayUsing(item)
-}
 const localItem = ref()
 const query = ref()
 const options = useSelectOptions(props.options)
@@ -79,7 +72,7 @@ const removeSelection = value => {
 }
 
 watch(localItem, value => {
-  if (value?.value) {
+  if (typeof value?.value !== 'undefined' && value?.value !== null) {
     localValue.value.push(value.value)
     localItem.value = null
     query.value = ''

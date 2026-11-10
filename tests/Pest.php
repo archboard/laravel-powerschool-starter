@@ -1,10 +1,5 @@
 <?php
 
-use App\Enums\Permission;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -16,32 +11,27 @@ use Tests\TestCase;
 |
 */
 
-uses(TestCase::class)->in('Feature');
-uses(RefreshDatabase::class)->in('Feature');
+use App\Enums\Permission;
+use App\Enums\UserType;
+use App\Models\Course;
+use App\Models\Section;
+use App\Models\Student;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Vite;
+use Tests\TestCase;
 
-/*
-|--------------------------------------------------------------------------
-| Browser Tests
-|--------------------------------------------------------------------------
-|
-| Browser tests use Playwright via pest-plugin-browser to test the live
-| Herd-served application at APP_URL. They run against the real app and
-| do not use RefreshDatabase — they are intentionally kept to public pages
-| that do not require database setup.
-|
-*/
-pest()->extend(TestCase::class)->group('browser')->in('Browser');
+uses(TestCase::class)->in('Feature', 'Browser');
+uses(RefreshDatabase::class)->in('Feature', 'Browser');
 
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
+// ponytail: a running `npm run dev` writes public/hot, which the headless browser cannot reach; always serve built assets.
+uses()->beforeEach(fn () => Vite::useHotFile(storage_path('framework/testing/no-hot')))->in('Browser');
+
+pest()->browser()
+    ->inChrome()
+    ->withHost('localhost')
+    // ponytail: CI runners need longer than the 5s default to load Vite chunks
+    ->timeout(15000);
 
 /*
 |--------------------------------------------------------------------------
@@ -79,17 +69,23 @@ function setSchool()
     return test()->setSchool();
 }
 
-function asCloud()
+function seedSection(?User $user = null): Section
 {
-    return test()->asCloud();
+    $user ??= test()->user;
+    $course = Course::factory()->create();
+    $section = Section::factory()
+        ->for($course)
+        ->create(['user_id' => $user->id]);
+    $students = Student::factory(3)->create();
+    $section->students()->attach($students);
+
+    return $section;
 }
 
-function asSelfHosted()
+function seedGuardian(Student ...$students): User
 {
-    return test()->asSelfHosted();
-}
+    $guardian = seedUser(['user_type' => UserType::guardian]);
+    $guardian->students()->attach($students);
 
-function tapUser(callable $callback)
-{
-    return test()->tapUser($callback);
+    return $guardian;
 }

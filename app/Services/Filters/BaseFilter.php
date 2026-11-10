@@ -10,9 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Conditionable;
 use Spatie\QueryBuilder\Filters\Filter;
 
-/**
- * @implements Filter<Model>
- */
+/** @implements Filter<Model> */
 abstract class BaseFilter implements Filter
 {
     use Conditionable;
@@ -21,14 +19,10 @@ abstract class BaseFilter implements Filter
 
     public Component $component = Component::text;
 
-    /**
-     * @var array<int, Operator>
-     */
+    /** @var array<int, Operator> */
     public array $operators = [];
 
-    /**
-     * @var array<string, mixed>
-     */
+    /** @var array<string, mixed> */
     public array $componentProps = [];
 
     public Closure $callback;
@@ -41,11 +35,11 @@ abstract class BaseFilter implements Filter
 
     public function __invoke(Builder $query, mixed $value, string $property): void
     {
-        if (! isset($this->callback)) {
-            $this->callback = $this->defaultCallback();
-        }
+        $callback = isset($this->callback)
+            ? $this->callback
+            : $this->defaultCallback();
 
-        ($this->callback)($query, $this->currentValue);
+        $callback($query, $value);
     }
 
     public static function make(string $key = '', string $label = ''): static
@@ -53,21 +47,17 @@ abstract class BaseFilter implements Filter
         return new static($key, $label);
     }
 
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     public function getOperators(): array
     {
-        return array_reduce($this->operators, function (array $carry, Operator $operator) {
+        return array_reduce($this->operators, function ($carry, Operator $operator) {
             $carry[$operator->value] = $operator->label();
 
             return $carry;
         }, []);
     }
 
-    /**
-     * @param  array<int|string, mixed>  $options
-     */
+    /** @param array<int|string, mixed> $options */
     public function options(array $options): static
     {
         $this->componentProps = [
@@ -118,8 +108,6 @@ abstract class BaseFilter implements Filter
 
     /**
      * Determines whether to include this filter in the available filters list.
-     *
-     * @return $this
      */
     public function hide(bool $available = false): static
     {
@@ -164,9 +152,7 @@ abstract class BaseFilter implements Filter
         };
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public function toArray(): array
     {
         return [
@@ -179,14 +165,12 @@ abstract class BaseFilter implements Filter
         ];
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public function toFilterArray(): array
     {
         return [
             'key' => $this->key,
-            'operator' => isset($this->operator) ? $this->operator->value : null,
+            'operator' => $this->operator->value,
             'value' => $this->currentValue,
         ];
     }

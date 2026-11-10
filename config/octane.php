@@ -1,5 +1,6 @@
 <?php
 
+use Inertia\ResponseFactory;
 use Laravel\Octane\Contracts\OperationTerminated;
 use Laravel\Octane\Events\RequestHandled;
 use Laravel\Octane\Events\RequestReceived;
@@ -39,7 +40,7 @@ return [
     |
     */
 
-    'server' => env('OCTANE_SERVER', 'roadrunner'),
+    'server' => env('OCTANE_SERVER', 'frankenphp'),
 
     /*
     |--------------------------------------------------------------------------
@@ -140,6 +141,8 @@ return [
         'mail.manager',
         // Holds an in-memory permission clipboard that would outlive the request
         Bouncer::class,
+        // Holds shared props (ChangeConfigTask shares the tenant)
+        ResponseFactory::class,
     ],
 
     /*

@@ -7,7 +7,11 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Inertia\Testing\AssertableInertia;
 
-it('tenants without passwords cannot access reset', function () {
+beforeEach(function () {
+    $this->refreshDatabase();
+});
+
+it('tenants without passwords can reset', function () {
     $this->tenant->update(['allow_password_auth' => false]);
 
     $this->get('/forgot-password')
@@ -22,14 +26,17 @@ it('reset password link screen can be rendered', function () {
             ->component('Auth/ForgotPassword')
             ->has('title')
             ->has('status')
-            ->where('userTypes.1', ['label' => 'Contact/Guardian', 'value' => 'guardian'])
+            ->where('userTypes', [
+                ['label' => 'Staff', 'value' => 'staff'],
+                ['label' => 'Contact/Guardian', 'value' => 'guardian'],
+            ])
         );
 });
 
 it('reset password link can be requested and reset successfully', function () {
     Notification::fake();
 
-    $user = seedUser(['user_type' => UserType::staff]);
+    $user = $this->seedUser(['user_type' => UserType::staff]);
 
     $this->post('/forgot-password', ['email' => $user->email, 'user_type' => UserType::staff->value])
         ->assertSessionHasNoErrors()
@@ -66,8 +73,8 @@ it('reset password link can be requested and reset successfully', function () {
 
 it('sends and applies the reset for the selected user type when users share an email', function () {
     Notification::fake();
-    $staff = seedUser(['user_type' => UserType::staff, 'email' => 'shared@example.com']);
-    $guardian = seedUser(['user_type' => UserType::guardian, 'email' => 'shared@example.com']);
+    $staff = $this->seedUser(['user_type' => UserType::staff, 'email' => 'shared@example.com']);
+    $guardian = $this->seedUser(['user_type' => UserType::guardian, 'email' => 'shared@example.com']);
 
     $this->post('/forgot-password', ['email' => 'shared@example.com', 'user_type' => UserType::guardian->value])
         ->assertSessionHasNoErrors();
@@ -92,7 +99,7 @@ it('sends and applies the reset for the selected user type when users share an e
 
 it('requires a valid user type to request a reset link', function (?string $userType, string $message) {
     Notification::fake();
-    $user = seedUser(['user_type' => UserType::staff]);
+    $user = $this->seedUser(['user_type' => UserType::staff]);
 
     $this->post('/forgot-password', ['email' => $user->email, 'user_type' => $userType])
         ->assertSessionHasErrors(['user_type' => $message]);
@@ -103,8 +110,34 @@ it('requires a valid user type to request a reset link', function (?string $user
     'unknown' => ['admin', 'The selected user type is invalid.'],
 ]);
 
+it('students can not request a reset link', function () {
+    Notification::fake();
+    $user = $this->seedUser(['user_type' => UserType::student]);
+
+    $this->post('/forgot-password', ['email' => $user->email, 'user_type' => UserType::student->value])
+        ->assertSessionHasErrors(['user_type' => 'The selected user type is invalid.']);
+
+    Notification::assertNothingSent();
+});
+
+it('students can not reset a password', function () {
+    $user = $this->seedUser(['user_type' => UserType::student]);
+    $token = Password::broker()->createToken($user);
+
+    $this->post('/reset-password', [
+        'token' => $token,
+        'email' => $user->email,
+        'user_type' => UserType::student->value,
+        'password' => 'new-password',
+        'password_confirmation' => 'new-password',
+    ])
+        ->assertSessionHasErrors(['user_type' => 'The selected user type is invalid.']);
+
+    expect(Hash::check('password', $user->fresh()->password))->toBeTrue();
+});
+
 it('requires a valid user type to reset a password', function (?string $userType, string $message) {
-    $user = seedUser(['user_type' => UserType::staff]);
+    $user = $this->seedUser(['user_type' => UserType::staff]);
     $token = Password::broker()->createToken($user);
 
     $this->post('/reset-password', [

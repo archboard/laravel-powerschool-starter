@@ -3,8 +3,14 @@
 namespace App\Models;
 
 use App\Models\Contracts\ExistsInSis;
+use App\Models\Contracts\Filterable;
+use App\Services\Filters\BaseFilter;
+use App\Services\Filters\Enums\Component;
+use App\Services\Filters\MultipleSelectFilter;
+use App\Services\Filters\TextFilter;
 use App\Traits\BelongsToSchool;
 use App\Traits\BelongsToTenant;
+use App\Traits\HasFilters;
 use App\Traits\HasFirstAndLastName;
 use Carbon\CarbonImmutable;
 use Database\Factories\StudentFactory;
@@ -14,7 +20,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -41,31 +46,31 @@ use Illuminate\Support\Facades\DB;
  * @property-read Tenant $tenant
  *
  * @method static \Database\Factories\StudentFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student filter(array<string, mixed> $filters = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student search(string $search)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereFirstName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereGradeLevel($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereLastName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereSchoolId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereSisId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereSisKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereStudentNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereTenantId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Student withoutTrashed()
+ * @method static Builder<static>|Student filter(\Illuminate\Support\Collection<array-key, mixed>|array<array-key, mixed> $data)
+ * @method static Builder<static>|Student newModelQuery()
+ * @method static Builder<static>|Student newQuery()
+ * @method static Builder<static>|Student onlyTrashed()
+ * @method static Builder<static>|Student query()
+ * @method static Builder<static>|Student search(string $search)
+ * @method static Builder<static>|Student whereCreatedAt($value)
+ * @method static Builder<static>|Student whereDeletedAt($value)
+ * @method static Builder<static>|Student whereEmail($value)
+ * @method static Builder<static>|Student whereFirstName($value)
+ * @method static Builder<static>|Student whereGradeLevel($value)
+ * @method static Builder<static>|Student whereId($value)
+ * @method static Builder<static>|Student whereLastName($value)
+ * @method static Builder<static>|Student whereSchoolId($value)
+ * @method static Builder<static>|Student whereSisId($value)
+ * @method static Builder<static>|Student whereSisKey($value)
+ * @method static Builder<static>|Student whereStudentNumber($value)
+ * @method static Builder<static>|Student whereTenantId($value)
+ * @method static Builder<static>|Student whereUpdatedAt($value)
+ * @method static Builder<static>|Student withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|Student withoutTrashed()
  *
  * @mixin \Eloquent
  */
-class Student extends Model implements ExistsInSis
+class Student extends Model implements ExistsInSis, Filterable
 {
     use BelongsToSchool;
     use BelongsToTenant;
@@ -73,35 +78,13 @@ class Student extends Model implements ExistsInSis
     /** @use HasFactory<StudentFactory> */
     use HasFactory;
 
+    use HasFilters;
     use HasFirstAndLastName;
     use SoftDeletes;
 
-    /**
-     * @var list<string>
-     */
     protected $guarded = [];
 
-    /**
-     * @param  Builder<Student>  $builder
-     * @param  array<string, mixed>  $filters
-     */
-    public function scopeFilter(Builder $builder, array $filters = []): void
-    {
-        $sort = $filters['sort'] ?? 'last_name';
-        $dir = $filters['dir'] ?? 'asc';
-
-        $builder->when($filters['search'] ?? null, function (Builder $builder, string $search) {
-            $builder->search($search);
-        })->when($filters['grade'] ?? null, function (Builder $builder, $grade) {
-            $builder->whereIn('grade_level', Arr::wrap($grade));
-        });
-
-        $builder->orderBy($sort, $dir);
-    }
-
-    /**
-     * @param  Builder<Student>  $builder
-     */
+    /** @param Builder<static> $builder */
     public function scopeSearch(Builder $builder, string $search): void
     {
         $builder->where(function (Builder $builder) use ($search) {
@@ -113,17 +96,13 @@ class Student extends Model implements ExistsInSis
         });
     }
 
-    /**
-     * @return BelongsToMany<Section, $this>
-     */
+    /** @return BelongsToMany<Section, $this> */
     public function sections(): BelongsToMany
     {
         return $this->belongsToMany(Section::class);
     }
 
-    /**
-     * @return BelongsToMany<User, $this>
-     */
+    /** @return BelongsToMany<User, $this> */
     public function contacts(): BelongsToMany
     {
         return $this->belongsToMany(User::class)
@@ -135,5 +114,27 @@ class Student extends Model implements ExistsInSis
         $this->tenant->getSisProvider()?->syncStudent($this);
 
         return $this;
+    }
+
+    /** @param Builder<Student> $builder */
+    protected function applySearchFilter(Builder $builder, string $search): void
+    {
+        $builder->search($search);
+    }
+
+    /** @return array<int, BaseFilter> */
+    public function filters(): array
+    {
+        return [
+            TextFilter::make('search', __('Search'))
+                ->hide()
+                ->using($this->applySearchFilter(...)),
+            TextFilter::make('first_name', __('First name')),
+            TextFilter::make('last_name', __('Last name')),
+            TextFilter::make('email', __('Email')),
+            MultipleSelectFilter::make('grade_level', __('Grade level'))
+                ->withComponent(Component::combobox)
+                ->options(School::current()->gradeSelectOptions()),
+        ];
     }
 }

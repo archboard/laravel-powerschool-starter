@@ -1,0 +1,33 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+import { ARCHBOARD, SITE_URL, WEBSITE } from '../config';
+
+const { entry, id, lastUpdated } = Astro.locals.starlightRoute;
+const url = new URL(Astro.url.pathname, SITE_URL).href;
+
+const graph: Record<string, unknown>[] = [
+  {
+    '@type': 'TechArticle',
+    headline: entry.data.title,
+    description: entry.data.description,
+    url,
+    inLanguage: 'en',
+    isPartOf: WEBSITE,
+    author: ARCHBOARD,
+    publisher: ARCHBOARD,
+    ...(lastUpdated ? { dateModified: lastUpdated.toISOString() } : {}),
+  },
+  // ponytail: no section crumbs, because sections have no page to link to and Google requires a URL
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'PowerSchool Starter', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: entry.data.title, item: url },
+    ],
+  },
+];
+
+---
+
+<Default />
+{id !== '404' && <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })} />}

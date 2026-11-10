@@ -4,7 +4,9 @@ namespace Tests;
 
 use App\Enums\Permission;
 use App\Enums\Role;
+use App\Models\Course;
 use App\Models\School;
+use App\Models\Section;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -13,28 +15,37 @@ use Silber\Bouncer\BouncerFacade;
 
 abstract class TestCase extends BaseTestCase
 {
-    use CreatesApplication;
+    protected bool $signIn = false;
 
-    protected Tenant $tenant;
+    protected bool $cloud = false;
 
-    protected School $school;
+    public Tenant $tenant;
 
-    protected User $user;
+    public School $school;
+
+    public ?User $user = null;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $domain = Uri::of(config('app.url'))->host();
+        $domain = Uri::of(env('APP_URL'))->host();
 
         $this->tenant = Tenant::factory()->create(compact('domain'));
-        $this->tenant->domain = $domain;
         $this->tenant->makeCurrent();
-        School::factory()
-            ->count(2)
-            ->create(['tenant_id' => $this->tenant->id]);
+        School::factory(2)
+            ->for($this->tenant)
+            ->create();
 
-        $this->asSelfHosted();
+        if ($this->signIn) {
+            $this->logIn();
+        }
+
+        if ($this->cloud) {
+            $this->asCloud();
+        } else {
+            $this->asSelfHosted();
+        }
 
         BouncerFacade::scope()->remove();
     }
@@ -58,6 +69,7 @@ abstract class TestCase extends BaseTestCase
         /** @var User $user */
         $user = $user ?? $this->seedUser($attributes);
 
+        //        $user->assign($role->value);
         $this->be($user);
         $this->user = $user;
 
@@ -71,14 +83,14 @@ abstract class TestCase extends BaseTestCase
         return $this;
     }
 
-    public function givePermission(Permission $permission): static
+    public function givePermission(Permission $permission, $arguments = null): static
     {
         $scope = $permission->shouldBeScoped()
             ? $this->user->school_id
             : null;
 
         BouncerFacade::scope()
-            ->onceTo($scope, fn () => BouncerFacade::allow($this->user)->to($permission->value));
+            ->onceTo($scope, fn () => BouncerFacade::allow($this->user)->to($permission->value, $arguments));
 
         return $this;
     }
@@ -118,5 +130,20 @@ abstract class TestCase extends BaseTestCase
         $callback($this->user);
 
         return $this;
+    }
+
+    public function seedSection(): Section
+    {
+        $course = Course::factory()->create([
+            'tenant_id' => $this->tenant->id,
+            'school_id' => $this->school->id,
+        ]);
+
+        return $course->sections()
+            ->save(Section::factory()->make([
+                'tenant_id' => $this->tenant->id,
+                'school_id' => $this->school->id,
+                'user_id' => $this->seedUser()->id,
+            ]));
     }
 }

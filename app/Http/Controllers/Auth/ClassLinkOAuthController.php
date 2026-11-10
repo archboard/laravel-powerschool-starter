@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class ClassLinkOAuthController extends Controller
 {
@@ -13,10 +13,8 @@ class ClassLinkOAuthController extends Controller
         //
     }
 
-    public function login(Request $request): Response
+    public function login(Request $request): ResponseFactory
     {
-        dump($request->all());
-
-        return response('', 200);
+        return response();
     }
 }

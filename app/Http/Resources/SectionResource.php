@@ -23,7 +23,11 @@ class SectionResource extends JsonResource
             'expression' => $this->resource->expression,
             'external_expression' => $this->resource->external_expression,
             'students_count' => $this->resource->students_count,
+            'teacher_display' => $this->resource->teacher_display,
             'course' => new CourseResource($this->whenLoaded('course')),
+            'teacher' => new PublicUserResource($this->whenLoaded('teacher')),
+            'students' => StudentResource::collection($this->whenLoaded('students')),
+            'model_alias' => $this->resource->getMorphClass(),
         ];
     }
 }

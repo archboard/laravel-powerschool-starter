@@ -3,49 +3,48 @@
 use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
-    asCloud();
+    $this->refreshDatabase();
+    $this->asCloud();
 });
 
 it('self hosted cant generate token', function () {
-    asSelfHosted();
+    $this->asSelfHosted();
 
-    $this->assertTrue(
-        DB::table('machine_api_tokens')->whereNotNull('api_token')->doesntExist()
-    );
+    expect(DB::table('machine_api_tokens')->whereNotNull('api_token')->doesntExist())->toBeTrue();
 
     $this->artisan('make:token')
         ->assertOk();
 
-    $this->assertTrue(
-        DB::table('machine_api_tokens')->whereNotNull('api_token')->doesntExist()
-    );
+    expect(DB::table('machine_api_tokens')->whereNotNull('api_token')->doesntExist())->toBeTrue();
 });
 
-it('can generate a new token', function () {
-    $this->assertTrue(
-        DB::table('machine_api_tokens')->whereNotNull('api_token')->doesntExist()
-    );
+it('can new generate token', function () {
+    expect(DB::table('machine_api_tokens')->whereNotNull('api_token')->doesntExist())->toBeTrue();
 
     $this->artisan('make:token')
         ->assertOk();
 
-    $this->assertTrue(
-        DB::table('machine_api_tokens')->whereNotNull('api_token')->exists()
-    );
+    expect(DB::table('machine_api_tokens')->whereNotNull('api_token')->exists())->toBeTrue();
 });
 
-it('can generate a new token over existing tokens', function () {
+it('can new generate token over existing tokens', function () {
     DB::table('machine_api_tokens')->insert(['api_token' => 'existing']);
 
-    $this->assertTrue(
-        DB::table('machine_api_tokens')->whereNotNull('api_token')->exists()
-    );
+    expect(DB::table('machine_api_tokens')->whereNotNull('api_token')->exists())->toBeTrue();
 
     $this->artisan('make:token')
         ->assertOk();
 
-    $this->assertEquals(1, DB::table('machine_api_tokens')->whereNotNull('api_token')->count());
-    $this->assertTrue(
-        DB::table('machine_api_tokens')->where('api_token', 'existing')->doesntExist()
-    );
+    expect(DB::table('machine_api_tokens')->whereNotNull('api_token')->count())->toBe(1);
+    expect(DB::table('machine_api_tokens')->where('api_token', 'existing')->doesntExist())->toBeTrue();
+});
+
+it('can store a given token', function () {
+    DB::table('machine_api_tokens')->insert(['api_token' => 'existing']);
+
+    $this->artisan('make:token', ['--token' => 'abc'])
+        ->assertOk();
+
+    expect(DB::table('machine_api_tokens')->whereNotNull('api_token')->pluck('api_token')->all())
+        ->toBe([hash('sha256', 'abc')]);
 });

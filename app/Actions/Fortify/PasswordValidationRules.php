@@ -9,9 +9,9 @@ trait PasswordValidationRules
     /**
      * Get the validation rules used to validate passwords.
      *
-     * @return array<int, string|Password>
+     * @return array<int, mixed>
      */
-    protected function passwordRules(): array
+    protected function passwordRules()
     {
         return ['required', 'string', new Password, 'confirmed'];
     }

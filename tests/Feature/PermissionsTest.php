@@ -8,7 +8,7 @@ use Inertia\Testing\AssertableInertia;
 beforeEach(function () {
     logIn()->setSchool();
 
-    $this->subjectUser = seedUser();
+    $this->subjectUser = test()->seedUser();
 });
 
 it("can't view without permission", function () {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permission;
 use App\Http\Resources\StudentResource;
 use App\Models\School;
 use App\Models\Student;
@@ -16,9 +17,13 @@ class StudentController extends Controller
      */
     public function index(Request $request, School $school): Response
     {
+        $this->authorize(Permission::viewAny, Student::class);
+
         $title = __('Students');
+        $filters = $request->currentFilters();
         $students = $school->students()
-            ->filter($request->all())
+            ->filter($filters)
+            ->orderBy('last_name')
             ->paginate(25);
 
         return inertia('students/Index', [
@@ -30,6 +35,8 @@ class StudentController extends Controller
                     ->to(route('students.index'))
                     ->isCurrent()
             ),
+            'availableFilters' => (new Student)->availableFiltersToArray(),
+            'currentFilters' => (object) $filters,
         ])->withViewData(compact('title'));
     }
 
@@ -38,8 +45,15 @@ class StudentController extends Controller
      */
     public function show(Student $student): Response
     {
+        $this->authorize(Permission::view, $student);
+
         $title = $student->name;
-        $student->load('school', 'sections', 'sections.course');
+        $student->load([
+            'school',
+            'sections',
+            'sections.course',
+            'sections.teacher',
+        ]);
 
         return inertia('students/Show', [
             'title' => $title,
@@ -54,29 +68,5 @@ class StudentController extends Controller
                     ->isCurrent(),
             ),
         ])->withViewData(compact('title'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Student $student): void
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Student $student): void
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Student $student): void
-    {
-        //
     }
 }

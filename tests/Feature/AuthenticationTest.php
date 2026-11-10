@@ -1,11 +1,14 @@
 <?php
 
 use App\Enums\UserType;
-use App\Providers\RouteServiceProvider;
 use Inertia\Testing\AssertableInertia;
 
+beforeEach(function () {
+    $this->refreshDatabase();
+});
+
 it('tenant without passwords cant login', function () {
-    $user = seedUser(['user_type' => UserType::staff]);
+    $user = $this->seedUser(['user_type' => UserType::staff]);
     $this->tenant->update(['allow_password_auth' => false]);
 
     $this->post('/login', [
@@ -19,11 +22,16 @@ it('login screen can be rendered', function () {
     $this->get('/login')
         ->assertOk()
         ->assertViewHas('title')
+        ->assertSee('<link rel="icon" type="image/png" href="/favicon.png" />', false)
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Auth/Login')
             ->has('title')
             ->has('status')
-            ->where('userTypes.1', ['label' => 'Contact/Guardian', 'value' => 'guardian'])
+            ->has('tenant.allow_password_auth')
+            ->where('userTypes', [
+                ['label' => 'Staff', 'value' => 'staff'],
+                ['label' => 'Contact/Guardian', 'value' => 'guardian'],
+            ])
         );
 });
 
@@ -37,24 +45,25 @@ it('login screen can be rendered when passwords are disabled', function () {
             ->component('Auth/Login')
             ->has('title')
             ->has('status')
+            ->where('tenant.allow_password_auth', false)
         );
 });
 
 it('users can authenticate using the login screen', function () {
-    $user = seedUser(['user_type' => UserType::staff]);
+    $user = $this->seedUser(['user_type' => UserType::staff]);
 
     $this->post('/login', [
         'email' => $user->email,
         'password' => 'password',
         'user_type' => UserType::staff->value,
     ])
-        ->assertRedirect(RouteServiceProvider::HOME);
+        ->assertRedirect('/');
 
     $this->assertAuthenticatedAs($user);
 });
 
 it('users can not authenticate with invalid password', function () {
-    $user = seedUser(['user_type' => UserType::staff]);
+    $user = $this->seedUser(['user_type' => UserType::staff]);
 
     $this->post('/login', [
         'email' => $user->email,
@@ -66,8 +75,8 @@ it('users can not authenticate with invalid password', function () {
 });
 
 it('logs in as the selected user type when users share an email', function (UserType $userType) {
-    $staff = seedUser(['user_type' => UserType::staff, 'email' => 'shared@example.com', 'password' => bcrypt('staff-password')]);
-    $guardian = seedUser(['user_type' => UserType::guardian, 'email' => 'shared@example.com', 'password' => bcrypt('guardian-password')]);
+    $staff = $this->seedUser(['user_type' => UserType::staff, 'email' => 'shared@example.com', 'password' => bcrypt('staff-password')]);
+    $guardian = $this->seedUser(['user_type' => UserType::guardian, 'email' => 'shared@example.com', 'password' => bcrypt('guardian-password')]);
     $user = $userType === UserType::staff ? $staff : $guardian;
 
     $this->post('/login', [
@@ -75,7 +84,7 @@ it('logs in as the selected user type when users share an email', function (User
         'password' => "{$userType->value}-password",
         'user_type' => $userType->value,
     ])
-        ->assertRedirect(RouteServiceProvider::HOME);
+        ->assertRedirect('/');
 
     $this->assertAuthenticatedAs($user);
 })->with([
@@ -84,7 +93,7 @@ it('logs in as the selected user type when users share an email', function (User
 ]);
 
 it('users can not authenticate as a different user type', function () {
-    $user = seedUser(['user_type' => UserType::staff]);
+    $user = $this->seedUser(['user_type' => UserType::staff]);
 
     $this->post('/login', [
         'email' => $user->email,
@@ -96,8 +105,21 @@ it('users can not authenticate as a different user type', function () {
     $this->assertGuest();
 });
 
+it('students can not authenticate with a password', function () {
+    $user = $this->seedUser(['user_type' => UserType::student]);
+
+    $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+        'user_type' => UserType::student->value,
+    ])
+        ->assertSessionHasErrors(['user_type' => 'The selected user type is invalid.']);
+
+    $this->assertGuest();
+});
+
 it('requires a valid user type to log in', function (?string $userType, string $message) {
-    $user = seedUser(['user_type' => UserType::staff]);
+    $user = $this->seedUser(['user_type' => UserType::staff]);
 
     $this->post('/login', [
         'email' => $user->email,
@@ -111,3 +133,34 @@ it('requires a valid user type to log in', function (?string $userType, string $
     'missing' => [null, 'This field is required.'],
     'unknown' => ['admin', 'The selected user type is invalid.'],
 ]);
+
+it('users can logout', function () {
+    $user = $this->seedUser();
+
+    $this->actingAs($user)
+        ->post('/logout')
+        ->assertRedirect('/');
+
+    $this->assertGuest();
+});
+
+it('users can logout when password auth is disabled', function () {
+    $user = $this->seedUser();
+    $this->tenant->update(['allow_password_auth' => false]);
+
+    $this->actingAs($user)
+        ->post('/logout')
+        ->assertRedirect('/');
+
+    $this->assertGuest();
+});
+
+it('guest cannot logout', function () {
+    $this->post('/logout')
+        ->assertRedirect('/login');
+});
+
+it('redirects guests to the login page', function () {
+    $this->get(route('students.index'))
+        ->assertRedirect(route('login'));
+});

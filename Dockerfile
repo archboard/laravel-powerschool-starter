@@ -1,12 +1,14 @@
 # syntax=docker/dockerfile:1
 
-FROM node:24-alpine AS assets
+# Built assets are the same on every architecture, so build them natively once
+FROM --platform=$BUILDPLATFORM node:26-alpine AS assets
 WORKDIR /app
-ARG VITE_APP_NAME="Laravel"
+ARG VITE_APP_NAME="PowerSchool Starter"
 ENV VITE_APP_NAME=$VITE_APP_NAME
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY resources resources
+COPY lang lang
 COPY vite.config.js jsconfig.json ./
 RUN npm run build
 
@@ -31,3 +33,10 @@ USER www-data
 EXPOSE 8000
 ENTRYPOINT ["docker/entrypoint.sh"]
 CMD ["php", "artisan", "octane:frankenphp", "--host=0.0.0.0", "--port=8000"]
+
+# DigitalOcean App Platform (see .do/deploy.template.yaml) runs a single
+# container with no sidecars, so this stage runs Reverb, the queue worker and
+# the scheduler alongside Octane. It is last on purpose: App Platform builds
+# the whole file with no --target. Compose pins `target: app` to skip it.
+FROM app AS app-platform
+ENTRYPOINT ["docker/app-platform/start.sh"]

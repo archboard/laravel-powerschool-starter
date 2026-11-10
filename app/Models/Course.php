@@ -3,7 +3,11 @@
 namespace App\Models;
 
 use App\Models\Contracts\ExistsInSis;
+use App\Models\Contracts\Filterable;
+use App\Services\Filters\BaseFilter;
+use App\Services\Filters\TextFilter;
 use App\Traits\BelongsToTenant;
+use App\Traits\HasFilters;
 use Carbon\CarbonImmutable;
 use Database\Factories\CourseFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,49 +31,35 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Tenant $tenant
  *
  * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course filter(array<string, mixed> $filters = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course search(string $search)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereCourseNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereSchoolId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereSisId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereSisKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereTenantId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereUpdatedAt($value)
+ * @method static Builder<static>|Course filter(\Illuminate\Support\Collection<array-key, mixed>|array<array-key, mixed> $data)
+ * @method static Builder<static>|Course newModelQuery()
+ * @method static Builder<static>|Course newQuery()
+ * @method static Builder<static>|Course query()
+ * @method static Builder<static>|Course search(string $search)
+ * @method static Builder<static>|Course whereCourseNumber($value)
+ * @method static Builder<static>|Course whereCreatedAt($value)
+ * @method static Builder<static>|Course whereId($value)
+ * @method static Builder<static>|Course whereName($value)
+ * @method static Builder<static>|Course whereSchoolId($value)
+ * @method static Builder<static>|Course whereSisId($value)
+ * @method static Builder<static>|Course whereSisKey($value)
+ * @method static Builder<static>|Course whereTenantId($value)
+ * @method static Builder<static>|Course whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */
-class Course extends Model implements ExistsInSis
+class Course extends Model implements ExistsInSis, Filterable
 {
     use BelongsToTenant;
 
     /** @use HasFactory<CourseFactory> */
     use HasFactory;
 
-    /**
-     * @var list<string>
-     */
+    use HasFilters;
+
     protected $guarded = [];
 
-    /**
-     * @param  Builder<Course>  $builder
-     * @param  array<string, mixed>  $filters
-     */
-    public function scopeFilter(Builder $builder, array $filters = []): void
-    {
-        $builder->when($filters['search'] ?? null, function ($builder, string $search) {
-            $builder->search($search);
-        })->orderBy($filters['sort'] ?? 'name', $filters['dir'] ?? 'asc');
-    }
-
-    /**
-     * @param  Builder<Course>  $builder
-     */
+    /** @param Builder<static> $builder */
     public function scopeSearch(Builder $builder, string $search): void
     {
         $builder->where(function (Builder $builder) use ($search) {
@@ -78,9 +68,7 @@ class Course extends Model implements ExistsInSis
         });
     }
 
-    /**
-     * @return HasMany<Section, $this>
-     */
+    /** @return HasMany<Section, $this> */
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class);
@@ -91,5 +79,21 @@ class Course extends Model implements ExistsInSis
         $this->tenant->getSisProvider()?->syncCourse($this);
 
         return $this;
+    }
+
+    /** @return array<int, BaseFilter> */
+    public function filters(): array
+    {
+        return [
+            TextFilter::make('search', __('Search'))
+                ->hide()
+                ->using($this->applySearchFilter(...)),
+        ];
+    }
+
+    /** @param Builder<Course> $builder */
+    protected function applySearchFilter(Builder $builder, string $search): void
+    {
+        $builder->search($search);
     }
 }

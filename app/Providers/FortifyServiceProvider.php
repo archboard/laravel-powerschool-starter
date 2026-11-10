@@ -9,6 +9,7 @@ use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Enums\UserType;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -64,13 +65,13 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         Fortify::authenticateUsing(function (Request $request) {
-            $request->validate(['user_type' => ['required', Rule::enum(UserType::class)]]);
+            $request->validate(['user_type' => ['required', Rule::enum(UserType::class)->except(UserType::student)]]);
 
             $user = User::where(DB::raw('lower(email)'), strtolower($request->input('email', '')))
                 ->where('user_type', $request->input('user_type'))
                 ->first();
 
-            if ($user && $user->password && Hash::check($request->input('password'), $user->password)) {
+            if ($user && $user->password && Hash::check((string) $request->input('password'), $user->password)) {
                 return $user;
             }
         });
@@ -80,8 +81,9 @@ class FortifyServiceProvider extends ServiceProvider
 
             return inertia('Auth/Login', [
                 'title' => $title,
+                'tenant' => Tenant::current()?->only(['allow_oidc_login', 'allow_password_auth']) ?? new \stdClass,
                 'status' => session('status'),
-                'userTypes' => UserType::selectOptions(),
+                'userTypes' => UserType::passwordSelectOptions(),
             ])->withViewData(compact('title'));
         });
 
@@ -91,7 +93,7 @@ class FortifyServiceProvider extends ServiceProvider
             return inertia('Auth/ForgotPassword', [
                 'title' => $title,
                 'status' => session('status'),
-                'userTypes' => UserType::selectOptions(),
+                'userTypes' => UserType::passwordSelectOptions(),
             ])->withViewData(compact('title'));
         });
 

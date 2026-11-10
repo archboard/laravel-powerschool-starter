@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpsertTenantRequest;
 use App\Http\Resources\TenantApiResource;
 use App\Models\Tenant;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
-use Illuminate\Support\Arr;
 
 class TenantController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @return AnonymousResourceCollection
      */
-    public function index(): AnonymousResourceCollection
+    public function index()
     {
         $tenants = Tenant::query()
             ->orderBy('created_at')
@@ -25,53 +25,19 @@ class TenantController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Creates or updates the tenant for a billing license: provisioning, retries and
+     * renewals are all this call. The resource responds 201 when it created the tenant.
+     * Setup links come back until the district has an admin, so calling it again reissues them.
      */
-    public function store(Request $request): TenantApiResource
+    public function update(UpsertTenantRequest $request, string $license): TenantApiResource
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'license' => ['required', 'uuid', 'unique:tenants'],
-            'domain' => ['required', 'string', 'unique:tenants'],
-            'custom_domain' => ['nullable', 'string', 'unique:tenants'],
-            'subscription_started_at' => ['required', 'date'],
-            'subscription_expires_at' => ['required', 'date'],
-        ]);
+        $tenant = $request->existingTenant() ?? new Tenant(['license' => $license]);
+        $tenant->fill($request->validated())->save();
 
-        /** @var Tenant $tenant */
-        $tenant = Tenant::create(Arr::except($data, 'email'));
-        $tenant->makeCurrent();
+        $links = $tenant->execute(fn (Tenant $tenant) => $tenant->hasDistrictAdmin()
+            ? ['setup_url' => null, 'plugin_url' => null]
+            : $tenant->setupLinks());
 
-        return new TenantApiResource($tenant);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     */
-    public function show($id): Response
-    {
-        return response()->noContent();
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  int  $id
-     */
-    public function update(Request $request, $id): Response
-    {
-        return response()->noContent();
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     */
-    public function destroy($id): Response
-    {
-        return response()->noContent();
+        return new TenantApiResource($tenant->refresh())->additional($links);
     }
 }

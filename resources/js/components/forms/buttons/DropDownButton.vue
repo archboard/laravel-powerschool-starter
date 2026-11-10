@@ -1,9 +1,11 @@
 <template>
   <Menu as="div" class="relative inline-block text-left z-10">
     <div>
-      <MenuButton class="focus:outline-none">
+      <MenuButton class="focus:outline-hidden">
         <AppButton :size="size" :color="color">
-          <slot />
+          <slot>
+            {{ __('Actions') }}
+          </slot>
           <component :is="icon || ChevronDownIcon" :class="[iconSize, '-mr-1 ml-2']" aria-hidden="true" />
         </AppButton>
       </MenuButton>
@@ -47,6 +49,7 @@ const props = defineProps({
   color: String,
 })
 const iconSizes = {
+  xs: 'h-4 w-4',
   sm: 'h-4 w-4',
   base: 'h-5 w-5',
 }

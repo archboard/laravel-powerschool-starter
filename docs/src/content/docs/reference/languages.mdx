@@ -1,0 +1,31 @@
+---
+title: Languages
+description: The six languages PowerSchool Starter's interface supports and right-to-left Arabic.
+sidebar:
+  order: 6
+---
+
+PowerSchool Starter uses one list of languages (`app/Enums/Language.php`) for the language each user reads the interface in.
+
+## Supported languages
+
+| Language | Code | Shown in the language menu as | Direction |
+| --- | --- | --- | --- |
+| English | `en` | English | Left to right |
+| Chinese (Mandarin) | `zh-CN` | 简体中文 | Left to right |
+| Japanese | `ja` | 日本語 | Left to right |
+| Korean | `ko` | 한국어 | Left to right |
+| Spanish | `es` | Español | Left to right |
+| Arabic | `ar` | العربية | Right to left |
+
+English is the source language and the default: new users start in English, and signed-out pages are in English. Every other language has a full translation file in `lang/<code>.json`. The Chinese translation is Simplified Chinese.
+
+## Interface language
+
+Each user picks their own interface language. It is stored on the user, not the school or district.
+
+- Change it from the **Language** menu in the sidebar (each language is listed by its native name), or from **Language** in **Personal settings**.
+- The page reloads in the new language.
+- Email notifications are sent in the recipient's language.
+- When Arabic is selected the whole interface switches to right-to-left layout.
+

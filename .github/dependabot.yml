@@ -1,0 +1,36 @@
+version: 2
+
+# Minor and patch bumps are grouped into one PR per ecosystem; majors get their own
+updates:
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      composer:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm:
+        update-types: [minor, patch]
+#    ignore:
+      # v7 stops publishing the plugin packages (daygrid, timegrid, etc. end at 6.x), so a bump needs a manual migration
+#      - dependency-name: '@fullcalendar/*'
+#        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly

@@ -2,20 +2,18 @@
 
 namespace App\Enums\Traits;
 
-use Illuminate\Support\Collection;
+use App\Enums\Contracts\HasCustomName;
 use Illuminate\Support\Str;
 
 trait HasOptions
 {
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     public static function options(): array
     {
         return array_reduce(
             static::cases(),
-            function (array $carry, $enum) {
-                $carry[$enum->value] = $enum->label();
+            function (array $carry, $sis) {
+                $carry[$sis->value] = $sis->label();
 
                 return $carry;
             },
@@ -23,18 +21,7 @@ trait HasOptions
         );
     }
 
-    /**
-     * @return Collection<int, self>
-     */
-    public static function collect(): Collection
-    {
-        /** @var Collection<int, self> */
-        return collect(static::cases());
-    }
-
-    /**
-     * @return array<int, array{label: string, value: mixed}>
-     */
+    /** @return array<int, array{label: string, value: string}> */
     public static function selectOptions(): array
     {
         return array_map(fn ($sis) => [
@@ -45,8 +32,14 @@ trait HasOptions
 
     public function label(): string
     {
+        if ($this instanceof HasCustomName) {
+            return $this->name();
+        }
+
         return Str::of($this->value)
-            ->replace(['-', '_'], ' ')
-            ->ucfirst();
+            ->replace(['_', '-'], '')
+            ->lower()
+            ->ucfirst()
+            ->toString();
     }
 }

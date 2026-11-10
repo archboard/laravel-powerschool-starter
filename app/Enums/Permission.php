@@ -2,6 +2,7 @@
 
 namespace App\Enums;
 
+use App\Enums\Traits\Collectable;
 use App\Enums\Traits\HasOptions;
 use App\Models\User;
 use Illuminate\Support\Collection;
@@ -9,6 +10,7 @@ use Illuminate\Support\Str;
 
 enum Permission: string
 {
+    use Collectable;
     use HasOptions;
 
     case everything = '*';
@@ -29,23 +31,24 @@ enum Permission: string
             self::create => __('Create'),
             self::update => __('Update'),
             self::delete => __('Delete'),
-            self::editTenantSettings => __('Edit tenant settings'),
-            self::editSchoolSettings => __('Edit school settings'),
             self::everything => __('Manages tenancy'),
             self::editPermissions => __('Edit user permissions'),
+            default => ucfirst($this->value),
         };
     }
 
     public function description(): ?string
     {
-        return match ($this) {
-            self::viewAny => (string) __('View resource listing'),
-            self::view => (string) __('View individual resource details'),
-            self::everything => (string) __('Gives the user full access to the entire tenancy with full permissions for everything.'),
-            self::editSchoolSettings => (string) __('Allows the user to edit all school settings.'),
-            self::editTenantSettings => (string) __('Allows the user to edit all tenant settings.'),
+        $description = match ($this) {
+            self::viewAny => __('View resource listing'),
+            self::view => __('View individual resource details'),
+            self::everything => __('Gives the user full access to the entire tenancy with full permissions for everything.'),
+            self::editSchoolSettings => __('Allows the user to edit all school settings.'),
+            self::editTenantSettings => __('Allows the user to edit all tenant settings.'),
             default => null,
         };
+
+        return is_string($description) ? $description : null;
     }
 
     public function key(): string
@@ -78,18 +81,14 @@ enum Permission: string
         };
     }
 
-    /**
-     * @return Collection<int, static>
-     */
+    /** @return Collection<int, self> */
     public static function getCrud(): Collection
     {
         return self::collect()
             ->filter(fn (Permission $permission) => $permission->isCrud());
     }
 
-    /**
-     * @return Collection<int, static>
-     */
+    /** @return Collection<int, self> */
     public static function getNonCrud(): Collection
     {
         return self::collect()
@@ -104,9 +103,7 @@ enum Permission: string
         };
     }
 
-    /**
-     * @return array{key: string, value: string, label: string, description: string|null, granted: bool}
-     */
+    /** @return array<string, mixed> */
     public function toEntry(User $user, ?string $className = null): array
     {
         return [

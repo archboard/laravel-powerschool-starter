@@ -1,21 +1,38 @@
-# Production stack. TLS terminates at your reverse proxy, which should route to app:8000.
+# Production stack. TLS terminates at your reverse proxy, which should route
+# `/` to app:8000 and `/app`, `/apps` to reverb:8080.
+# `docker compose pull` uses the published image; `docker compose build` builds from source.
 x-app: &app
-  image: ${COMPOSE_PROJECT_NAME:-app}
-  build: .
+  image: ghcr.io/archboard/laravel-powerschool-starter:${APP_VERSION:-latest}
+  build:
+    context: .
+    target: app
   restart: unless-stopped
   env_file: .env
   environment:
     OCTANE_SERVER: frankenphp
     LOG_CHANNEL: stderr
+    TRUSTED_PROXIES: '*'
     DB_HOST: postgres
     REDIS_HOST: redis
     CACHE_DRIVER: redis
     SESSION_DRIVER: redis
     QUEUE_CONNECTION: redis
+    REVERB_SERVER_HOST: 0.0.0.0
+    REVERB_SERVER_PORT: 8080
   depends_on:
     postgres:
       condition: service_healthy
     redis:
+      condition: service_healthy
+
+# Background services start once the app is healthy, i.e. after migrations have
+# run, and drop the image's FrankenPHP healthcheck since they don't serve HTTP
+x-worker: &worker
+  <<: *app
+  healthcheck:
+    disable: true
+  depends_on:
+    app:
       condition: service_healthy
 
 services:
@@ -31,12 +48,18 @@ services:
       retries: 3
       start_period: 30s
 
+  reverb:
+    <<: *worker
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    ports:
+      - "8080:8080"
+
   queue:
-    <<: *app
-    command: php artisan queue:work redis --tries=3 --max-time=3600
+    <<: *worker
+    command: php artisan queue:work redis --queue=default,sis_sync --tries=3 --max-time=3600
 
   scheduler:
-    <<: *app
+    <<: *worker
     command: php artisan schedule:work
 
   postgres:
@@ -47,7 +70,8 @@ services:
       POSTGRES_USER: ${DB_USERNAME:-laravel}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
     volumes:
-      - postgres:/var/lib/postgresql/data
+      # Postgres 18+ keeps data in /var/lib/postgresql/18/docker, so mount the parent
+      - postgres:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s

@@ -4,7 +4,7 @@
       class="relative w-full cursor-default"
     >
       <ComboboxInput
-        class="bg-white dark:bg-gray-900 shadow-sm block w-full rounded-lg text-sm focus:outline-none focus:ring-2"
+        class="pr-14 truncate bg-white dark:bg-gray-900 shadow-xs block w-full rounded-lg text-sm focus:outline-hidden focus:ring-2"
         :class="{
           'focus:ring-primary-500 focus:border-primary-500 border-gray-300 dark:border-gray-600': !hasError,
           'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500': hasError,
@@ -14,6 +14,11 @@
         :id="id"
         :placeholder="placeholder || __('Type for options…')"
       />
+
+      <button @click.prevent="localValue = null" v-if="!isEmpty(localValue)" type="button" class="absolute inset-y-0 right-8 flex items-center cursor-pointer">
+        <TrashIcon class="h-4 w-4 text-red-400" aria-hidden="true" />
+        <span class="sr-only">{{ __('Clear selection') }}</span>
+      </button>
 
       <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
         <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -30,8 +35,8 @@
       <ComboboxOptions
         :class="[
             menuColors.bg,
-            `absolute z-10 mt-1 top-10 max-h-60 w-full min-w-[16rem] overflow-auto rounded-md text-base ring-opacity-5 focus:outline-none sm:text-sm`,
-            !!query ? 'py-1 shadow-lg ring-1 ring-black' : ''
+            `absolute z-10 mt-1 top-10 max-h-60 w-full min-w-[16rem] overflow-auto rounded-md text-base focus:outline-hidden sm:text-sm`,
+            !!query ? 'py-1 shadow-lg ring-1 ring-black/5' : ''
           ]"
       >
         <div
@@ -86,9 +91,10 @@ import {
   ComboboxButton,
 } from '@headlessui/vue'
 import { useVModel } from '@vueuse/core'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/24/solid'
+import { CheckIcon, ChevronUpDownIcon, TrashIcon } from '@heroicons/vue/24/solid'
 import useMenuColors from '@/composition/useMenuColors.js'
 import Spinner from '@/components/Spinner.vue'
+import isEmpty from 'just-is-empty'
 
 const props = defineProps({
   modelValue: [Number, String, Object],

@@ -3,23 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\School;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class ToggleSelectionController extends Controller
 {
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request, School $school, string $model): Response|RedirectResponse|JsonResponse
+    public function __invoke(Request $request, School $school, string $model): JsonResponse|RedirectResponse
     {
+        /** @var User $user */
         $user = $request->user();
-
-        if (! $user) {
-            return back();
-        }
 
         if ($request->isMethod('delete')) {
             $user->deselectAllModel($model);

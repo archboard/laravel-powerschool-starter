@@ -3,38 +3,73 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
     branches: [main]
 
 jobs:
-  pint:
-    name: Pint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.5'
-          coverage: none
-      - run: composer install --no-interaction --no-progress --prefer-dist
-      - run: vendor/bin/pint --test
-
   phpstan:
     name: PHPStan
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
           extensions: intl, pdo, redis
           coverage: none
-      - run: composer install --no-interaction --no-progress --prefer-dist
-      - run: vendor/bin/phpstan analyse --memory-limit=512M
 
-  test:
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run PHPStan
+        run: ./vendor/bin/phpstan analyse --memory-limit=512M
+
+  pint:
+    name: Pint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run Pint
+        run: ./vendor/bin/pint --test
+
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+  pest:
     name: Pest
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:18
@@ -49,6 +84,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     env:
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
@@ -56,85 +92,201 @@ jobs:
       DB_DATABASE: laravel
       DB_USERNAME: laravel
       DB_PASSWORD: laravel
+      POWERSCHOOL_ADDRESS: https://powerschool.test
+      POWERSCHOOL_CLIENT_ID: 00000000-0000-0000-0000-000000000001
+      POWERSCHOOL_CLIENT_SECRET: 00000000-0000-0000-0000-000000000002
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
           extensions: intl, pdo, pdo_pgsql, redis
           coverage: none
-      - run: composer install --no-interaction --no-progress --prefer-dist
-      - uses: actions/setup-node@v4
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: cp .env.example .env
-      - run: php artisan key:generate
-      - run: npm run build
-      - run: vendor/bin/pest --parallel
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Copy environment file
+        run: cp .env.example .env
+
+      - name: Generate app key
+        run: php artisan key:generate
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Run Pest
+        run: ./vendor/bin/pest --parallel
+
       - name: Upload browser screenshots
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: browser-screenshots
           path: tests/Browser/Screenshots
           if-no-files-found: ignore
 
-  docker:
-    name: Docker
+  # Laravel Cloud builds from source, so this only triggers the deploy hooks. The hooks
+  # return once the deploy is queued, not when it finishes. Push to deploy must be off.
+  deploy:
+    name: Deploy
+    needs: [phpstan, pint, eslint, pest]
+    # Pull requests run this workflow too and must never deploy
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    # `if` can't read secrets directly, so each step checks its hook through env and skips when unset (e.g. on forks)
+    env:
+      PRODUCTION_DEPLOY_HOOK: ${{ secrets.LARAVEL_CLOUD_PRODUCTION_DEPLOY_HOOK }}
+
+    steps:
+      - name: Deploy to production
+        if: env.PRODUCTION_DEPLOY_HOOK != ''
+        run: curl --fail-with-body -X POST "$PRODUCTION_DEPLOY_HOOK?commit_hash=$GITHUB_SHA"
+
+  docker:
+    name: Docker (${{ matrix.arch }})
+    # Never publish an image that failed the checks
+    needs: [phpstan, pint, eslint, pest]
+    # Each arch builds natively on its own runner instead of under QEMU
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
       packages: write
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
       - name: Build image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
+          target: app
           push: false
           load: true
-          tags: app:ci
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: powerschool-starter:ci
+          cache-from: type=gha,scope=${{ matrix.arch }}
+          cache-to: type=gha,scope=${{ matrix.arch }},mode=max
+
       - name: Boot the image
         run: |
           docker run -d --name app -p 8000:8000 \
             -e APP_KEY=base64:$(openssl rand -base64 32) \
             -e DB_CONNECTION=sqlite -e DB_DATABASE=/tmp/ci.sqlite \
             -e CACHE_DRIVER=array -e SESSION_DRIVER=array -e QUEUE_CONNECTION=sync -e BROADCAST_CONNECTION=log \
-            app:ci
+            powerschool-starter:ci
           # The tenant finder queries `tenants` on every request, so /up needs a migrated database
           docker exec app php artisan migrate --force --no-interaction
           for i in $(seq 1 30); do curl -f http://localhost:8000/up && exit 0; sleep 2; done
           docker logs app
           exit 1
+
       - name: Log in to GHCR
         if: github.event_name == 'push'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Image tags
+
+      - name: Image labels
         if: github.event_name == 'push'
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+
+      # Pushed untagged; docker-manifest tags the combined multi-arch image
+      - name: Push image by digest
+        if: github.event_name == 'push'
+        id: push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: app
+          platforms: linux/${{ matrix.arch }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=${{ matrix.arch }}
+
+      - name: Save digest
+        if: github.event_name == 'push'
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.push.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - uses: actions/upload-artifact@v7
+        if: github.event_name == 'push'
+        with:
+          name: digest-${{ matrix.arch }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+
+  docker-manifest:
+    name: Docker manifest
+    needs: docker
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digest-*
+          merge-multiple: true
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image tags
+        id: meta
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=sha
             type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
-      - name: Push image
-        if: github.event_name == 'push'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
+            type=raw,value=stable,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+
+      - name: Push multi-arch manifest
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)

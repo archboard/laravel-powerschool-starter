@@ -20,9 +20,7 @@ use Silber\Bouncer\BouncerFacade;
 
 trait HasPermissions
 {
-    /**
-     * @return Attribute<array<string, mixed>, never>
-     */
+    /** @return Attribute<mixed, never> */
     public function permissions(): Attribute
     {
         return Attribute::get(
@@ -60,7 +58,7 @@ trait HasPermissions
     }
 
     /**
-     * @return array{permissions: array<int, array{key: string, granted: bool}>, schools: array<int, array{manages: bool, permissions: array<int, array{key: string, granted: bool}>, models: array<int, array{model: string, label: string, manages: bool, permissions: array<int, array{key: string, granted: bool}>}>}>}
+     * @return array{permissions: array<int, array<string, mixed>>, schools: array<int, array{manages: bool, permissions: array<int, array<string, mixed>>, models: array<int, array{model: string, label: string, manages: bool, permissions: array<int, array<string, mixed>>}>}>}
      */
     public function getPermissionMatrix(?User $authUser = null, ?School $school = null): array
     {
@@ -91,7 +89,7 @@ trait HasPermissions
     }
 
     /**
-     * @return array{manages: bool, permissions: array<int, array{key: string, granted: bool}>, models: array<int, array{model: string, label: string, manages: bool, permissions: array<int, array{key: string, granted: bool}>}>}
+     * @return array{manages: bool, permissions: array<int, array<string, mixed>>, models: array<int, array{model: string, label: string, manages: bool, permissions: array<int, array<string, mixed>>}>}
      */
     public function getScopedPermissionMatrix(School $school): array
     {
@@ -162,24 +160,17 @@ trait HasPermissions
         return $this;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public function permissionsToFrontend(School $school): array
     {
         $matrix = $this->getPermissionMatrix(school: $school);
-        /** @var array<int, array{key: string, granted: bool}> $permissionsArray */
-        $permissionsArray = $matrix['permissions'];
-        $abilities = collect($permissionsArray)
+        $schoolMatrix = $matrix['schools'][$school->id] ?? [];
+        $abilities = collect($matrix['permissions'])
             ->mapWithKeys(fn (array $permission) => [$permission['key'] => $permission['granted']]);
-        /** @var array<int, array{key: string, granted: bool}> $schoolPermissions */
-        $schoolPermissions = Arr::get($matrix, 'schools.'.$school->id.'.permissions', []);
-        $permissions = collect($schoolPermissions)
+        $permissions = collect($schoolMatrix['permissions'] ?? [])
             ->mapWithKeys(fn (array $permission) => [$permission['key'] => $permission['granted']]);
-        /** @var array<int, array{model: string, permissions: array<int, array{key: string, granted: bool}>}> $schoolModels */
-        $schoolModels = Arr::get($matrix, 'schools.'.$school->id.'.models', []);
-        $models = collect($schoolModels)
-            ->mapWithKeys(fn (array $model) => [
+        $models = collect($schoolMatrix['models'] ?? [])
+            ->mapWithKeys(fn ($model) => [
                 $model['model'] => collect($model['permissions'])
                     ->mapWithKeys(fn (array $permission) => [$permission['key'] => $permission['granted']]),
             ]);

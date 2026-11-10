@@ -2,23 +2,27 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "enums": "php artisan publish:enums-to-javascript",
     "build": "vite build",
     "dev": "vite",
     "lint": "eslint resources/js"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@headlessui-float/vue": "^0.15.1",
     "@headlessui/vue": "^1.7.23",
-    "@heroicons/vue": "^2.2.0",
-    "@inertiajs/vue3": "^3.7.0",
+    "@heroicons/vue": "^2.2",
+    "@inertiajs/vue3": "^3.8.0",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/vite": "^4.3.3",
-    "@vitejs/plugin-vue": "^6.0.8",
-    "@vueuse/core": "^14.4.0",
-    "autoprefixer": "^10.5.5",
+    "@vitejs/plugin-vue": "^6.0",
+    "@vueuse/core": "^15.0",
     "axios": "^1.20.0",
     "cross-env": "^10.1",
     "dayjs": "^1.11.23",
+    "eslint": "^10.14.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "globals": "^17.14.0",
     "just-clone": "^6.2.0",
     "just-is-empty": "^3.4.1",
     "just-omit": "^2.2.0",
@@ -27,21 +31,19 @@
     "just-safe-get": "^4.2.0",
     "just-throttle": "^4.2.0",
     "just-unique": "^4.2.0",
-    "laravel-vite-plugin": "^3.2.0",
-    "laravel-vue-i18n": "^2.8.0",
-    "nanoid": "^6.0.1",
+    "laravel-echo": "^2.5.0",
+    "laravel-vite-plugin": "^3.2",
+    "laravel-vue-i18n": "^2.9.0",
+    "nanoid": "^6.0.2",
     "nprogress": "^0.2.0",
-    "playwright": "^1.63.0",
-    "qs": "6.16.0",
+    "postcss": "^8.5.29",
+    "pusher-js": "^8.6.0",
+    "qs": "^6.16.0",
     "tailwindcss": "^4.3.3",
-    "v-calendar": "^3.0.1",
-    "vite": "^8.2.2",
-    "vue": "^3.5.42"
+    "vite": "^8.3.3",
+    "vue": "^3.5.43"
   },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.10.0",
-    "eslint-plugin-vue": "^10.11.0",
-    "globals": "^17.12.0"
+  "dependencies": {
+    "playwright": "^1.63.0"
   }
 }

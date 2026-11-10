@@ -1,45 +1,45 @@
 <?php
 
-use Symfony\Component\Process\Process;
-
-/*
-|--------------------------------------------------------------------------
-| Smoke Tests
-|--------------------------------------------------------------------------
-|
-| These tests spin up a dedicated artisan serve instance backed by the
-| saas_test PostgreSQL database and assert that pages render without any
-| JavaScript errors or unexpected console output.
-|
-| Run with: php artisan test --testsuite=Browser
-|
-*/
-
-$serverProcess = null;
-
-beforeAll(function () use (&$serverProcess) {
-    $root = dirname(__DIR__, 2);
-
-    // Wipe and rebuild the test database schema
-    Process::fromShellCommandline('php artisan migrate:fresh --force', $root)->mustRun();
-
-    // Start a dedicated test server. SESSION_DRIVER=cookie is set inline so it
-    // overrides the SESSION_DRIVER=array that phpunit injects into the environment,
-    // allowing Playwright's browser to maintain a real cookie-based session.
-    $serverProcess = Process::fromShellCommandline(
-        'SESSION_DRIVER=cookie php artisan serve --host=127.0.0.1 --port=8001',
-        $root,
-    );
-    $serverProcess->start();
-
-    // Allow the server a moment to bind to the port before tests run
-    usleep(1_000_000);
+beforeEach(function () {
+    $this->tenant->update(['allow_password_auth' => true]);
+    setSchool();
+    $this->withoutExceptionHandling();
 });
 
-afterAll(function () use (&$serverProcess) {
-    $serverProcess?->stop();
-});
-
-it('public pages load without js errors', function () {
+it('loads guest pages without smoke', function () {
     visit(['/login', '/forgot-password'])->assertNoSmoke();
+});
+
+it('loads authenticated pages without smoke', function () {
+    logIn();
+    fullPermissions();
+
+    visit([
+        '/',
+        '/activity',
+        '/courses',
+        '/sections',
+        '/select-school',
+        '/settings/personal/edit',
+        '/settings/school/edit',
+        '/settings/tenant/edit',
+        '/students',
+        '/users',
+    ])->assertNoSmoke();
+});
+
+it('loads record pages without smoke', function () {
+    logIn();
+    fullPermissions();
+    $section = seedSection();
+    $student = $section->students->first();
+    $teacher = $section->teacher;
+
+    visit([
+        "/courses/{$section->course_id}",
+        "/sections/{$section->id}",
+        "/students/{$student->id}",
+        "/users/{$teacher->id}",
+        "/users/{$teacher->id}/permissions",
+    ])->assertNoSmoke();
 });

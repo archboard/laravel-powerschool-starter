@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\ActivityEvent;
+use App\Enums\Role;
 use App\Enums\Sis;
 use App\SisProviders\SisProvider;
 use Carbon\CarbonImmutable;
@@ -10,20 +12,26 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Multitenancy\Models\Tenant as TenantBase;
 
 /**
  * @property int $id
  * @property string $name
- * @property Collection<string, mixed> $sis_config
- * @property string|null $domain
+ * @property string $code
+ * @property Collection<array-key, mixed> $sis_config
+ * @property string $domain
  * @property string|null $custom_domain
  * @property int $plugin_downloads
+ * @property int|null $school_limit
  * @property bool $allow_password_auth
  * @property bool $allow_oidc_login
  * @property string|null $subscription_started_at
@@ -31,7 +39,7 @@ use Spatie\Multitenancy\Models\Tenant as TenantBase;
  * @property string|null $license
  * @property string|null $timezone
  * @property Sis|null $sis_provider
- * @property Collection<string, mixed> $smtp_config
+ * @property Collection<array-key, mixed> $smtp_config
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Course> $courses
@@ -67,114 +75,152 @@ use Spatie\Multitenancy\Models\Tenant as TenantBase;
  * @method static Builder<static>|Tenant whereTimezone($value)
  * @method static Builder<static>|Tenant whereUpdatedAt($value)
  *
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
+ *
+ * @method static Builder<static>|Tenant wherePluginDownloads($value)
+ * @method static Builder<static>|Tenant whereSchoolLimit($value)
+ * @method static Builder<static>|Tenant whereCode($value)
+ *
  * @mixin \Eloquent
  */
-class Tenant extends TenantBase
+final class Tenant extends TenantBase
 {
     /** @use HasFactory<TenantFactory> */
     use HasFactory;
 
-    /**
-     * @var list<string>
-     */
+    use LogsActivity;
+
     protected $guarded = [];
 
+    protected static function booted(): void
+    {
+        self::creating(function (Tenant $tenant) {
+            $tenant->code ??= self::generateCode();
+        });
+    }
+
     /**
-     * @var array<string, string>
+     * A unique four character code districts enter on the root domain to find their login page.
      */
+    public static function generateCode(): string
+    {
+        do {
+            $code = Str::upper(Str::random(4));
+        } while (self::query()->where('code', $code)->exists());
+
+        return $code;
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logExcept(['updated_at', 'sis_config', 'smtp_config'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges()
+            ->setDescriptionForEvent(fn (string $event) => ActivityEvent::from($event)->description());
+    }
+
     protected $casts = [
         'sis_provider' => Sis::class,
         'sis_config' => 'encrypted:collection',
         'smtp_config' => 'encrypted:collection',
         'allow_password_auth' => 'boolean',
+        'school_limit' => 'integer',
     ];
 
-    protected static function booted(): void
+    /** @return Attribute<string, string> */
+    protected function domain(): Attribute
     {
-        static::created(function (Tenant $tenant) {
-            //
-        });
-    }
+        return Attribute::make(
+            get: function ($value): string {
+                $domain = $value ?? request()->host();
 
-    /**
-     * @return Attribute<string, never>
-     */
-    public function domain(): Attribute
-    {
-        return Attribute::get(fn ($value) => $value ?? request()->host());
-    }
-
-    /**
-     * @return Attribute<Collection<string, mixed>, never>
-     */
-    public function sisConfig(): Attribute
-    {
-        /** @var Attribute<Collection<string, mixed>, never> $attribute */
-        $attribute = Attribute::get(
-            fn ($value): Collection => $value ? $this->castAttribute('sis_config', $value) : collect()
+                return Str::of($domain)
+                    ->replaceStart('https://', '')
+                    ->replaceStart('http://', '')
+                    ->toString();
+            },
+            set: function ($value): string {
+                return Str::of($value ?? '')
+                    ->replaceStart('https://', '')
+                    ->replaceStart('http://', '')
+                    ->toString();
+            }
         );
-
-        return $attribute;
     }
 
-    /**
-     * @return Attribute<Collection<string, mixed>, never>
-     */
-    public function smtpConfig(): Attribute
+    /** @return Attribute<Collection<array-key, mixed>, Collection<array-key, mixed>|array<array-key, mixed>> */
+    protected function sisConfig(): Attribute
     {
-        /** @var Attribute<Collection<string, mixed>, never> $attribute */
-        $attribute = Attribute::get(function ($value): Collection {
-            return $value
-                ? $this->castAttribute('smtp_config', $value)
-                : collect([
-                    'host' => null,
-                    'port' => null,
-                    'username' => null,
-                    'password' => null,
-                    'from_name' => null,
-                    'from_address' => null,
-                    'encryption' => null,
-                ]);
-        });
-
-        return $attribute;
+        return Attribute::get(fn ($value) => $this->castSisConfig($value));
     }
 
-    /**
-     * @return HasMany<School, $this>
-     */
+    /** @return Collection<array-key, mixed> */
+    protected function castSisConfig(mixed $value): Collection
+    {
+        return $value ? $this->castAttribute('sis_config', $value) : collect();
+    }
+
+    /** @return Attribute<Collection<array-key, mixed>, Collection<array-key, mixed>|array<array-key, mixed>> */
+    protected function smtpConfig(): Attribute
+    {
+        return Attribute::get(fn ($value) => $this->castSmtpConfig($value));
+    }
+
+    /** @return Collection<array-key, mixed> */
+    protected function castSmtpConfig(mixed $value): Collection
+    {
+        return $value
+            ? $this->castAttribute('smtp_config', $value)
+            : collect([
+                'host' => null,
+                'port' => null,
+                'username' => null,
+                'password' => null,
+                'from_name' => null,
+                'from_address' => null,
+                'encryption' => null,
+            ]);
+    }
+
+    /** @return HasMany<School, $this> */
     public function schools(): HasMany
     {
         return $this->hasMany(School::class);
     }
 
     /**
-     * @return HasMany<User, $this>
+     * Makes exactly the given schools active and deactivates the rest.
+     *
+     * @param  array<int, int|string>  $schoolIds
      */
+    public function activateSchools(array $schoolIds): void
+    {
+        $this->schools()->whereIn('id', $schoolIds)->update(['active' => true]);
+        $this->schools()->whereNotIn('id', $schoolIds)->update(['active' => false]);
+    }
+
+    /** @return HasMany<User, $this> */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
 
-    /**
-     * @return HasMany<Student, $this>
-     */
+    /** @return HasMany<Student, $this> */
     public function students(): HasMany
     {
         return $this->hasMany(Student::class);
     }
 
-    /**
-     * @return HasMany<Course, $this>
-     */
+    /** @return HasMany<Course, $this> */
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class);
     }
 
-    /**
-     * @return HasMany<Section, $this>
-     */
+    /** @return HasMany<Section, $this> */
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class);
@@ -182,26 +228,71 @@ class Tenant extends TenantBase
 
     public static function fromRequest(Request $request): ?Tenant
     {
-        return static::getByHost($request->getHost());
+        return self::getByHost($request->host());
     }
 
     public static function fromRequestAndFallback(Request $request): Tenant
     {
-        return static::fromRequest($request) ?? new self([
-            'domain' => $request->getHost(),
+        return self::fromRequest($request) ?? new self([
+            'domain' => $request->host(),
             'sis_provider' => Sis::PS,
         ]);
     }
 
     public static function getByHost(string $host): ?Tenant
     {
-        return static::query()
+        return self::query()
             ->where('domain', $host)
             ->orWhere(function (Builder $builder) use ($host) {
                 $builder->whereNotNull('custom_domain')
                     ->where('custom_domain', $host);
             })
             ->first();
+    }
+
+    public function hasDistrictAdmin(): bool
+    {
+        return $this->users()->whereIs(Role::DISTRICT_ADMIN->value)->exists();
+    }
+
+    /**
+     * Signed links that let a new cloud district install the plugin and run the setup wizard.
+     * They're signed relative to the path so they only resolve on this tenant's domain.
+     *
+     * @return array{setup_url: string, plugin_url: string}
+     */
+    public function setupLinks(): array
+    {
+        $expiresAt = now()->addDays(14);
+        $link = fn (string $route): string => "https://{$this->domain}"
+            .URL::temporarySignedRoute($route, $expiresAt, ['tenant' => $this->id], absolute: false);
+
+        return [
+            'setup_url' => $link('setup'),
+            'plugin_url' => $link('setup.plugin'),
+        ];
+    }
+
+    /**
+     * Permanently deletes the district and everything it owns. Most tables cascade from the
+     * tenant's foreign key; the rest only reference the tenant or its users loosely.
+     */
+    public function purge(): void
+    {
+        DB::transaction(function () {
+            // ponytail: query builder, the models' global tenant/school scopes don't apply here
+            $userIds = DB::table('users')->where('tenant_id', $this->id)->select('id');
+
+            DB::table('sessions')->whereIn('user_id', $userIds)->delete();
+            DB::table('assigned_roles')->where('entity_type', 'user')->whereIn('entity_id', $userIds)->delete();
+            DB::table('permissions')->where('entity_type', 'user')->whereIn('entity_id', $userIds)->delete();
+            DB::table('activity_log')
+                ->where('tenant_id', $this->id)
+                ->orWhere(fn (QueryBuilder $query) => $query->where('subject_type', 'tenant')->where('subject_id', $this->id))
+                ->delete();
+
+            activity()->withoutLogging(fn () => $this->delete());
+        });
     }
 
     public function installed(): bool
@@ -232,17 +323,16 @@ class Tenant extends TenantBase
     {
         return Arr::get(
             $this->$configKey,
-            $key !== null ? (string) Str::replace("{$configKey}.", '', $key) : null,
+            $key === null ? null : Str::replace("{$configKey}.", '', $key),
             $defaultValue
         );
     }
 
     public function setConfigKey(string $configKey, ?string $key, mixed $value): static
     {
-        $normalizedKey = (string) Str::replace("{$configKey}.", '', $key ?? '');
         $this->$configKey = [
             ...$this->$configKey,
-            $normalizedKey => $value,
+            ($key === null ? '' : Str::replace("{$configKey}.", '', $key)) => $value,
         ];
 
         return $this;
@@ -255,31 +345,12 @@ class Tenant extends TenantBase
 
     public function getConfigFieldValue(string $configKey, ?string $key = null): mixed
     {
-        if (! $key && Str::contains($configKey, '.')) {
-            [$configKey, $key] = explode('.', $configKey);
+        if (is_string($key) && Str::contains($key, '.')) {
+            [$configKey, $key] = explode('.', $key);
 
             return $this->getConfigFieldValue($configKey, $key);
         }
 
         return $this->$configKey->get($key);
-    }
-
-    /**
-     * @return array<string, array<int, mixed>>
-     */
-    public function getInstallationRules(): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'domain' => ['required', Rule::unique('tenants', 'domain')->ignoreModel($this)],
-            ...(config('app.cloud') ? [
-                'custom_domain' => [
-                    'nullable',
-                    Rule::unique('tenants', 'domain')->ignoreModel($this),
-                    Rule::unique('tenants', 'custom_domain')->ignoreModel($this),
-                ],
-            ] : []),
-            ...$this->sis_provider?->getRules() ?? [],
-        ];
     }
 }

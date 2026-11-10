@@ -18,8 +18,8 @@ it('can be accessed with permission', function () {
     $this->get(route('settings.tenant.edit'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->has('title')
-            ->has('tenantSettings')
-            ->has('smtpSettings')
+            ->has('tenant')
+            ->has('smtp')
             ->has('schools')
         )
         ->assertOk();
@@ -46,13 +46,99 @@ it('can update smtp settings', function () {
     $this->assertEquals($data, $this->tenant->smtp_config->toArray());
 });
 
+it('lets cloud tenants keep the app-wide mailer without smtp settings', function () {
+    fullPermissions();
+    $this->asCloud();
+
+    $this->put(route('settings.tenant.smtp'), ['custom' => false])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('settings.tenant.edit'));
+
+    expect($this->tenant->refresh()->smtp_config->get('custom'))->toBeFalse();
+});
+
+it('requires smtp settings when a cloud tenant uses its own provider', function () {
+    fullPermissions();
+    $this->asCloud();
+
+    $this->put(route('settings.tenant.smtp'), ['custom' => true])
+        ->assertSessionHasErrors(['host', 'port', 'from_name', 'from_address']);
+});
+
+it('shows the licensed school count in the cloud', function () {
+    fullPermissions();
+    $this->asCloud();
+    $this->tenant->update(['school_limit' => 5]);
+
+    $this->get(route('settings.tenant.edit'))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('schoolLimit', 5));
+});
+
+it('activates the chosen schools within the limit in the cloud', function () {
+    fullPermissions();
+    $this->asCloud();
+    $this->tenant->update(['school_limit' => 1]);
+    [$chosen, $other] = $this->tenant->schools;
+
+    $this->put(route('settings.tenant.schools'), ['schools' => [$chosen->id]])
+        ->assertSessionHas('success');
+
+    expect($chosen->fresh()->active)->toBeTrue()
+        ->and($other->fresh()->active)->toBeFalse();
+});
+
+it('moves the current school to an accessible active school when it is deactivated', function () {
+    fullPermissions();
+    $this->asCloud();
+    $this->tenant->update(['school_limit' => 1]);
+    [$chosen, $deactivated] = $this->tenant->schools;
+    $this->user->schools()->sync([$chosen->id, $deactivated->id]);
+    $this->user->update(['school_id' => $deactivated->id]);
+
+    $this->put(route('settings.tenant.schools'), ['schools' => [$chosen->id]])
+        ->assertSessionHas('success');
+
+    expect($this->user->fresh()->school_id)->toBe($chosen->id);
+});
+
+it('keeps the current school when it stays active', function () {
+    fullPermissions();
+    [$current, $other] = $this->tenant->schools;
+    $this->user->schools()->sync([$current->id, $other->id]);
+    $this->user->update(['school_id' => $current->id]);
+
+    $this->put(route('settings.tenant.schools'), ['schools' => [$other->id, $current->id]])
+        ->assertSessionHas('success');
+
+    expect($this->user->fresh()->school_id)->toBe($current->id);
+});
+
+it('rejects activating more schools than the limit in the cloud', function () {
+    fullPermissions();
+    $this->asCloud();
+    $this->tenant->update(['school_limit' => 1]);
+    $this->tenant->schools()->update(['active' => false]);
+
+    $this->put(route('settings.tenant.schools'), ['schools' => $this->tenant->schools->pluck('id')->all()])
+        ->assertSessionHasErrors('schools');
+
+    expect($this->tenant->schools()->where('active', true)->exists())->toBeFalse();
+});
+
+it('rejects the unimplemented ClassLink provider', function () {
+    fullPermissions();
+
+    $this->put(route('settings.tenant.update'), ['sis_provider' => Sis::CLASS_LINK->value])
+        ->assertSessionHasErrors('sis_provider');
+});
+
 it('can update tenant settings', function () {
     fullPermissions();
 
     $data = [
         'name' => fake()->company(),
         'domain' => fake()->domainName(),
-        'sis_provider' => fake()->randomElement(Sis::cases())->value,
+        'sis_provider' => Sis::PS->value,
         'allow_password_auth' => fake()->boolean(),
         'allow_oidc_login' => fake()->boolean(),
     ];
